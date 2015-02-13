@@ -11,12 +11,12 @@ class Fat32Manager
 private:
 	static const size_t bootSectorSize = 512;
 
-	std::string _partitionPath;
-	char *_viewOfFile;
-	FatBS *_bootSector;
-	Fat32ExtBS *_fat32ExtBS;
+	std::string partitionPath;
+	char *viewOfFile;
+	FatBS bootSector;
+	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
-	bool fatInfoLoaded;
+	bool fatInfoLoaded, bootSectorLoaded;
 
 	//private methods
 private:
@@ -27,10 +27,10 @@ private:
 			createFileMappingHandle;
 		size_t fileSize;
 
-		if( _partitionPath == "" )
+		if( partitionPath == "" )
 			return false;
 
-		createFileHandle = CreateFile( std::wstring( _partitionPath.begin( ), _partitionPath.end( ) ).c_str( ),
+		createFileHandle = CreateFile( std::wstring( partitionPath.begin( ), partitionPath.end( ) ).c_str( ),
 									   GENERIC_READ | GENERIC_WRITE,
 									   NULL,
 									   NULL,
@@ -51,13 +51,13 @@ private:
 		if( createFileMappingHandle == NULL )
 			return false;
 
-		_viewOfFile = reinterpret_cast<char*>( MapViewOfFile( createFileMappingHandle,
+		viewOfFile = reinterpret_cast<char*>( MapViewOfFile( createFileMappingHandle,
 			FILE_MAP_ALL_ACCESS,
 			NULL,
 			NULL,
 			bootSectorSize ) );
 
-		if( _viewOfFile == nullptr )
+		if( viewOfFile == nullptr )
 			return false;
 
 		return true;
@@ -65,26 +65,28 @@ private:
 
 	bool loadBootSector()
 	{
-		if( _viewOfFile == nullptr )
+		if( viewOfFile == nullptr )
 		{
 			if( !createMapViewOfFile() )
 				return false;
 		}
 
-		_bootSector = reinterpret_cast<FatBS*>( _viewOfFile );
+		bootSector = *( reinterpret_cast<FatBS*>( viewOfFile ) );
+
+		bootSectorLoaded = true;
 
 		return true;
 	}
 
 	void loadFatInfo()
 	{
-		fatInfo.total_sectors = ( _bootSector->total_sectors_16 == 0 ) ? _bootSector->total_sectors_32 : _bootSector->total_sectors_16;
-		fatInfo.fat_size = ( _bootSector->table_size_16 == 0 ) ? _bootSector->total_sectors_32 : _bootSector->table_size_16;
-		fatInfo.root_dir_sectors = ( ( _bootSector->root_entry_count * 32 ) + ( _bootSector->bytes_per_sector - 1 ) ) / _bootSector->bytes_per_sector;
-		fatInfo.first_data_sector = _bootSector->reserved_sector_count + ( _bootSector->table_count * fatInfo.fat_size ) + fatInfo.root_dir_sectors;
-		fatInfo.first_fat_sector = _bootSector->reserved_sector_count;
-		fatInfo.data_sectors = fatInfo.total_sectors - ( _bootSector->reserved_sector_count + ( _bootSector->table_count * fatInfo.fat_size ) + fatInfo.root_dir_sectors );
-		fatInfo.total_clusters = fatInfo.data_sectors / _bootSector->sectors_per_cluster;
+		fatInfo.total_sectors = ( bootSector.total_sectors_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.total_sectors_16;
+		fatInfo.fat_size = ( bootSector.table_size_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.table_size_16;
+		fatInfo.root_dir_sectors = ( ( bootSector.root_entry_count * 32 ) + ( bootSector.bytes_per_sector - 1 ) ) / bootSector.bytes_per_sector;
+		fatInfo.first_data_sector = bootSector.reserved_sector_count + ( bootSector.table_count * fatInfo.fat_size ) + fatInfo.root_dir_sectors;
+		fatInfo.first_fat_sector = bootSector.reserved_sector_count;
+		fatInfo.data_sectors = fatInfo.total_sectors - ( bootSector.reserved_sector_count + ( bootSector.table_count * fatInfo.fat_size ) + fatInfo.root_dir_sectors );
+		fatInfo.total_clusters = fatInfo.data_sectors / bootSector.sectors_per_cluster;
 
 		fatInfoLoaded = true;
 	}
@@ -93,17 +95,18 @@ private:
 
 public:
 	Fat32Manager() :
-		_viewOfFile( nullptr ),
-		_bootSector( nullptr ),
+		viewOfFile( nullptr ),
 		fatInfoLoaded( false )
 	{}
 	Fat32Manager( const std::string &partitionPath ) :
-		_partitionPath( partitionPath ),
-		_viewOfFile( nullptr ),
-		_bootSector( nullptr ),
+		partitionPath( partitionPath ),
+		viewOfFile( nullptr ),
 		fatInfoLoaded( false )
 	{}
-	~Fat32Manager() {}
+	~Fat32Manager() 
+	{
+
+	}
 
 	EFatType getFatType( )
 	{
@@ -120,7 +123,7 @@ public:
 
 	bool isValidFat32( )
 	{
-		if( _bootSector == nullptr )
+		if( bootSectorLoaded == false )
 		{
 			if( !loadBootSector( ) )
 				return false;
