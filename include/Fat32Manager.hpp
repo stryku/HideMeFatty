@@ -9,6 +9,8 @@
 class Fat32Manager
 {
 private:
+	static const size_t bootSectorSize = 512;
+
 	std::string _partitionPath;
 	char *_viewOfFile;
 	FatBS *_bootSector;
@@ -53,7 +55,10 @@ private:
 			FILE_MAP_ALL_ACCESS,
 			NULL,
 			NULL,
-			NULL ) );
+			bootSectorSize ) );
+
+		if( _viewOfFile == nullptr )
+			return false;
 
 		return true;
 	}
@@ -84,19 +89,7 @@ private:
 		fatInfoLoaded = true;
 	}
 
-	bool isValidFat32()
-	{
-		if( _bootSector == nullptr )
-		{
-			if( !loadBootSector( ) )
-				return false;
-		}
-
-		if( fatInfoLoaded == false )
-			loadFatInfo();
-
-		return getFatType() == FAT32;
-	}
+	
 
 public:
 	Fat32Manager() :
@@ -105,7 +98,7 @@ public:
 		fatInfoLoaded( false )
 	{}
 	Fat32Manager( const std::string &partitionPath ) :
-		_partitionPath( _partitionPath ),
+		_partitionPath( partitionPath ),
 		_viewOfFile( nullptr ),
 		_bootSector( nullptr ),
 		fatInfoLoaded( false )
@@ -123,6 +116,20 @@ public:
 			else
 				return FAT32;
 		}
+	}
+
+	bool isValidFat32( )
+	{
+		if( _bootSector == nullptr )
+		{
+			if( !loadBootSector( ) )
+				return false;
+		}
+
+		if( fatInfoLoaded == false )
+			loadFatInfo( );
+
+		return getFatType( ) == FAT32;
 	}
 };
 

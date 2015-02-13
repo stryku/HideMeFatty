@@ -1,6 +1,9 @@
 #ifndef _INCLUDE_FATSTRUCTS_
 #define _INCLUDE_FATSTRUCTS_
 
+#pragma pack(push)
+#pragma pack(1)
+
 struct Fat32ExtBS
 {
 	//extended fat32 stuff
@@ -41,6 +44,8 @@ struct FatBS
 	unsigned char		extended_section[54];
 
 };
+
+#pragma pack(pop)
 
 struct FatInfo
 {
