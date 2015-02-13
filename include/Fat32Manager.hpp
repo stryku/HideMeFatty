@@ -58,7 +58,7 @@ private:
 		return true;
 	}
 
-	bool loadBootSectorPtr()
+	bool loadBootSector()
 	{
 		if( _viewOfFile == nullptr )
 		{
@@ -88,7 +88,7 @@ private:
 	{
 		if( _bootSector == nullptr )
 		{
-			if( !loadBootSectorPtr() )
+			if( !loadBootSector( ) )
 				return false;
 		}
 
