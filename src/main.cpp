@@ -9,7 +9,8 @@ int main()
 
 	if( fat32mngr.isValidFat32() )
 		cout << "ta\n";
-	else cout << "nie\n";
+	else 
+		cout << "nie\n";
 
 	fat32mngr.printFiles();
 

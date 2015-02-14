@@ -1,70 +1,24 @@
 #ifndef _INCLUDE_FAT32MANAGER_
 #define _INCLUDE_FAT32MANAGER_
 
-#include <Windows.h>
-#include <string>
 #include <memory>
 
 #include <FatStructs.h>
+#include <MappedFileManager.hpp>
 
 class Fat32Manager
 {
 private:
 	static const size_t bootSectorSize = 512;
-
-	std::string partitionPath;
-	HANDLE createFileHandle,
-		createFileMappingHandle;
-	char *viewOfFile;
+	
 	FatBS bootSector;
 	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
 	bool fatInfoLoaded, bootSectorLoaded;
-	SYSTEM_INFO systemInfo;
+	MappedFileManager mappedFileMngr;
 
 	//private methods
 private:
-
-	bool createMapViewOfFile( )
-	{
-		
-		size_t fileSize;
-
-		if( partitionPath == "" )
-			return false;
-
-		createFileHandle = CreateFile( std::wstring( partitionPath.begin( ), partitionPath.end( ) ).c_str( ),
-									   GENERIC_READ | GENERIC_WRITE,
-									   NULL,
-									   NULL,
-									   OPEN_EXISTING,
-									   FILE_ATTRIBUTE_NORMAL,
-									   NULL );
-
-		if( createFileHandle == INVALID_HANDLE_VALUE )
-			return false;
-
-		createFileMappingHandle = CreateFileMapping( createFileHandle,
-													 NULL,
-													 PAGE_READWRITE,
-													 NULL,
-													 NULL,
-													 NULL );
-
-		if( createFileMappingHandle == NULL )
-			return false;
-
-		viewOfFile = reinterpret_cast<char*>( MapViewOfFile( createFileMappingHandle,
-			FILE_MAP_ALL_ACCESS,
-			NULL,
-			NULL,
-			bootSectorSize ) );
-
-		if( viewOfFile == nullptr )
-			return false;
-
-		return true;
-	}
 
 	void loadFat32ExtBS()
 	{
@@ -73,23 +27,35 @@ private:
 
 	bool loadBootSector()
 	{
-		if( viewOfFile == nullptr )
-		{
-			if( !createMapViewOfFile() )
-				return false;
-		}
+		FatBS *mappedPtr;
 
-		bootSector = *( reinterpret_cast<FatBS*>( viewOfFile ) );
+		if( bootSectorLoaded )
+			return true;
+
+		if( !mappedFileMngr.good() )
+			return false;
+
+		mappedPtr = static_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
+
+		if( mappedPtr == nullptr )
+			return false;
+
+		bootSector = *mappedPtr;
 
 		loadFat32ExtBS();
 
 		bootSectorLoaded = true;
+
+		mappedFileMngr.unmap( mappedPtr );
 
 		return true;
 	}
 
 	void loadFatInfo()
 	{
+		if( fatInfoLoaded )
+			return;
+
 		fatInfo.total_sectors = ( bootSector.total_sectors_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.total_sectors_16;
 		fatInfo.fat_size = ( bootSector.table_size_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.table_size_16;
 		fatInfo.root_dir_sectors = ( ( bootSector.root_entry_count * 32 ) + ( bootSector.bytes_per_sector - 1 ) ) / bootSector.bytes_per_sector;
@@ -110,50 +76,29 @@ private:
 		return clusterNo * clusterSize();
 	}
 
-	inline size_t prepareOffsetForGranularity( size_t offset )
+	unsigned char* loadCluster( size_t clusterNo )
 	{
-		offset = offset / systemInfo.dwAllocationGranularity * systemInfo.dwAllocationGranularity;
-		return offset;
+		void *mappedPtr;
+		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
+										clusterSize() );
+		return static_cast<unsigned char*>( mappedPtr );
 	}
-
-	char* mapCluster( size_t clusterNo )
-	{
-		size_t clusterOffset, preparedOffset;
-		DWORD fileOffsetHigh, fileOffsetLow;
-		
-		clusterOffset = getClusterStartOffset( clusterNo );
-		preparedOffset = prepareOffsetForGranularity( clusterOffset );
-
-		fileOffsetHigh = preparedOffset >> 32; // high 32 bit
-		fileOffsetLow = preparedOffset & 0xffffffff; // low 32 bit
-
-		viewOfFile = reinterpret_cast<char*>( MapViewOfFile( createFileMappingHandle,
-			FILE_MAP_ALL_ACCESS,
-			fileOffsetHigh,
-			fileOffsetLow,
-			bootSectorSize ) );
-	}
-
+	
 public:
 	Fat32Manager() :
-		viewOfFile( nullptr ),
 		fatInfoLoaded( false ),
 		bootSectorLoaded( false )
-	{
-		GetSystemInfo( &systemInfo );
-	}
-	Fat32Manager( const std::string &partitionPath ) :
-		partitionPath( partitionPath ),
-		viewOfFile( nullptr ),
-		fatInfoLoaded( false ),
-		bootSectorLoaded( false )
-	{
-		GetSystemInfo( &systemInfo );
-	}
-	~Fat32Manager() 
-	{
+	{}
 
+	Fat32Manager( const std::string &partitionPath ) :
+		fatInfoLoaded( false ),
+		bootSectorLoaded( false )
+	{
+		mappedFileMngr.setPartitionPath( partitionPath );
+		mappedFileMngr.init();
 	}
+
+	~Fat32Manager() {}
 
 	EFatType getFatType( )
 	{
@@ -184,11 +129,12 @@ public:
 
 	void printFiles()
 	{
-		char *clusterPtr;
+		unsigned char *clusterPtr;
 		FatDirectoryEntry *dirEntry;
 
-		clusterPtr = readCluster( fat32ExtBS.root_cluster );
+		clusterPtr = loadCluster( fat32ExtBS.root_cluster );
 		dirEntry = reinterpret_cast<FatDirectoryEntry*>( clusterPtr );
+
 
 	}
 };
