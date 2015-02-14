@@ -130,10 +130,10 @@ public:
 	void printFiles()
 	{
 		unsigned char *clusterPtr;
-		FatDirectoryEntry *dirEntry;
+		/*FatDirectoryEntry *dirEntry;
 
 		clusterPtr = loadCluster( fat32ExtBS.root_cluster );
-		dirEntry = reinterpret_cast<FatDirectoryEntry*>( clusterPtr );
+		dirEntry = reinterpret_cast<FatDirectoryEntry*>( clusterPtr );*/
 
 
 	}

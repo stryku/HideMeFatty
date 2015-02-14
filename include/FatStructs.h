@@ -49,7 +49,9 @@ struct FatBS
 
 };
 
-struct FatDirectoryEntry
+
+
+struct FatRawDirectoryEntry
 {
 	char fileName[11];
 	unsigned char attributes;
@@ -65,7 +67,7 @@ struct FatDirectoryEntry
 	unsigned int fileSize;
 };
 
-struct FatLongFileName
+struct FatRawLongFileName
 {
 	unsigned char sequenceNumber : 4;
 	unsigned char finalNamePart : 4;
@@ -73,7 +75,7 @@ struct FatLongFileName
 	unsigned char attribute;
 	unsigned char longEntryType;
 	unsigned char checkSum;
-	char16_t nextChars[6];
+	char16_t middleChars[6];
 	unsigned short int alwaysZero;
 	char16_t finalChars[2];
 };
