@@ -1,3 +1,7 @@
+/*
+credits: http://wiki.osdev.org/FAT
+*/
+
 #ifndef _INCLUDE_FATSTRUCTS_
 #define _INCLUDE_FATSTRUCTS_
 
@@ -43,6 +47,35 @@ struct FatBS
 	//this will be cast to it's specific type once the driver actually knows what type of FAT this is.
 	unsigned char		extended_section[54];
 
+};
+
+struct FatDirectoryEntry
+{
+	char fileName[11];
+	unsigned char attributes;
+	unsigned char reserved;
+	unsigned char creationTenthSecond;
+	unsigned short int creationTime;
+	unsigned short int creationDate;
+	unsigned short int lastAccess;
+	unsigned short int highCluster;
+	unsigned short int lastModificationTime;
+	unsigned short int lastModoficationDate;
+	unsigned short int lowCluster;
+	unsigned int fileSize;
+};
+
+struct FatLongFileName
+{
+	unsigned char sequenceNumber : 4;
+	unsigned char finalNamePart : 4;
+	char16_t firtsChars[5];
+	unsigned char attribute;
+	unsigned char longEntryType;
+	unsigned char checkSum;
+	char16_t nextChars[6];
+	unsigned short int alwaysZero;
+	char16_t finalChars[2];
 };
 
 #pragma pack(pop)

@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <memory>
 
 #include <FatStructs.h>
 
@@ -12,19 +13,21 @@ private:
 	static const size_t bootSectorSize = 512;
 
 	std::string partitionPath;
+	HANDLE createFileHandle,
+		createFileMappingHandle;
 	char *viewOfFile;
 	FatBS bootSector;
 	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
 	bool fatInfoLoaded, bootSectorLoaded;
+	SYSTEM_INFO systemInfo;
 
 	//private methods
 private:
 
 	bool createMapViewOfFile( )
 	{
-		HANDLE createFileHandle,
-			createFileMappingHandle;
+		
 		size_t fileSize;
 
 		if( partitionPath == "" )
@@ -63,6 +66,11 @@ private:
 		return true;
 	}
 
+	void loadFat32ExtBS()
+	{
+		fat32ExtBS = *( reinterpret_cast<Fat32ExtBS*>( &bootSector.extended_section ) );
+	}
+
 	bool loadBootSector()
 	{
 		if( viewOfFile == nullptr )
@@ -72,6 +80,8 @@ private:
 		}
 
 		bootSector = *( reinterpret_cast<FatBS*>( viewOfFile ) );
+
+		loadFat32ExtBS();
 
 		bootSectorLoaded = true;
 
@@ -91,18 +101,55 @@ private:
 		fatInfoLoaded = true;
 	}
 
-	
+	inline size_t clusterSize()
+	{ 
+		return bootSector.bytes_per_sector * bootSector.sectors_per_cluster;
+	}
+	inline size_t getClusterStartOffset( size_t clusterNo )
+	{
+		return clusterNo * clusterSize();
+	}
+
+	inline size_t prepareOffsetForGranularity( size_t offset )
+	{
+		offset = offset / systemInfo.dwAllocationGranularity * systemInfo.dwAllocationGranularity;
+		return offset;
+	}
+
+	char* mapCluster( size_t clusterNo )
+	{
+		size_t clusterOffset, preparedOffset;
+		DWORD fileOffsetHigh, fileOffsetLow;
+		
+		clusterOffset = getClusterStartOffset( clusterNo );
+		preparedOffset = prepareOffsetForGranularity( clusterOffset );
+
+		fileOffsetHigh = preparedOffset >> 32; // high 32 bit
+		fileOffsetLow = preparedOffset & 0xffffffff; // low 32 bit
+
+		viewOfFile = reinterpret_cast<char*>( MapViewOfFile( createFileMappingHandle,
+			FILE_MAP_ALL_ACCESS,
+			fileOffsetHigh,
+			fileOffsetLow,
+			bootSectorSize ) );
+	}
 
 public:
 	Fat32Manager() :
 		viewOfFile( nullptr ),
-		fatInfoLoaded( false )
-	{}
+		fatInfoLoaded( false ),
+		bootSectorLoaded( false )
+	{
+		GetSystemInfo( &systemInfo );
+	}
 	Fat32Manager( const std::string &partitionPath ) :
 		partitionPath( partitionPath ),
 		viewOfFile( nullptr ),
-		fatInfoLoaded( false )
-	{}
+		fatInfoLoaded( false ),
+		bootSectorLoaded( false )
+	{
+		GetSystemInfo( &systemInfo );
+	}
 	~Fat32Manager() 
 	{
 
@@ -133,6 +180,16 @@ public:
 			loadFatInfo( );
 
 		return getFatType( ) == FAT32;
+	}
+
+	void printFiles()
+	{
+		char *clusterPtr;
+		FatDirectoryEntry *dirEntry;
+
+		clusterPtr = readCluster( fat32ExtBS.root_cluster );
+		dirEntry = reinterpret_cast<FatDirectoryEntry*>( clusterPtr );
+
 	}
 };
 

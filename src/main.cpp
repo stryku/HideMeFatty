@@ -11,5 +11,7 @@ int main()
 		cout << "ta\n";
 	else cout << "nie\n";
 
+	fat32mngr.printFiles();
+
 	return 0;
 }
