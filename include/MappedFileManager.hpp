@@ -40,14 +40,14 @@ private:
 													 NULL );
 	}
 
-	inline size_t getOffsetForGranularity( size_t offset ) const
+	inline uint64_t getOffsetForGranularity( uint64_t offset ) const
 	{
 		offset = offset / systemInfo.dwAllocationGranularity * systemInfo.dwAllocationGranularity;
 		return offset;
 	}
 
-	inline size_t getSizeForGranularity( const size_t offset, 
-										 const size_t preparedOffset, 
+	inline uint64_t getSizeForGranularity( const uint64_t offset,
+										   const uint64_t preparedOffset,
 										 size_t size ) const
 	{
 		size += offset - preparedOffset;
@@ -94,10 +94,10 @@ public:
 				createFileMappingHandle != NULL;
 	}
 
-	void* map( size_t startOffset, size_t sizeToMap )
+	void* map( uint64_t startOffset, size_t sizeToMap )
 	{
 		void *mappedPtr;
-		size_t preparedOffset, preparedSize;
+		uint64_t preparedOffset, preparedSize;
 		DWORD offsetHigh, offsetLow;
 
 		preparedOffset = getOffsetForGranularity( startOffset );
@@ -113,6 +113,11 @@ public:
 								   preparedSize );
 
 		mappedPointers.insert( mappedPtr );
+
+		if( mappedPtr == nullptr )
+			return nullptr;
+
+		mappedPtr = reinterpret_cast<char*>(mappedPtr)+( startOffset - preparedOffset );
 
 		return mappedPtr;
 	}

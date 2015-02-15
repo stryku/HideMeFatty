@@ -11,7 +11,7 @@
 class DirectoryEntry
 {
 private:
-	static const unsigned int DELETED_MAGIC = 0xE5;
+	static const unsigned char DELETED_MAGIC = 0xE5;
 
 	std::wstring name;
 	size_t fileSize;
@@ -79,6 +79,8 @@ private:
 
 			tempName += rawDirEntry.fileName[i];
 		}
+
+		return tempName;
 	}
 	inline Date extractDate( const unsigned short int time, const unsigned short int date ) const
 	{
@@ -107,6 +109,11 @@ private:
 
 public:
 	DirectoryEntry() {}
+	DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames, 
+					const FatRawDirectoryEntry &rawDirEntry )
+	{
+		assign( longFileNames, rawDirEntry );
+	}
 	~DirectoryEntry() {}
 
 	void assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry )

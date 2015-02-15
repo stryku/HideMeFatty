@@ -2,15 +2,19 @@
 #define _INCLUDE_FAT32MANAGER_
 
 #include <memory>
+#include <vector>
 
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
+#include <DirectoryEntry.hpp>
 
 class Fat32Manager
 {
 private:
 	static const size_t bootSectorSize = 512;
-	
+	static const unsigned char DELETED_MAGIC = 0xE5;
+	static const unsigned char LFN_ATTRIBUTE = 0x0F;
+
 	FatBS bootSector;
 	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
@@ -57,7 +61,7 @@ private:
 			return;
 
 		fatInfo.total_sectors = ( bootSector.total_sectors_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.total_sectors_16;
-		fatInfo.fat_size = ( bootSector.table_size_16 == 0 ) ? bootSector.total_sectors_32 : bootSector.table_size_16;
+		fatInfo.fat_size = ( bootSector.table_size_16 == 0 ) ? fat32ExtBS.table_size_32 : bootSector.table_size_16;
 		fatInfo.root_dir_sectors = ( ( bootSector.root_entry_count * 32 ) + ( bootSector.bytes_per_sector - 1 ) ) / bootSector.bytes_per_sector;
 		fatInfo.first_data_sector = bootSector.reserved_sector_count + ( bootSector.table_count * fatInfo.fat_size ) + fatInfo.root_dir_sectors;
 		fatInfo.first_fat_sector = bootSector.reserved_sector_count;
@@ -67,23 +71,74 @@ private:
 		fatInfoLoaded = true;
 	}
 
-	inline size_t clusterSize()
+	void* loadCluster( size_t clusterNo )
+	{
+		void *mappedPtr;
+
+		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
+										clusterSize() );
+		return mappedPtr;
+	}
+
+	inline size_t clusterSize() const
 	{ 
 		return bootSector.bytes_per_sector * bootSector.sectors_per_cluster;
 	}
-	inline size_t getClusterStartOffset( size_t clusterNo )
+	inline size_t getClusterFirstSectorNo( size_t clusterNo ) const
 	{
-		return clusterNo * clusterSize();
+		return ( clusterNo - 2 ) * bootSector.reserved_sector_count + fatInfo.first_data_sector;
+	}
+	inline uint64_t getClusterStartOffset( size_t clusterNo ) const
+	{
+		//return clusterNo * clusterSize();
+		return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 	}
 
-	unsigned char* loadCluster( size_t clusterNo )
+	std::vector<FatRawLongFileName> extractLongFileNames( void *&ptrInCluster ) const
 	{
-		void *mappedPtr;
-		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
-										clusterSize() );
-		return static_cast<unsigned char*>( mappedPtr );
+		FatRawLongFileName *longFileNamePtr;
+		char *charPtr;
+		std::vector<FatRawLongFileName> ret;
+
+		longFileNamePtr = static_cast<FatRawLongFileName*>( ptrInCluster );
+		charPtr = static_cast<char*>( ptrInCluster );
+		
+		if( *charPtr == 0 || *charPtr == DELETED_MAGIC )
+			return ret;
+
+		for( ; longFileNamePtr->attribute == LFN_ATTRIBUTE; ++longFileNamePtr )
+			ret.push_back( *longFileNamePtr );
+
+		ptrInCluster = longFileNamePtr;
 	}
 	
+	std::vector<DirectoryEntry> getFilesFromDirCluster( size_t dirCluster )
+	{
+		std::vector<DirectoryEntry> dirEntries;
+		FatRawDirectoryEntry tempRawDirEntry;
+		std::vector<FatRawLongFileName> tempRawLongFileNames;
+		void *mappedClusterPtr;
+
+		mappedClusterPtr = loadCluster( dirCluster );
+
+		if( mappedClusterPtr == nullptr )
+			return dirEntries;
+
+		while( true )
+		{
+			tempRawLongFileNames = extractLongFileNames( mappedClusterPtr );
+
+			if( *( static_cast<char*>( mappedClusterPtr ) ) == 0 )
+				break;
+
+			tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( mappedClusterPtr ) );
+
+			dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
+		}
+
+		return dirEntries;
+	}
+
 public:
 	Fat32Manager() :
 		fatInfoLoaded( false ),
@@ -129,13 +184,12 @@ public:
 
 	void printFiles()
 	{
-		unsigned char *clusterPtr;
-		/*FatDirectoryEntry *dirEntry;
+		std::vector<DirectoryEntry> dirEntries;
 
-		clusterPtr = loadCluster( fat32ExtBS.root_cluster );
-		dirEntry = reinterpret_cast<FatDirectoryEntry*>( clusterPtr );*/
+		dirEntries = getFilesFromDirCluster( fat32ExtBS.root_cluster );
 
-
+		for( auto &i : dirEntries )
+			i.print( std::wcout );
 	}
 };
 
