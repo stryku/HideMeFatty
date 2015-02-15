@@ -70,7 +70,7 @@ struct FatRawDirectoryEntry
 struct FatRawLongFileName
 {
 	unsigned char sequenceNumber : 4;
-	unsigned char finalNamePart : 4;
+	unsigned char isFinalNamePart : 4;
 	char16_t firtsChars[5];
 	unsigned char attribute;
 	unsigned char longEntryType;

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
@@ -109,7 +110,16 @@ private:
 		for( ; longFileNamePtr->attribute == LFN_ATTRIBUTE; ++longFileNamePtr )
 			ret.push_back( *longFileNamePtr );
 
+		std::sort( ret.begin(), 
+				   ret.end(),
+				   []( const FatRawLongFileName &a, const FatRawLongFileName &b )
+		{
+			return a.sequenceNumber < b.sequenceNumber;
+		} );
+
 		ptrInCluster = longFileNamePtr;
+
+		return ret;
 	}
 	
 	std::vector<DirectoryEntry> getFilesFromDirCluster( size_t dirCluster )
@@ -134,6 +144,8 @@ private:
 			tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( mappedClusterPtr ) );
 
 			dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
+
+			mappedClusterPtr = reinterpret_cast<char*>(mappedClusterPtr) + sizeof( FatRawDirectoryEntry );
 		}
 
 		return dirEntries;

@@ -12,6 +12,7 @@ class DirectoryEntry
 {
 private:
 	static const unsigned char DELETED_MAGIC = 0xE5;
+	static const char END_OF_NAME = 0x20;
 
 	std::wstring name;
 	size_t fileSize;
@@ -36,49 +37,66 @@ private:
 
 		for( size_t i = 0; i < 6; ++i )
 		{
-			if( longFileName.firtsChars[i] == '\0' )
+			if( longFileName.middleChars[i] == '\0' )
 				return namePart;
 
-			namePart += longFileName.firtsChars[i];
+			namePart += longFileName.middleChars[i];
 		}
 
 		for( size_t i = 0; i < 2; ++i )
 		{
-			if( longFileName.firtsChars[i] == '\0' )
+			if( longFileName.finalChars[i] == '\0' )
 				return namePart;
 
-			namePart += longFileName.firtsChars[i];
+			namePart += longFileName.finalChars[i];
 		}
 
 		return namePart;
 	}
 
-	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry ) const
+	inline std::wstring extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
 	{
-		std::wstring tempName;
-
-		for( size_t i = 0; i < 8; ++i )
-		{
-			if( rawDirEntry.fileName[i] == '\0' )
-				break;
-
-			tempName += rawDirEntry.fileName[i];
-		}
-
-		for( const auto &i : longFileNames )
-		{
-			tempName += getPartOfName( i );
-		}
-
-		tempName += '.';
+		std::wstring tempExtension;
 
 		for( size_t i = 8; i < 11; ++i )
 		{
-			if( rawDirEntry.fileName[i] == '\0' )
+			if( rawDirEntry.fileName[i] == END_OF_NAME )
 				break;
 
-			tempName += rawDirEntry.fileName[i];
+			tempExtension += rawDirEntry.fileName[i];
 		}
+
+		return tempExtension;
+	}
+
+	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry ) const
+	{
+		std::wstring tempName, tempExtension;
+
+		if( longFileNames.size() == 0 )
+		{
+			for( size_t i = 0; i < 8; ++i )
+			{
+				if( rawDirEntry.fileName[i] == END_OF_NAME )
+					break;
+
+				tempName += rawDirEntry.fileName[i];
+			}
+
+			tempExtension = extractExtension( rawDirEntry );
+
+			if( tempExtension.length() != 0 )
+			{
+				tempName += '.';
+				tempName += tempExtension;
+			}
+		}
+		else
+		{
+			for( const auto &i : longFileNames )
+				tempName += getPartOfName( i );
+		}
+
 
 		return tempName;
 	}
