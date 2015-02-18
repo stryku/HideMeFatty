@@ -37,10 +37,10 @@ private:
 		if( bootSectorLoaded )
 			return true;
 
-		if( !mappedFileMngr.good() )
-			return false;
+		/*if( !mappedFileMngr.is_() )
+			return false;*/
 
-		mappedPtr = static_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
+		mappedPtr = reinterpret_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
 
 		if( mappedPtr == nullptr )
 			return false;
@@ -162,7 +162,6 @@ public:
 		bootSectorLoaded( false )
 	{
 		mappedFileMngr.setPartitionPath( partitionPath );
-		mappedFileMngr.init();
 	}
 
 	~Fat32Manager() {}
