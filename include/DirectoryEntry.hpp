@@ -68,29 +68,35 @@ private:
 
 		return tempExtension;
 	}
-
-	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry ) const
+	inline std::wstring extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
 	{
 		std::wstring tempName, tempExtension;
 
-		if( longFileNames.size() == 0 )
+		for( size_t i = 0; i < 8; ++i )
 		{
-			for( size_t i = 0; i < 8; ++i )
-			{
-				if( rawDirEntry.fileName[i] == END_OF_NAME )
-					break;
+			if( rawDirEntry.fileName[i] == END_OF_NAME )
+				break;
 
-				tempName += rawDirEntry.fileName[i];
-			}
-
-			tempExtension = extractExtension( rawDirEntry );
-
-			if( tempExtension.length() != 0 )
-			{
-				tempName += '.';
-				tempName += tempExtension;
-			}
+			tempName += rawDirEntry.fileName[i];
 		}
+
+		tempExtension = extractExtension( rawDirEntry );
+
+		if( tempExtension.length( ) != 0 )
+		{
+			tempName += '.';
+			tempName += tempExtension;
+		}
+
+		return tempName;
+	}
+	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames, 
+									 const FatRawDirectoryEntry &rawDirEntry ) const
+	{
+		std::wstring tempName;
+
+		if( longFileNames.size() == 0 )
+			tempName = extractShortName( rawDirEntry );
 		else
 		{
 			for( const auto &i : longFileNames )

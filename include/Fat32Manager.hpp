@@ -122,7 +122,7 @@ private:
 		return ret;
 	}
 	
-	std::vector<DirectoryEntry> getFilesFromDirCluster( size_t dirCluster )
+	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster )
 	{
 		std::vector<DirectoryEntry> dirEntries;
 		FatRawDirectoryEntry tempRawDirEntry;
@@ -198,7 +198,7 @@ public:
 	{
 		std::vector<DirectoryEntry> dirEntries;
 
-		dirEntries = getFilesFromDirCluster( fat32ExtBS.root_cluster );
+		dirEntries = getDirEntriesFromDirCluster( fat32ExtBS.root_cluster );
 
 		for( auto &i : dirEntries )
 			i.print( std::wcout );
