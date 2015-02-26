@@ -19,8 +19,10 @@ private:
 	FatBS bootSector;
 	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
-	bool fatInfoLoaded, bootSectorLoaded;
+	bool fatInfoLoaded, bootSectorLoaded, fatTableLoaded, initOk;
 	MappedFileManager mappedFileMngr;
+	std::vector<unsigned int> fatTable;
+	
 
 	//private methods
 private:
@@ -51,7 +53,7 @@ private:
 
 		bootSectorLoaded = true;
 
-		mappedFileMngr.unmap( mappedPtr );
+		mappedFileMngr.unmap();
 
 		return true;
 	}
@@ -72,9 +74,39 @@ private:
 		fatInfoLoaded = true;
 	}
 
-	void* loadCluster( size_t clusterNo )
+	bool loadFatTable()
 	{
-		void *mappedPtr;
+		char *mappedPtr;
+		size_t fatTableSize;
+
+		if( bootSectorLoaded == false )
+			return false;
+
+		if( fatTableLoaded )
+			return true;
+
+		fatTableSize = fatInfo.fat_size * bootSector.bytes_per_sector;
+
+		mappedPtr = mappedFileMngr.map( fatInfo.first_fat_sector,
+										fatTableSize );
+
+		if( mappedPtr == nullptr )
+			return false;
+
+		fatTable.resize( fatTableSize );
+
+		std::copy( mappedPtr,
+				   mappedPtr + fatInfo.fat_size * bootSector.bytes_per_sector,
+				   fatTable.begin() );
+
+		fatTableLoaded = true;
+
+		return true;
+	}
+
+	char* loadCluster( size_t clusterNo )
+	{
+		char *mappedPtr;
 
 		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
 										clusterSize() );
@@ -151,17 +183,53 @@ private:
 		return dirEntries;
 	}
 
+	DirectoryEntry findNextFile( size_t firstFolderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
+	{
+		std::vector<DirectoryEntry> dirEntries;
+		auto it = dirEntries.begin();
+
+		dirEntries = getDirEntriesFromDirCluster( firstFolderCluster );
+
+		if( prevFile.type() != BAD_DIR_ENTRY )
+			for( ; it->getName() == prevFile.getName(); ++it );
+
+		for( ; it != dirEntries.end(); ++it )
+		{
+			if( it->type( ) == ARCHIVE )
+				return *it;
+		}
+
+		return DirectoryEntry();
+	}
+
+	bool init()
+	{
+		if( loadBootSector() == false )
+			return false;
+
+		loadFatInfo( );
+
+		if( loadFatTable() == false )
+			return false;
+
+		return true;
+	}
+
 public:
 	Fat32Manager() :
 		fatInfoLoaded( false ),
-		bootSectorLoaded( false )
+		bootSectorLoaded( false ),
+		fatTableLoaded( false ),
+		initOk( false )
 	{}
 
 	Fat32Manager( const std::string &partitionPath ) :
 		fatInfoLoaded( false ),
-		bootSectorLoaded( false )
+		bootSectorLoaded( false ),
+		fatTableLoaded( false )
 	{
 		mappedFileMngr.setPartitionPath( partitionPath );
+		initOk = init();
 	}
 
 	~Fat32Manager() {}
@@ -181,14 +249,8 @@ public:
 
 	bool isValidFat32( )
 	{
-		if( bootSectorLoaded == false )
-		{
-			if( !loadBootSector( ) )
-				return false;
-		}
-
-		if( fatInfoLoaded == false )
-			loadFatInfo( );
+		if( !initOk )
+			return false;
 
 		return getFatType( ) == FAT32;
 	}
@@ -197,11 +259,24 @@ public:
 	{
 		std::vector<DirectoryEntry> dirEntries;
 
+		if( !initOk )
+			return;
+
 		dirEntries = getDirEntriesFromDirCluster( fat32ExtBS.root_cluster );
 
 		for( auto &i : dirEntries )
 			i.print( std::wcout );
 	}
+
+	/*bool hideFile( const std::string &filePath )
+	{
+		DirectoryEntry actualFile;
+
+		if( !initOk )
+			return;
+
+		actualFile = findNextFile( fat32ExtBS.root_cluster );
+	}*/
 };
 
 #endif

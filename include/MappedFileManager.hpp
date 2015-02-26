@@ -80,7 +80,7 @@ public:
 		return mappedPtr;
 	}
 
-	void unmap( void *ptr )
+	void unmap()
 	{
 		mappedFile.close();
 	}

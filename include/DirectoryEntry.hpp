@@ -21,7 +21,6 @@ private:
 	Date creationDate, lastModificationDate;
 	bool deleted;
 
-
 private:
 	inline std::wstring getPartOfName( const FatRawLongFileName &longFileName ) const
 	{
@@ -132,9 +131,12 @@ private:
 	}
 
 public:
-	DirectoryEntry() {}
+	DirectoryEntry() :
+		attributes( BAD_DIR_ENTRY )
+	{}
 	DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames, 
-					const FatRawDirectoryEntry &rawDirEntry )
+					const FatRawDirectoryEntry &rawDirEntry ) :
+		attributes( BAD_DIR_ENTRY )
 	{
 		assign( longFileNames, rawDirEntry );
 	}
@@ -159,6 +161,17 @@ public:
 		ostream << "Cluster: " << cluster << "\n";
 		ostream << "Attributes: 0x" << std::hex << attributes << "\n\n";
 	}
+
+	EDirEntryType type() const
+	{
+		return static_cast<EDirEntryType>( attributes );
+	}
+
+	std::wstring getName() const
+	{
+		return name;
+	}
+	
 };
 
 #endif
