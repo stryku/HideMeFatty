@@ -28,10 +28,4 @@ struct ClusterInfo
 	freeBytesOffset;
 };
 
-struct HiddedFileChainLink
-{
-	size_t nextClusterNo,
-	offsetInNextCluster;
-};
-
 #endif

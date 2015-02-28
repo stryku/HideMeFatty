@@ -10,6 +10,22 @@ namespace fs = boost::filesystem;
 
 class FileHidder
 {
+public:
+	struct HiddenChunkMetadata
+	{
+		size_t nextClusterNo, offsetInNextCluster;
+
+		HiddenChunkMetadata() :
+			nextClusterNo( magicEndOfChain )
+		{}
+		HiddenChunkMetadata( const size_t _nextClusterNo,
+							 const size_t _offsetInNextCluster ) :
+							 nextClusterNo( _nextClusterNo ),
+							 offsetInNextCluster( _offsetInNextCluster )
+		{}
+						
+	};
+
 private:
 	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
 	Fat32Manager fatManager;
@@ -20,13 +36,14 @@ public:
 
 	bool hideFile( const std::string &filePath, const std::string &partitionPath )
 	{
-		const int badFileMagic = -1;
+		const size_t metadataSize = sizeof( HiddenChunkMetadata );
 
 		std::vector<ClusterInfo> clustersWithFreeBytes;
 		uintmax_t fileSize,
 			copiedBytes = 0;
 		MappedFileManager mappedFileMngr;
 		char *mappedPtr;
+		HiddenChunkMetadata hiddenChunkMetadata;
 
 		fatManager.setPartitionPath( partitionPath );
 
@@ -35,7 +52,7 @@ public:
 		if( fileSize == static_cast<uintmax_t>( -1 ) )
 			return false;
 
-		clustersWithFreeBytes = fatManager.getClustersWithFreeBytes( fileSize );
+		clustersWithFreeBytes = fatManager.getClustersWithFreeBytes( fileSize, metadataSize );
 
 		if( clustersWithFreeBytes.size() == 0 )
 			return false;
@@ -53,23 +70,26 @@ public:
 
 		for( auto it = clustersWithFreeBytes.begin(); it != clustersWithFreeBytes.end(); ++it )
 		{
-			size_t bytesToCopy = it->freeBytes - sizeof( size_t ),
-				nextClusterNo;
+			size_t bytesToCopy = it->freeBytes - metadataSize;
 			auto nextCluster = it + 1;
+
+			if( nextCluster == clustersWithFreeBytes.end() )
+				hiddenChunkMetadata.nextClusterNo = magicEndOfChain;
+			else
+			{
+				hiddenChunkMetadata.nextClusterNo = nextCluster->clusterNo;
+				hiddenChunkMetadata.offsetInNextCluster = nextCluster->freeBytesOffset;
+			}
 
 			fatManager.writeToCluster( it->clusterNo,
 									   it->freeBytesOffset,
+									   metadataSize,
+									   reinterpret_cast<char*>  ( &hiddenChunkMetadata ) );
+
+			fatManager.writeToCluster( it->clusterNo,
+									   it->freeBytesOffset + metadataSize,
 									   bytesToCopy,
 									   mappedPtr + copiedBytes );
-
-			if( nextCluster == clustersWithFreeBytes.end() )
-				nextClusterNo = magicEndOfChain;
-			else
-				nextClusterNo = nextCluster->clusterNo;
-
-			fatManager.writeToEndOfCluster( it->clusterNo,
-											sizeof( size_t ),
-											reinterpret_cast<char*>( &nextClusterNo ) );
 
 			copiedBytes += bytesToCopy;
 		}

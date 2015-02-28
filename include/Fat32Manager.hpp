@@ -315,9 +315,10 @@ public:
 			i.print( std::wcout );
 	}
 
-	std::vector<ClusterInfo> getClustersWithFreeBytes( uintmax_t freeBytesNeeded )
+	std::vector<ClusterInfo> getClustersWithFreeBytes( const uintmax_t freeBytesNeeded, 
+													   const size_t metadataSize )
 	{
-		const size_t acceptatbleFreeBytes = 10 + sizeof( size_t );
+		const size_t acceptatbleFreeBytes = 10 + metadataSize; // instead of 10 you can write any sensible number of bytes
 
 		std::vector<ClusterInfo> clusters;
 		uintmax_t leftBytesToFind;
@@ -339,7 +340,7 @@ public:
 			if( freeBytes >= acceptatbleFreeBytes )
 			{
 				clusters.push_back( getFileLastClusterInfo( tempDirEntry ) );
-				leftBytesToFind -= ( freeBytes - sizeof( HiddedFileChainLink ) );
+				leftBytesToFind -= freeBytes - metadataSize;
 			}
 		}
 
