@@ -183,12 +183,12 @@ private:
 		return dirEntries;
 	}
 
-	DirectoryEntry findNextFile( size_t firstFolderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
+	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
 	{
 		std::vector<DirectoryEntry> dirEntries;
 		auto it = dirEntries.begin();
 
-		dirEntries = getDirEntriesFromDirCluster( firstFolderCluster );
+		dirEntries = getDirEntriesFromDirCluster( folderCluster );
 
 		if( prevFile.type() != BAD_DIR_ENTRY )
 			for( ; it->getName() == prevFile.getName(); ++it );
@@ -215,6 +215,47 @@ private:
 		return true;
 	}
 
+	void clear()
+	{
+		fatInfoLoaded = false;
+		bootSectorLoaded = false;
+		fatTableLoaded = false;
+		initOk = false;
+	}
+
+	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const
+	{
+		return clusterSize() - ( fileDirEntry.getFileSize() % clusterSize() );
+	}
+
+	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const
+	{
+		const size_t lastClusterMagic = 0x0FFFFFF8;
+
+		size_t actualClusterNo;
+
+		actualClusterNo = fileDirEntry.getCluster();
+
+		while( true )
+		{
+			if( fatTable[actualClusterNo] >= lastClusterMagic )
+				return actualClusterNo;
+
+			actualClusterNo = fatTable[actualClusterNo];
+		}
+	}
+
+	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry )
+	{
+		ClusterInfo ret;
+
+		ret.freeBytes = getFreeSpaceAfterFile( fileDirEntry );
+		ret.freeBytesOffset = fileDirEntry.getFileSize() % clusterSize();
+		ret.clusterNo = getFileLastClusterNo( fileDirEntry );
+
+		return ret;
+	}
+
 public:
 	Fat32Manager() :
 		fatInfoLoaded( false ),
@@ -228,11 +269,17 @@ public:
 		bootSectorLoaded( false ),
 		fatTableLoaded( false )
 	{
-		mappedFileMngr.setPartitionPath( partitionPath );
+		mappedFileMngr.setFilePath( partitionPath );
 		initOk = init();
 	}
 
 	~Fat32Manager() {}
+
+	void setPartitionPath( const std::string &partitionPath )
+	{
+		mappedFileMngr.setFilePath( partitionPath );
+		initOk = init();
+	}
 
 	EFatType getFatType( )
 	{
@@ -268,15 +315,56 @@ public:
 			i.print( std::wcout );
 	}
 
-	/*bool hideFile( const std::string &filePath )
+	std::vector<ClusterInfo> getClustersWithFreeBytes( uintmax_t freeBytesNeeded )
 	{
-		DirectoryEntry actualFile;
+		const size_t acceptatbleFreeBytes = 10 + sizeof( size_t );
 
-		if( !initOk )
-			return;
+		std::vector<ClusterInfo> clusters;
+		uintmax_t leftBytesToFind;
+		DirectoryEntry tempDirEntry;
 
-		actualFile = findNextFile( fat32ExtBS.root_cluster );
-	}*/
+		leftBytesToFind = freeBytesNeeded;
+
+		while( leftBytesToFind > 0 )
+		{
+			size_t freeBytes;
+
+			tempDirEntry = findNextFile( fat32ExtBS.root_cluster, tempDirEntry );
+
+			if( tempDirEntry.type() == BAD_DIR_ENTRY )
+				return std::vector<ClusterInfo>();
+
+			freeBytes = getFreeSpaceAfterFile( tempDirEntry );
+			
+			if( freeBytes >= acceptatbleFreeBytes )
+			{
+				clusters.push_back( getFileLastClusterInfo( tempDirEntry ) );
+				leftBytesToFind -= ( freeBytes - sizeof( HiddedFileChainLink ) );
+			}
+		}
+
+		return clusters;
+	}
+
+	void writeToCluster( const size_t clusterNo, 
+						 const size_t offset, 
+						 const size_t dataSize, 
+						 const char *data )
+	{
+		char *clusterPtr = loadCluster( clusterNo );
+
+		std::copy( data, data + dataSize, clusterPtr + offset );
+	}
+
+	void writeToEndOfCluster( const size_t clusterNo,
+							  const size_t dataSize,
+							  const char *data )
+	{
+		writeToCluster( clusterNo,
+						clusterSize() - dataSize,
+						dataSize,
+						data );
+	}
 };
 
 #endif

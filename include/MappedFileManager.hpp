@@ -19,7 +19,7 @@ typedef boost::iostreams::mapped_file MappedFile;
 class MappedFileManager
 {
 private:
-	std::string partitionPath;
+	std::string filePath;
 	size_t allocationGranularity;
 	MappedFile mappedFile;
 
@@ -51,12 +51,12 @@ public:
 		mappedFile.close();
 	}
 
-	void setPartitionPath( const std::string &pathToPartition )
+	void setFilePath( const std::string &pathToFile )
 	{
-		partitionPath = pathToPartition;
+		filePath = pathToFile;
 	}
 
-	char* map( uint64_t startOffset, size_t sizeToMap )
+	char* map( uint64_t startOffset = 0, size_t sizeToMap = 0 )
 	{
 		char *mappedPtr;
 		uint64_t preparedOffset, preparedSize;
@@ -64,7 +64,7 @@ public:
 		preparedOffset = getOffsetForGranularity( startOffset );
 		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap );
 
-		mappedFile.open( partitionPath,
+		mappedFile.open( filePath,
 							 std::ios_base::in | std::ios_base::out,
 							 preparedSize,
 							 preparedOffset );

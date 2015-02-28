@@ -172,6 +172,15 @@ public:
 		return name;
 	}
 	
+	uint64_t getFileSize() const
+	{
+		return fileSize;
+	}
+
+	size_t getCluster() const
+	{
+		return cluster;
+	}
 };
 
 #endif
