@@ -53,8 +53,6 @@ private:
 
 		bootSectorLoaded = true;
 
-		mappedFileMngr.unmap();
-
 		return true;
 	}
 

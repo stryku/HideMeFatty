@@ -73,7 +73,7 @@ private:
 		preparedOffset = getOffsetForMapGranularity( preparedOffset );
 		preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
 
-		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset ) )
+		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
 
 			mappedFile.open( filePath,
 			std::ios_base::in | std::ios_base::out,
@@ -88,6 +88,7 @@ private:
 
 		mappedChunkInfo.begin = preparedOffset;
 		mappedChunkInfo.end = preparedOffset + preparedSize;
+		mappedChunkInfo.mapped = true;
 	}
 
 public:
@@ -116,6 +117,7 @@ public:
 	{
 		char *mappedPtr;
 		uint64_t preparedOffset, preparedSize;
+		//uintptr_t preparedPtr;
 
 		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
 			remapChunk( startOffset, sizeToMap );
@@ -123,16 +125,17 @@ public:
 		if( mappedFile.is_open( ) == false )
 			return nullptr;
 
-		mappedPtr = mappedFile.data( );
+		mappedPtr = mappedFile.data( ) + startOffset;
 
-		mappedPtr = mappedPtr+( startOffset - preparedOffset );
+		//preparedPtr = reinterpret_cast<uintptr_t>( mappedPtr ) % allocationGranularity;
+		//mappedPtr = reinterpret_cast<char*>( preparedPtr );
 
 		return mappedPtr;
 	}
 
 	void unmap()
 	{
-		mappedFile.close();
+		//mappedFile.close();
 	}
 };
 
