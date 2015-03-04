@@ -39,9 +39,6 @@ private:
 		if( bootSectorLoaded )
 			return true;
 
-		/*if( !mappedFileMngr.is_() )
-			return false;*/
-
 		mappedPtr = reinterpret_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
 
 		if( mappedPtr == nullptr )
@@ -121,7 +118,6 @@ private:
 	}
 	inline uint64_t getClusterStartOffset( size_t clusterNo ) const
 	{
-		//return clusterNo * clusterSize();
 		return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 	}
 

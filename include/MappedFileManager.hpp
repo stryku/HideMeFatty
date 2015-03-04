@@ -117,7 +117,6 @@ public:
 	{
 		char *mappedPtr;
 		uint64_t preparedOffset, preparedSize;
-		//uintptr_t preparedPtr;
 
 		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
 			remapChunk( startOffset, sizeToMap );
@@ -127,15 +126,8 @@ public:
 
 		mappedPtr = mappedFile.data( ) + startOffset;
 
-		//preparedPtr = reinterpret_cast<uintptr_t>( mappedPtr ) % allocationGranularity;
-		//mappedPtr = reinterpret_cast<char*>( preparedPtr );
 
 		return mappedPtr;
-	}
-
-	void unmap()
-	{
-		//mappedFile.close();
 	}
 };
 
