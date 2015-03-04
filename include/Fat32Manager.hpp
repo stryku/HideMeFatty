@@ -103,6 +103,8 @@ private:
 	{
 		char *mappedPtr;
 
+		uintmax_t clusterStart = getClusterStartOffset( clusterNo );
+
 		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
 										clusterSize() );
 		return mappedPtr;
@@ -114,7 +116,7 @@ private:
 	}
 	inline size_t getClusterFirstSectorNo( size_t clusterNo ) const
 	{
-		return ( clusterNo - 2 ) * bootSector.reserved_sector_count + fatInfo.first_data_sector;
+		return ( clusterNo - 2 ) * bootSector.sectors_per_cluster + fatInfo.first_data_sector;
 	}
 	inline uint64_t getClusterStartOffset( size_t clusterNo ) const
 	{
@@ -180,9 +182,11 @@ private:
 	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
 	{
 		std::vector<DirectoryEntry> dirEntries;
-		auto it = dirEntries.begin();
 
 		dirEntries = getDirEntriesFromDirCluster( folderCluster );
+
+		auto it = dirEntries.begin( );
+
 
 		if( prevFile.type() != BAD_DIR_ENTRY )
 			for( ; it->getName() == prevFile.getName(); ++it );
@@ -315,7 +319,7 @@ public:
 		const size_t acceptatbleFreeBytes = 10 + metadataSize; // instead of 10 you can write any sensible number of bytes
 
 		std::vector<ClusterInfo> clusters;
-		uintmax_t leftBytesToFind;
+		intmax_t leftBytesToFind;
 		DirectoryEntry tempDirEntry;
 
 		leftBytesToFind = freeBytesNeeded;
@@ -359,6 +363,11 @@ public:
 						clusterSize() - dataSize,
 						dataSize,
 						data );
+	}
+
+	void close()
+	{
+		mappedFileMngr.close();
 	}
 };
 

@@ -1,15 +1,6 @@
 #ifndef _INCLUDE_MAPPEDFILEMANAGER_
 #define _INCLUDE_MAPPEDFILEMANAGER_
 
-#ifdef _WIN32
-	#include <Windows.h>
-#endif //#ifdef _WIN32
-
-#ifdef linux
-	#include <unistd.h>
-#endif //#ifdef linux
-
-
 #include <string>
 #include <set>
 #include <boost\iostreams\device\mapped_file.hpp>
@@ -128,6 +119,11 @@ public:
 
 
 		return mappedPtr;
+	}
+
+	void close()
+	{
+		mappedFile.close();
 	}
 };
 
