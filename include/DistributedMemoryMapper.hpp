@@ -37,19 +37,18 @@ public:
 		totalSize += size;
 	}
 
-	char& operator[]( const size_t no )
+	char& operator[]( size_t no )
 	{
 		size_t size = 0;
 
-		if( no >= totalSize )
-			return 'a';
+		
 
-		for( const &chunk : chunks )
+		for( const auto &chunk : chunks )
 		{
-			size += chunk.size;
+			if( no < chunk.size )
+				return chunk.ptr[no];
 
-			if( no < size )
-				return chunk.ptr[no%size];
+			no -= chunk.size;
 		}
 	}
 };
