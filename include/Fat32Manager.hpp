@@ -39,9 +39,6 @@ private:
 		if( bootSectorLoaded )
 			return true;
 
-		/*if( !mappedFileMngr.is_() )
-			return false;*/
-
 		mappedPtr = reinterpret_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
 
 		if( mappedPtr == nullptr )
@@ -52,8 +49,6 @@ private:
 		loadFat32ExtBS();
 
 		bootSectorLoaded = true;
-
-		mappedFileMngr.unmap();
 
 		return true;
 	}
@@ -108,6 +103,8 @@ private:
 	{
 		char *mappedPtr;
 
+		uintmax_t clusterStart = getClusterStartOffset( clusterNo );
+
 		mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
 										clusterSize() );
 		return mappedPtr;
@@ -119,11 +116,10 @@ private:
 	}
 	inline size_t getClusterFirstSectorNo( size_t clusterNo ) const
 	{
-		return ( clusterNo - 2 ) * bootSector.reserved_sector_count + fatInfo.first_data_sector;
+		return ( clusterNo - 2 ) * bootSector.sectors_per_cluster + fatInfo.first_data_sector;
 	}
 	inline uint64_t getClusterStartOffset( size_t clusterNo ) const
 	{
-		//return clusterNo * clusterSize();
 		return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 	}
 
@@ -183,12 +179,33 @@ private:
 		return dirEntries;
 	}
 
-	DirectoryEntry findNextFile( size_t firstFolderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
+	std::vector<std::wstring> getPathFoldersNames( const std::wstring &path ) const
+	{
+		std::vector<std::wstring> folders;
+		size_t posBegin = 0, posEnd;
+
+		while( ( posEnd = path.find( '/', posBegin ) ) != std::wstring::npos )
+		{
+			folders.push_back( path.substr( posBegin, posEnd ) );
+			posBegin = posEnd;
+		}
+
+		return folders;
+	}
+
+	std::wstring getPathFileName( const std::wstring &path ) const
+	{
+		return path.substr( path.find_last_of( '/' ) );
+	}
+
+	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
 	{
 		std::vector<DirectoryEntry> dirEntries;
-		auto it = dirEntries.begin();
 
-		dirEntries = getDirEntriesFromDirCluster( firstFolderCluster );
+		dirEntries = getDirEntriesFromDirCluster( folderCluster );
+
+		auto it = dirEntries.begin( );
+
 
 		if( prevFile.type() != BAD_DIR_ENTRY )
 			for( ; it->getName() == prevFile.getName(); ++it );
@@ -202,6 +219,22 @@ private:
 		return DirectoryEntry();
 	}
 
+	DirectoryEntry findDirEntryInFolder( const std::wstring &searchedDirEntryName, const size_t folderCluster )
+	{
+		DirectoryEntry currentDirEntry;
+
+		do
+		{
+			if( currentDirEntry.getName( ) == searchedDirEntryName )
+				return currentDirEntry;
+
+			currentDirEntry = findNextFile( folderCluster, currentDirEntry );
+
+		} while( currentDirEntry.type( ) != BAD_DIR_ENTRY );
+
+		return currentDirEntry;
+	}
+
 	bool init()
 	{
 		if( loadBootSector() == false )
@@ -210,6 +243,72 @@ private:
 		loadFatInfo( );
 
 		if( loadFatTable() == false )
+			return false;
+
+		return true;
+	}
+
+	void clear()
+	{
+		fatInfoLoaded = false;
+		bootSectorLoaded = false;
+		fatTableLoaded = false;
+		initOk = false;
+	}
+
+	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const
+	{
+		return clusterSize() - ( fileDirEntry.getFileSize() % clusterSize() );
+	}
+
+	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const
+	{
+		const size_t lastClusterMagic = 0x0FFFFFF8;
+
+		size_t actualClusterNo;
+
+		actualClusterNo = fileDirEntry.getCluster();
+
+		while( true )
+		{
+			if( fatTable[actualClusterNo] >= lastClusterMagic )
+				return actualClusterNo;
+
+			actualClusterNo = fatTable[actualClusterNo];
+		}
+	}
+
+	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry )
+	{
+		ClusterInfo ret;
+
+		ret.freeBytes = getFreeSpaceAfterFile( fileDirEntry );
+		ret.freeBytesOffset = fileDirEntry.getFileSize() % clusterSize();
+		ret.clusterNo = getFileLastClusterNo( fileDirEntry );
+
+		return ret;
+	}
+
+	bool isPathCorrect( const std::wstring &path )
+	{
+		std::vector<std::wstring> foldersNames;
+		std::wstring fileName;
+		DirectoryEntry currentFolder;
+
+		foldersNames = getPathFoldersNames( path );
+		fileName = getPathFileName( path );
+
+		currentFolder.setCluster( fat32ExtBS.root_cluster );
+
+		for( const auto &folderName : foldersNames )
+		{
+			currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+
+			if( currentFolder.type = BAD_DIR_ENTRY )
+				return false;
+		}
+
+		if( findDirEntryInFolder( fileName, currentFolder.getCluster() ).type() == BAD_DIR_ENTRY )
 			return false;
 
 		return true;
@@ -228,11 +327,17 @@ public:
 		bootSectorLoaded( false ),
 		fatTableLoaded( false )
 	{
-		mappedFileMngr.setPartitionPath( partitionPath );
+		mappedFileMngr.setFilePath( partitionPath );
 		initOk = init();
 	}
 
 	~Fat32Manager() {}
+
+	void setPartitionPath( const std::string &partitionPath )
+	{
+		mappedFileMngr.setFilePath( partitionPath );
+		initOk = init();
+	}
 
 	EFatType getFatType( )
 	{
@@ -268,15 +373,62 @@ public:
 			i.print( std::wcout );
 	}
 
-	/*bool hideFile( const std::string &filePath )
+	std::vector<ClusterInfo> getClustersWithFreeBytes( const uintmax_t freeBytesNeeded, 
+													   const size_t metadataSize )
 	{
-		DirectoryEntry actualFile;
+		const size_t acceptatbleFreeBytes = 10 + metadataSize; // instead of 10 you can write any sensible number of bytes
 
-		if( !initOk )
-			return;
+		std::vector<ClusterInfo> clusters;
+		intmax_t leftBytesToFind;
+		DirectoryEntry tempDirEntry;
 
-		actualFile = findNextFile( fat32ExtBS.root_cluster );
-	}*/
+		leftBytesToFind = freeBytesNeeded;
+
+		while( leftBytesToFind > 0 )
+		{
+			size_t freeBytes;
+
+			tempDirEntry = findNextFile( fat32ExtBS.root_cluster, tempDirEntry );
+
+			if( tempDirEntry.type() == BAD_DIR_ENTRY )
+				return std::vector<ClusterInfo>();
+
+			freeBytes = getFreeSpaceAfterFile( tempDirEntry );
+			
+			if( freeBytes >= acceptatbleFreeBytes )
+			{
+				clusters.push_back( getFileLastClusterInfo( tempDirEntry ) );
+				leftBytesToFind -= freeBytes - metadataSize;
+			}
+		}
+
+		return clusters;
+	}
+
+	void writeToCluster( const size_t clusterNo, 
+						 const size_t offset, 
+						 const size_t dataSize, 
+						 const char *data )
+	{
+		char *clusterPtr = loadCluster( clusterNo );
+
+		std::copy( data, data + dataSize, clusterPtr + offset );
+	}
+
+	void writeToEndOfCluster( const size_t clusterNo,
+							  const size_t dataSize,
+							  const char *data )
+	{
+		writeToCluster( clusterNo,
+						clusterSize() - dataSize,
+						dataSize,
+						data );
+	}
+
+	void close()
+	{
+		mappedFileMngr.close();
+	}
 };
 
 #endif
