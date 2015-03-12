@@ -21,4 +21,11 @@ struct Date
 	~Date() {}
 };
 
+struct ClusterInfo
+{
+	size_t clusterNo,
+	freeBytes,
+	freeBytesOffset;
+};
+
 #endif

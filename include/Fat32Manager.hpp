@@ -304,7 +304,7 @@ private:
 		{
 			currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
 
-			if( currentFolder.type = BAD_DIR_ENTRY )
+			if( currentFolder.type() == BAD_DIR_ENTRY )
 				return false;
 		}
 
@@ -313,7 +313,6 @@ private:
 
 		return true;
 	}
-
 public:
 	Fat32Manager() :
 		fatInfoLoaded( false ),
@@ -415,15 +414,8 @@ public:
 		std::copy( data, data + dataSize, clusterPtr + offset );
 	}
 
-	void writeToEndOfCluster( const size_t clusterNo,
-							  const size_t dataSize,
-							  const char *data )
-	{
-		writeToCluster( clusterNo,
-						clusterSize() - dataSize,
-						dataSize,
-						data );
-	}
+
+
 
 	void close()
 	{
