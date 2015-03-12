@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
@@ -179,7 +180,41 @@ private:
 		return dirEntries;
 	}
 
-	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevFile = DirectoryEntry() )
+	std::vector<std::wstring> getPathFoldersNames( const std::wstring &path ) const
+	{
+		std::vector<std::wstring> folders;
+		size_t posBegin = 0, posEnd, numberToCopy;
+
+		while( ( posEnd = path.find( '/', posBegin ) ) != std::wstring::npos )
+		{
+			numberToCopy = posEnd - posBegin;
+			folders.push_back( path.substr( posBegin, numberToCopy ) );
+			posBegin = posEnd+1;
+		}
+
+		return folders;
+	}
+
+	std::wstring getPathFileName( const std::wstring &path ) const
+	{
+		size_t pos = path.find_last_of( '/' );
+
+		pos = ( pos == std::wstring::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
+
+		return path.substr( pos );
+	}
+
+	std::wstring removeExtension( const std::wstring& filename )
+	{
+		size_t lastdot = filename.find_last_of( '.' );
+
+		if( lastdot == std::string::npos ) 
+			return filename;
+
+		return filename.substr( 0, lastdot );
+	}
+
+	DirectoryEntry findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() )
 	{
 		std::vector<DirectoryEntry> dirEntries;
 
@@ -187,17 +222,42 @@ private:
 
 		auto it = dirEntries.begin( );
 
+		if( prevDirEntry.type() != BAD_DIR_ENTRY )
+			it = std::find( dirEntries.begin( ), dirEntries.end( ), prevDirEntry ) + 1;
 
-		if( prevFile.type() != BAD_DIR_ENTRY )
-			for( ; it->getName() == prevFile.getName(); ++it );
-
-		for( ; it != dirEntries.end(); ++it )
-		{
-			if( it->type( ) == ARCHIVE )
-				return *it;
-		}
+		if( it == dirEntries.end() )
+			return DirectoryEntry();
+		else
+			return *it;
 
 		return DirectoryEntry();
+	}
+
+	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() )
+	{
+		return DirectoryEntry();
+	}
+
+	DirectoryEntry findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster )
+	{
+		DirectoryEntry currentDirEntry;
+		std::wstring rawName;
+
+		rawName = removeExtension( searchedDirEntryName );
+
+		if( rawName.length() <= 8 )
+			boost::to_upper( searchedDirEntryName );
+
+		do
+		{
+			if( currentDirEntry.getName( ) == searchedDirEntryName )
+				return currentDirEntry;
+
+			currentDirEntry = findNextDirEntry( folderCluster, currentDirEntry );
+
+		} while( currentDirEntry.type( ) != BAD_DIR_ENTRY );
+
+		return currentDirEntry;
 	}
 
 	bool init()
@@ -254,6 +314,7 @@ private:
 		return ret;
 	}
 
+	
 public:
 	Fat32Manager() :
 		fatInfoLoaded( false ),
@@ -355,20 +416,40 @@ public:
 		std::copy( data, data + dataSize, clusterPtr + offset );
 	}
 
-	void writeToEndOfCluster( const size_t clusterNo,
-							  const size_t dataSize,
-							  const char *data )
-	{
-		writeToCluster( clusterNo,
-						clusterSize() - dataSize,
-						dataSize,
-						data );
-	}
+
+
 
 	void close()
 	{
 		mappedFileMngr.close();
 	}
+
+	bool isPathCorrect( const std::wstring &path )
+	{
+		std::vector<std::wstring> foldersNames;
+		std::wstring fileName;
+		DirectoryEntry currentFolder;
+
+		foldersNames = getPathFoldersNames( path );
+		fileName = getPathFileName( path );
+
+		currentFolder.setCluster( fat32ExtBS.root_cluster );
+
+		for( const auto &folderName : foldersNames )
+		{
+			currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+
+			if( currentFolder.type( ) == BAD_DIR_ENTRY )
+				return false;
+		}
+
+		if( fileName.length() > 0 &&
+			findDirEntryInFolder( fileName, currentFolder.getCluster() ).type() == BAD_DIR_ENTRY )
+			return false;
+
+		return true;
+	}
+
 };
 
 #endif

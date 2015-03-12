@@ -19,6 +19,16 @@ struct Date
 		year( 0 )
 	{}
 	~Date() {}
+
+	bool operator==( const Date &d ) const
+	{
+		return d.second == second &&
+				d.minute == minute &&
+				d.hour == hour &&
+				d.day == day &&
+				d.month == month &&
+				d.year == year;
+	}
 };
 
 struct ClusterInfo

@@ -109,7 +109,7 @@ enum EDirEntryType
 	DIRECTORY = 0x10,
 	ARCHIVE = 0x20,
 	LFN = READ_ONLY | HIDDEN | SYSTEM | VOLUME_ID,
-	BAD_DIR_ENTRY
+	BAD_DIR_ENTRY = 0
 };
 
 #endif

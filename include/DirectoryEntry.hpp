@@ -181,6 +181,21 @@ public:
 	{
 		return cluster;
 	}
+
+	void setCluster( size_t cluster )
+	{
+		this->cluster = cluster;
+	}
+
+	bool operator==( const DirectoryEntry &de ) const
+	{
+		return	de.name == name &&
+				de.fileSize == fileSize &&
+				de.attributes == attributes &&
+				de.cluster == cluster &&
+				de.creationDate == creationDate &&
+				de.lastModificationDate == lastModificationDate;
+	}
 };
 
 #endif
