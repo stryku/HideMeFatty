@@ -2,6 +2,7 @@
 
 #include <FileHidder.hpp>
 #include <Fat32Manager.hpp>
+#include <DistributedMemoryMapper.hpp>
 
 using namespace std;
 
@@ -30,21 +31,21 @@ struct Test
 
 int main()
 {
-	Fat32Manager fat( "fat32example" );
-	Test tests[] =
-	{
-		Test( std::string( "katalog_1/katalog_1_1/" ), std::string( "true" ) ),
-		Test( std::string( "katalog_1/katalog_1_1" ), std::string( "true" ) ),
-		Test( std::string( "katalog_1/katalog_1_1/plik_1_2.txt" ), std::string( "false" ) ),
-		Test( std::string( "katalog_1/katalog_1_1/plik_1_3.txt" ), std::string( "false" ) ),
-		Test( std::string( "katalog_1/katalog_1_1/plik_1_4.txt" ), std::string( "false" ) ),
-		Test( std::string( "katalog_1/katalog_1_1/bad/plik_1_4.txt" ), std::string( "false" ) ),
-	};
+	char tab[100];
 
-	for( auto &i : tests )
-	{
-		i.print( wcout, fat.isPathCorrect( i.path ) );
-	}
+	DistributedMemoryMapper dmm;
+
+	for( int i = 0; i < 100; ++i )
+		tab[i] = 'a';
+
+	dmm.addMemoryChunk( tab, 2 );
+	dmm.addMemoryChunk( tab + 4, 2 );
+	dmm.addMemoryChunk( tab + 8, 2 );
+	dmm.addMemoryChunk( tab + 12, 2 );
+
+	char c = 'b';
+	for( int i = 0; i < 8; ++i, ++c )
+		dmm[i] = c;
 
 	return 0;
 }
