@@ -11,15 +11,8 @@ private:
 		char *ptr;
 		size_t size;
 
-		ChunkMetadata() :
-			ptr( nullptr ),
-			size( 0 )
-		{}
-
-		ChunkMetadata( char *ptr, size_t size ) :
-			ptr( ptr ),
-			size( size )
-		{}
+		ChunkMetadata();
+		ChunkMetadata( char *ptr, size_t size );
 		~ChunkMetadata() {}
 	};
 
@@ -35,63 +28,16 @@ public:
 	{}
 	~DistributedMemoryMapper() {}
 
-	void addMemoryChunk( char *ptr, size_t size )
-	{
-		chunks.push_back( ChunkMetadata( ptr, size ) );
-		
-		totalSize += size;
-	}
+	void addMemoryChunk( char *ptr, size_t size );
 
-	char& operator[]( uintmax_t no )
-	{
-		uintmax_t size = 0;
+	char& operator[]( uintmax_t no );
 
-		for( const auto &chunk : chunks )
-		{
-			if( no < chunk.size )
-				return chunk.ptr[no];
-
-			no -= chunk.size;
-		}
-	}
-
-	char& shuffled()
-	{
-		return (*this)[*shuffledIterator++];
-	}
+	char& shuffled();
 
 	template <class T>
-	void createShuffledArray( T &rng )
-	{
-		std::vector<bool> usedBytes( totalSize, false );
+	void createShuffledArray( T &rng );
 
-		shuffledArray.resize( totalSize );
-
-		for( uintmax_t i = 0; i < totalSize; ++i )
-		{
-			uintmax_t ind;
-
-			ind = rng() % totalSize;
-
-			while( usedBytes[ind] )
-			{
-				++ind;
-				ind %= totalSize;
-			}
-
-			shuffledArray[i] = ind;
-			usedBytes[ind] = true;
-		}
-
-		shuffledIterator = shuffledArray.begin();
-	}
-
-	void clear()
-	{
-		chunks.clear();
-		shuffledArray.clear();
-		totalSize = 0;
-	}
+	void clear();
 };
 
 #endif

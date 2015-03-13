@@ -4,6 +4,8 @@
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
 
+#include <algorithm>
+
 using namespace std;
 
 
