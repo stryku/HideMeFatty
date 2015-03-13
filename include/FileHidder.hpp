@@ -4,6 +4,7 @@
 #include <boost\filesystem\operations.hpp>
 #include <vector>
 #include <string>
+#include <numeric>
 
 #include <Fat32Manager.hpp>
 
@@ -29,12 +30,12 @@ private:
 
 	uintmax_t getFilesSize( const std::vector<std::wstring> &filesPaths )
 	{
-		uintmax_t size = 0;
+		uintmax_t totalSize = std::accumulate( filesPaths.begin( ),
+											   filesPaths.end( ),
+											   0,
+											   []( uintmax_t sum, std::wstring &path ) { return sum + fs::file_size( path ); } );
 
-		for( const auto &path : filesPaths )
-			size += fs::file_size( path );
-
-		return size;
+		return totalSize;
 	}
 
 	uintmax_t getSizeToHide( const std::vector<std::wstring> &filesToHide )
@@ -46,6 +47,19 @@ private:
 		size += sizeof( uint64_t ); // for last 0 
 
 		return size;
+	}
+
+	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::wstring> &filesOnPartition )
+	{
+		uintmax_t totalSize = std::accumulate( filesOnPartition.begin( ),
+											   filesOnPartition.end( ),
+											   0,
+											   [this]( uintmax_t sum, std::wstring &path ) 
+												{ 
+													return sum + fatManager.getFreeSpaceAfterFile( path );
+												} );
+
+		return totalSize;
 	}
 
 public:
@@ -154,6 +168,9 @@ public:
 		uintmax_t sizeToHide;
 
 		if( !isPathsCorrect( filesOnPartition ) )
+			return false;
+
+		if( getSizeToHide( filesToHide ) > getFreeSpaceAfterFiles( filesOnPartition ) )
 			return false;
 
 
