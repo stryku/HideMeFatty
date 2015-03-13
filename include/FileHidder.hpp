@@ -10,18 +10,52 @@
 #include <vector>
 #include <string>
 #include <numeric>
+#include <fstream>
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
+#include <pathOperations.hpp>
 
 namespace fs = boost::filesystem;
+using namespace pathOperations;
 
 class FileHidder
 {
+public:
+	struct HiddenChunkMetadata2
+	{
+		size_t nextClusterNo, offsetInNextCluster;
+
+		HiddenChunkMetadata2( ) :
+			nextClusterNo( magicEndOfChain )
+		{}
+		HiddenChunkMetadata2( const size_t _nextClusterNo,
+							  const size_t _offsetInNextCluster ) :
+							  nextClusterNo( _nextClusterNo ),
+							  offsetInNextCluster( _offsetInNextCluster )
+		{}
+
+	};
+
+	struct HiddenFileMetadata
+	{
+		static const size_t maxFileName = 256;
+
+		uint64_t fileSize;
+		wchar_t fileName[maxFileName];
+
+		HiddenFileMetadata( ) {}
+
+		HiddenFileMetadata( const std::wstring &fileName,
+							const uint64_t fileSize ) :
+							fileSize( fileSize )
+		{
+			std::copy( fileName.begin( ), fileName.end( ), this->fileName );
+		}
+	};
 private:
 
 	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
-	static const size_t maxFileName = 256;
 	Fat32Manager fatManager;
 	DistributedMemoryMapper dmm;
 
@@ -121,37 +155,42 @@ private:
 		return true;
 	}
 
-public:
-	struct HiddenChunkMetadata2
+	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const size_t freeSpaceSize )
 	{
-		size_t nextClusterNo, offsetInNextCluster;
+		const char *data = reinterpret_cast<const char*>( &metadata );;
 
-		HiddenChunkMetadata2( ) :
-			nextClusterNo( magicEndOfChain )
-		{}
-		HiddenChunkMetadata2( const size_t _nextClusterNo,
-							 const size_t _offsetInNextCluster ) :
-							 nextClusterNo( _nextClusterNo ),
-							 offsetInNextCluster( _offsetInNextCluster )
-		{}
-						
-	};
+		for( size_t i = 0; i < sizeof( HiddenFileMetadata ); ++i )
+			dmm[rng() % freeSpaceSize] = data[i];
+	}
 
-	struct HiddenFileMetadata
+	bool hideFileContents( const std::wstring &filePath, boost::random::mt19937 &rng, const size_t freeSpaceSize )
 	{
-		wchar_t fileName[maxFileName];
-		uint64_t fileSize;
+		uintmax_t fileSize;
+		char ch;
+		std::ifstream file( filePath, std::ios::binary );
 
-		HiddenFileMetadata( ) {}
+		if( !file.is_open( ) )
+			return false;
 
-		HiddenFileMetadata( const std::wstring &fileName,
-							 const uint64_t fileSize ) :
-							 fileSize( fileSize )
+		fileSize = fs::file_size( filePath );
+
+		for( size_t i = 0; i < fileSize; ++i )
 		{
-			std::copy( fileName.begin(), fileName.end(), this->fileName );
+			ch = file.get();
+			dmm[rng() % freeSpaceSize] = ch;
 		}
-	};
 
+		return true;
+	}
+
+	bool hideFile( const std::wstring &filePath, boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	{
+		HiddenFileMetadata fileMetadata( getPathFileName( filePath ),
+										 fs::file_size( filePath ) );
+
+		hideMetadata( fileMetadata, rng, freeSpaceSize );
+		hideFileContents( filePath, rng, freeSpaceSize );
+	}
 
 public:
 	FileHidder() {}
