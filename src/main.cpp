@@ -23,9 +23,9 @@ int main()
 	wstring partitionPath = StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc" );
 
 	filesToHide.push_back( StringToWString( "test.txt" ) );
-	filesToHide.push_back( StringToWString( "test.png" ) );
+	//filesToHide.push_back( StringToWString( "test.png" ) );
 
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/plik_2.txt" ) );
+	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/linux-2.6.32.64.tar.xz" ) );
 
 	fileHidder.hideFiles( filesOnPartition, partitionPath, filesToHide, StringToWString( "fat32example" ) );
 

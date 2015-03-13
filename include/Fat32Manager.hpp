@@ -49,7 +49,7 @@ private:
 	FatInfo fatInfo;
 	bool fatInfoLoaded, bootSectorLoaded, fatTableLoaded, initOk;
 	MappedFileManager mappedFileMngr;
-	std::vector<unsigned int> fatTable;
+	std::vector<uint32_t> fatTable;
 	
 
 	//private methods
@@ -110,17 +110,17 @@ private:
 
 		fatTableSize = fatInfo.fat_size * bootSector.bytes_per_sector;
 
-		mappedPtr = mappedFileMngr.map( fatInfo.first_fat_sector,
+		mappedPtr = mappedFileMngr.map( fatInfo.first_fat_sector * bootSector.bytes_per_sector, 
 										fatTableSize );
 
 		if( mappedPtr == nullptr )
 			return false;
 
-		fatTable.resize( fatTableSize );
+		fatTable.resize( fatTableSize / sizeof( uint32_t ) );
 
 		std::copy( mappedPtr,
 				   mappedPtr + fatInfo.fat_size * bootSector.bytes_per_sector,
-				   fatTable.begin() );
+				   reinterpret_cast<char*>( &fatTable[0] ) );
 
 		fatTableLoaded = true;
 

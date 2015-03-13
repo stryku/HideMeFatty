@@ -24,6 +24,8 @@
 #include <DistributedMemoryMapper.hpp>
 #include <pathOperations.hpp>
 
+#include <iostream>
+
 namespace fs = boost::filesystem;
 using namespace pathOperations;
 
@@ -127,7 +129,7 @@ private:
 
 	uint32_t getSeed( const std::vector<std::wstring> &filesOnPartition )
 	{
-		std::string stringSeed("");
+		std::string stringSeed(""), stringHash("");
 		CryptoPP::SHA1 sha1;
 		std::stringstream ss;
 		uint32_t seed;
@@ -140,11 +142,11 @@ private:
 									 std::string(""),
 									 [this]( std::string sum, std::wstring &path ) { return sum + hashFile( path ); } );*/
 
-		CryptoPP::StringSource( stringSeed, 
+		CryptoPP::StringSource( stringSeed,
 								true, 
-								new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringSeed ) ) ) );
+								new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringHash ) ) ) );
 
-		stringSeed = stringSeed.substr( 0, 8 );//D111CA31
+		stringSeed = stringHash.substr( 0, 8 );//D111CA31
 
 		ss << std::hex << stringSeed;
 		ss >> seed;
@@ -377,6 +379,12 @@ public:
 		boost::random::mt19937 rng;
 		std::vector<std::wstring> preparedPaths;
 
+		std::cout << "Hidding files\n";
+		for( auto i : filesOnPartition )
+			std::wcout << i << "\n";
+
+		std::cout << "\n";
+
 		fatManager.setPartitionPath( partitionDevPath );
 
 		preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
@@ -386,13 +394,19 @@ public:
 
 		freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
+		std::cout << "Free space after files: " << freeSpaceSize << "\n";
+
 		if( getSizeToHide( filesToHide ) > freeSpaceSize )
 			return false;
+
+		std::cout << "Size to hide: " << getSizeToHide( filesToHide ) << "\n";
 
 		if( !mapFreeSpace( preparedPaths ) )
 			return false;
 
 		seed = getSeed( filesOnPartition );
+
+		std::cout << "Seed: " << seed << "\n";
 
 		rng.seed( seed );
 
@@ -419,6 +433,12 @@ public:
 		boost::random::mt19937 rng;
 		std::vector<std::wstring> preparedPaths;
 
+		std::cout << "\n\nRestoring files\n";
+		for( auto i : filesOnPartition )
+			std::wcout << i << "\n";
+
+		std::cout << "\n";
+
 		fatManager.setPartitionPath( partitionDevPath );
 
 		preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
@@ -433,6 +453,7 @@ public:
 
 		seed = getSeed( filesOnPartition );
 
+		std::cout << "Seed: " << seed << "\n";
 		rng.seed( seed );
 
 		dmm.createShuffledArray( rng );
