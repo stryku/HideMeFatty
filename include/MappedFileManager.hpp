@@ -108,7 +108,19 @@ private:
 		mappedChunkInfo.mapped = true;
 	}
 
+	char* getUserPtr( uintmax_t startOffset )
+	{
+		uintptr_t intPtr;
+		char *preparedPtr;
 
+		preparedPtr = mappedFile.data();
+
+		intPtr = reinterpret_cast<uintptr_t> ( mappedFile.data() );
+
+		preparedPtr += startOffset - intPtr;
+
+		return preparedPtr;
+	}
 
 public:
 	MappedFileManager( ) :
@@ -140,10 +152,10 @@ public:
 		if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
 			remapChunk( startOffset, sizeToMap, hard );
 
-		if( mappedFile.is_open( ) == false )
+		if( mappedFile.is_open() == false )
 			return nullptr;
 
-		mappedPtr = mappedFile.data( ) + startOffset;
+		mappedPtr = getUserPtr( startOffset );
 
 		return mappedPtr;
 	}
