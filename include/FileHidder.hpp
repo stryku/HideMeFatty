@@ -405,6 +405,7 @@ public:
 		if( !mapFreeSpace( preparedPaths ) )
 			return false;
 
+		std::cout << "Calculate seed...\n";
 		seed = getSeed( filesOnPartition );
 
 		std::cout << "Seed: " << seed << "\n";
@@ -452,6 +453,7 @@ public:
 		if( !mapFreeSpace( preparedPaths ) )
 			return false;
 
+		std::cout << "\nCalculate seed...\n";
 		seed = getSeed( filesOnPartition );
 
 		std::cout << "Seed: " << seed << "\n";

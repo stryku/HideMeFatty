@@ -20,6 +20,7 @@ private:
 	static const size_t bootSectorSize = 512;
 	static const unsigned char DELETED_MAGIC = 0xE5;
 	static const unsigned char LFN_ATTRIBUTE = 0x0F;
+	const size_t lastClusterMagic = 0x0FFFFFF8;
 
 	struct ClusterWithFreeSpace
 	{
@@ -151,16 +152,15 @@ private:
 		return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 	}
 
-	std::vector<FatRawLongFileName> extractLongFileNames( void *&ptrInCluster ) const
+	std::vector<FatRawLongFileName> extractLongFileNames( char *&ptrInCluster ) const
 	{
 		FatRawLongFileName *longFileNamePtr;
 		char *charPtr;
 		std::vector<FatRawLongFileName> ret;
 
-		longFileNamePtr = static_cast<FatRawLongFileName*>( ptrInCluster );
-		charPtr = static_cast<char*>( ptrInCluster );
+		longFileNamePtr = reinterpret_cast<FatRawLongFileName*>( ptrInCluster );
 		
-		if( *charPtr == 0 || *charPtr == DELETED_MAGIC )
+		if( *ptrInCluster == 0 || *ptrInCluster == DELETED_MAGIC )
 			return ret;
 
 		for( ; longFileNamePtr->attribute == LFN_ATTRIBUTE; ++longFileNamePtr )
@@ -173,35 +173,68 @@ private:
 			return a.sequenceNumber < b.sequenceNumber;
 		} );
 
-		ptrInCluster = longFileNamePtr;
+		ptrInCluster = reinterpret_cast<char*>( longFileNamePtr );
 
 		return ret;
 	}
 	
+	std::vector<size_t> getClusterChain( size_t firstCluster )
+	{
+		std::vector<size_t> chain;
+		size_t cluster = firstCluster;
+
+		do
+		{
+			chain.push_back( cluster );
+			cluster = fatTable[cluster];
+		} while( cluster <= lastClusterMagic );
+
+		return chain;
+	}
+
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster )
 	{
 		std::vector<DirectoryEntry> dirEntries;
 		FatRawDirectoryEntry tempRawDirEntry;
 		std::vector<FatRawLongFileName> tempRawLongFileNames;
-		void *mappedClusterPtr;
+		char *mappedClusterPtr, *endOfCluster;
 
 		mappedClusterPtr = loadCluster( dirCluster );
 
 		if( mappedClusterPtr == nullptr )
 			return dirEntries;
 
+		endOfCluster = mappedClusterPtr + clusterSize();
+
 		while( true )
 		{
 			tempRawLongFileNames = extractLongFileNames( mappedClusterPtr );
 
-			if( *( static_cast<char*>( mappedClusterPtr ) ) == 0 )
+			if( mappedClusterPtr >= endOfCluster || *( static_cast<char*>( mappedClusterPtr ) ) == 0 )
 				break;
 
 			tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( mappedClusterPtr ) );
 
 			dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
 
-			mappedClusterPtr = reinterpret_cast<char*>(mappedClusterPtr) + sizeof( FatRawDirectoryEntry );
+			mappedClusterPtr += sizeof( FatRawDirectoryEntry );
+		}
+
+		return dirEntries;
+	}
+
+	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster )
+	{
+		std::vector<size_t> clusterChain;
+		std::vector<DirectoryEntry> tmpDirEntries, dirEntries;
+
+		clusterChain = getClusterChain( firstCluster );
+
+		for( const auto &cluster : clusterChain )
+		{
+			tmpDirEntries = getDirEntriesFromDirCluster( cluster );
+			dirEntries.reserve( dirEntries.size() + tmpDirEntries.size() );
+			dirEntries.insert( dirEntries.end(), tmpDirEntries.begin(), tmpDirEntries.end() );
 		}
 
 		return dirEntries;
@@ -245,7 +278,7 @@ private:
 	{
 		std::vector<DirectoryEntry> dirEntries;
 
-		dirEntries = getDirEntriesFromDirCluster( folderCluster );
+		dirEntries = getDirEntriesFromFolder( folderCluster );
 
 		auto it = dirEntries.begin( );
 
@@ -268,16 +301,16 @@ private:
 	DirectoryEntry findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster )
 	{
 		DirectoryEntry currentDirEntry;
-		std::wstring rawName;
+		std::wstring dirEntryName;
 
-		rawName = removeExtension( searchedDirEntryName );
-
-		if( rawName.length() <= 8 )
-			boost::to_upper( searchedDirEntryName );
+		boost::to_upper( searchedDirEntryName );
 
 		do
 		{
-			if( currentDirEntry.getName( ) == searchedDirEntryName )
+			dirEntryName = currentDirEntry.getName();
+			boost::to_upper( dirEntryName );
+
+			if( dirEntryName == searchedDirEntryName )
 				return currentDirEntry;
 
 			currentDirEntry = findNextDirEntry( folderCluster, currentDirEntry );
@@ -315,7 +348,6 @@ private:
 
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const
 	{
-		const size_t lastClusterMagic = 0x0FFFFFF8;
 
 		size_t actualClusterNo;
 
