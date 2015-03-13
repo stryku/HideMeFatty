@@ -2,9 +2,14 @@
 #define _INCLUDE_FILEHIDDER_HPP_
 
 #include <boost\filesystem\operations.hpp>
+#include <boost\lexical_cast.hpp>
+#include <cryptopp562\sha.h>
+#include <cryptopp562\hex.h>
+#include <cryptopp562\files.h>
 #include <vector>
 #include <string>
 #include <numeric>
+#include <sstream>
 
 #include <Fat32Manager.hpp>
 
@@ -60,6 +65,36 @@ private:
 												} );
 
 		return totalSize;
+	}
+
+	std::string hashFile( const fs::path &path )
+	{
+		std::string result;
+		CryptoPP::SHA1 hash;
+		CryptoPP::FileSource( path.string( ).c_str( ), true,
+							  new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
+							  new CryptoPP::StringSink( result ), true ) ) );
+		return result;
+	}
+
+	uint32_t getSeed( const std::vector<std::wstring> &filesOnPartition )
+	{
+		std::string stringSeed;
+		CryptoPP::SHA1 sha1;
+		std::stringstream ss;
+
+		stringSeed = std::accumulate( filesOnPartition.begin( ),
+									 filesOnPartition.end( ),
+									 std::string(""),
+									 [this]( std::string sum, std::wstring &path ) { return sum + hashFile( path ); } );
+
+		CryptoPP::StringSource( stringSeed, 
+								true, 
+								new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringSeed ) ) ) );
+
+		stringSeed = stringSeed.substr( 0, 8 );
+
+		return boost::lexical_cast<uint32_t>( stringSeed );
 	}
 
 public:
@@ -166,6 +201,7 @@ public:
 					const std::wstring &partitionPath )
 	{
 		uintmax_t sizeToHide;
+		uint32_t seed;
 
 		if( !isPathsCorrect( filesOnPartition ) )
 			return false;
@@ -173,7 +209,7 @@ public:
 		if( getSizeToHide( filesToHide ) > getFreeSpaceAfterFiles( filesOnPartition ) )
 			return false;
 
-
+		seed = getSeed( filesOnPartition );
 	}
 };
 
