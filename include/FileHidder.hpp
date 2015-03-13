@@ -155,7 +155,7 @@ private:
 		return true;
 	}
 
-	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 	{
 		const char *data = reinterpret_cast<const char*>( &metadata );;
 
@@ -163,7 +163,7 @@ private:
 			dmm[rng() % freeSpaceSize] = data[i];
 	}
 
-	bool hideFileContents( const std::wstring &filePath, boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	bool hideFileContents( const std::wstring &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 	{
 		uintmax_t fileSize;
 		char ch;
@@ -183,13 +183,14 @@ private:
 		return true;
 	}
 
-	bool hideFile( const std::wstring &filePath, boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	bool hideFile( const std::wstring &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 	{
 		HiddenFileMetadata fileMetadata( getPathFileName( filePath ),
 										 fs::file_size( filePath ) );
 
 		hideMetadata( fileMetadata, rng, freeSpaceSize );
-		hideFileContents( filePath, rng, freeSpaceSize );
+		
+		return hideFileContents( filePath, rng, freeSpaceSize );
 	}
 
 public:
@@ -265,14 +266,16 @@ public:
 					const std::vector<std::wstring> &filesToHide,
 					const std::wstring &partitionPath )
 	{
-		uintmax_t sizeToHide;
+		uintmax_t freeSpaceSize;
 		uint32_t seed;
 		boost::random::mt19937 rng;
 
 		if( !isPathsCorrect( filesOnPartition ) )
 			return false;
 
-		if( getSizeToHide( filesToHide ) > getFreeSpaceAfterFiles( filesOnPartition ) )
+		freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
+
+		if( getSizeToHide( filesToHide ) > freeSpaceSize )
 			return false;
 
 		if( !mapFreeSpace( filesOnPartition ) )
@@ -282,7 +285,13 @@ public:
 
 		rng.seed( seed );
 
+		for( const auto &file : filesToHide )
+		{
+			if( !hideFile( file, rng, freeSpaceSize ) )
+				return false;
+		}
 
+		return true;
 	}
 };
 
