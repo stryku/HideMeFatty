@@ -160,6 +160,8 @@ private:
 		uintmax_t startOffset;
 		char *mappedPtr;
 		
+		chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
+
 		dmm.clear();
 
 		mappedPtr = fatManager.mapSpaceAfterFiles( filesOnPartition );
@@ -167,7 +169,6 @@ private:
 		if( mappedPtr == nullptr )
 			return false;
 
-		chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
 
 		startOffset = std::min_element( chunks.begin(), chunks.end() )->offset;
 
