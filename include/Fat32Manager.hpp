@@ -5,10 +5,14 @@
 #include <vector>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost\filesystem\operations.hpp>
+
 
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
 #include <DirectoryEntry.hpp>
+
+namespace fs = boost::filesystem;
 
 class Fat32Manager
 {
@@ -31,6 +35,10 @@ private:
 		bool operator< ( const ClusterWithFreeSpace &c )
 		{
 			return clusterNo < c.clusterNo;
+		}
+		bool operator> ( const ClusterWithFreeSpace &c )
+		{
+			return clusterNo > c.clusterNo;
 		}
 	};
 
@@ -399,7 +407,7 @@ public:
 
 	~Fat32Manager() {}
 
-	void setPartitionPath( const std::string &partitionPath )
+	void setPartitionPath( const fs::path &partitionPath )
 	{
 		mappedFileMngr.setFilePath( partitionPath );
 		initOk = init();
@@ -491,7 +499,7 @@ public:
 
 	bool isPathCorrect( const std::wstring &path )
 	{
-		return findFile( path ).type() == BAD_DIR_ENTRY;
+		return findFile( path ).type() != BAD_DIR_ENTRY;
 	}
 
 	size_t getFreeSpaceAfterFile( const std::wstring &path )
@@ -533,8 +541,8 @@ public:
 													getFileFreeSpaceOffset( file ) ) );
 		}
 
-		firstCluster = std::min( clusters.begin( ), clusters.end( ) )->clusterNo;
-		lastCluster = std::max( clusters.begin( ), clusters.end( ) )->clusterNo;
+		firstCluster = std::min_element( clusters.begin(), clusters.end() )->clusterNo;
+		lastCluster = std::max_element( clusters.begin( ), clusters.end( ) )->clusterNo;
 
 		preparedOffset = getClusterStartOffset( firstCluster );
 		preparedSize = getClusterStartOffset( lastCluster + 1 ) - preparedOffset;

@@ -1,9 +1,17 @@
 #ifndef _INCLUDE_FILEHIDDER_HPP_
 #define _INCLUDE_FILEHIDDER_HPP_
 
+// Crypto++ Library
+#ifdef _DEBUG
+#  pragma comment ( lib, "cryptlib" )
+#else
+#  pragma comment ( lib, "cryptlib" )
+#endif
+
 #include <boost\filesystem\operations.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost\lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <cryptopp562\sha.h>
 #include <cryptopp562\hex.h>
 #include <cryptopp562\files.h>
@@ -44,12 +52,16 @@ public:
 		uint64_t fileSize;
 		wchar_t fileName[maxFileName];
 
-		HiddenFileMetadata( ) {}
+		HiddenFileMetadata( ) 
+		{
+			std::memset( this->fileName, '\0', maxFileName*sizeof( wchar_t ) );
+		}
 
 		HiddenFileMetadata( const std::wstring &fileName,
 							const uint64_t fileSize ) :
 							fileSize( fileSize )
 		{
+			std::memset( this->fileName, '\0', maxFileName*sizeof( wchar_t ) );
 			std::copy( fileName.begin( ), fileName.end( ), this->fileName );
 		}
 	};
@@ -59,7 +71,7 @@ private:
 	Fat32Manager fatManager;
 	DistributedMemoryMapper dmm;
 
-	bool isPathsCorrect( const std::vector<std::wstring> &paths )
+	bool isPathsCorrect( const std::vector<std::wstring> &paths, const std::wstring &partitionPath )
 	{
 		for( const auto &path : paths )
 		{
@@ -72,10 +84,10 @@ private:
 
 	uintmax_t getFilesSize( const std::vector<std::wstring> &filesPaths )
 	{
-		uintmax_t totalSize = std::accumulate( filesPaths.begin( ),
-											   filesPaths.end( ),
-											   0,
-											   []( uintmax_t sum, std::wstring &path ) { return sum + fs::file_size( path ); } );
+		uintmax_t totalSize = 0;
+
+		for( const auto &file : filesPaths )
+			totalSize += fs::file_size( file );
 
 		return totalSize;
 	}
@@ -93,13 +105,11 @@ private:
 
 	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::wstring> &filesOnPartition )
 	{
-		uintmax_t totalSize = std::accumulate( filesOnPartition.begin( ),
-											   filesOnPartition.end( ),
-											   0,
-											   [this]( uintmax_t sum, std::wstring &path ) 
-												{ 
-													return sum + fatManager.getFreeSpaceAfterFile( path );
-												} );
+		uintmax_t totalSize = 0;
+
+		for( const auto &file : filesOnPartition )
+			totalSize += fatManager.getFreeSpaceAfterFile( file );
+
 
 		return totalSize;
 	}
@@ -116,22 +126,29 @@ private:
 
 	uint32_t getSeed( const std::vector<std::wstring> &filesOnPartition )
 	{
-		std::string stringSeed;
+		std::string stringSeed("");
 		CryptoPP::SHA1 sha1;
 		std::stringstream ss;
+		uint32_t seed;
 
-		stringSeed = std::accumulate( filesOnPartition.begin( ),
+		for( const auto &file : filesOnPartition )
+			stringSeed += hashFile( file );
+
+		/*stringSeed = std::accumulate( filesOnPartition.begin( ),
 									 filesOnPartition.end( ),
 									 std::string(""),
-									 [this]( std::string sum, std::wstring &path ) { return sum + hashFile( path ); } );
+									 [this]( std::string sum, std::wstring &path ) { return sum + hashFile( path ); } );*/
 
 		CryptoPP::StringSource( stringSeed, 
 								true, 
 								new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringSeed ) ) ) );
 
-		stringSeed = stringSeed.substr( 0, 8 );
+		stringSeed = stringSeed.substr( 0, 8 );//D111CA31
 
-		return boost::lexical_cast<uint32_t>( stringSeed );
+		ss << std::hex << stringSeed;
+		ss >> seed;
+
+		return seed;
 	}
 
 	bool mapFreeSpace( const std::vector<std::wstring> &filesOnPartition )
@@ -147,7 +164,7 @@ private:
 
 		chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
 
-		startOffset = std::min( chunks.begin(), chunks.end() )->offset;
+		startOffset = std::min_element( chunks.begin(), chunks.end() )->offset;
 
 		for( const auto &chunk : chunks )
 			dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
@@ -157,7 +174,7 @@ private:
 
 	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 	{
-		const char *data = reinterpret_cast<const char*>( &metadata );;
+		const char *data = reinterpret_cast<const char*>( &metadata );
 
 		for( size_t i = 0; i < sizeof( HiddenFileMetadata ); ++i )
 			dmm[rng() % freeSpaceSize] = data[i];
@@ -193,11 +210,61 @@ private:
 		return hideFileContents( filePath, rng, freeSpaceSize );
 	}
 
+	std::vector<std::wstring> preparePathsOnPartition( const std::vector<std::wstring> &filesOnPartition, const std::wstring &partitionPath ) const
+	{
+		size_t partitionPathLength = partitionPath.length();
+		std::vector<std::wstring> preparedPaths;
+
+
+		for( auto &path : filesOnPartition )
+			preparedPaths.push_back( path.substr( partitionPathLength + 1 ) );
+
+		return preparedPaths;
+	}
+
+	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	{
+		HiddenFileMetadata metadata;
+		char *metadataPtr;
+
+		metadataPtr = reinterpret_cast<char*>( &metadata );
+
+		for( size_t i = 0; i < sizeof( HiddenFileMetadata ); ++i )
+			metadataPtr[i] = dmm[rng() % freeSpaceSize];
+
+		return metadata;
+	}
+
+	void restoreFile( std::ofstream &fileStream, boost::random::mt19937 &rng, const size_t freeSpaceSize, const HiddenFileMetadata &metadata )
+	{
+		for( uintmax_t i = 0; i < metadata.fileSize; ++i )
+			fileStream.put( dmm[rng() % freeSpaceSize] );
+	}
+
+	bool restoreMyFile( const std::wstring &pathToStore, boost::random::mt19937 &rng, const size_t freeSpaceSize )
+	{
+		HiddenFileMetadata fileMetadata;
+		std::ofstream file;
+
+		fileMetadata = restoreMetadata( rng, freeSpaceSize );
+
+		if( fileMetadata.fileSize == 0 )
+			return false;
+
+		file.open( pathToStore + static_cast<wchar_t>('/') + fileMetadata.fileName );
+
+		restoreFile( file, rng, freeSpaceSize, fileMetadata );
+
+		return true;
+	}
+
+	
+
 public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFile2( const std::string &filePath, const std::string &partitionPath )
+	/*bool hideFile2( const std::string &filePath, const std::string &partitionPath )
 	{
 		const size_t metadataSize = sizeof( HiddenChunkMetadata );
 
@@ -259,26 +326,32 @@ public:
 
 		return true;
 	}
-
+*/
 	
 
 	bool hideFiles( const std::vector<std::wstring> &filesOnPartition,
+					const std::wstring &partitionPath,
 					const std::vector<std::wstring> &filesToHide,
-					const std::wstring &partitionPath )
+					const std::wstring &partitionDevPath )
 	{
 		uintmax_t freeSpaceSize;
 		uint32_t seed;
 		boost::random::mt19937 rng;
+		std::vector<std::wstring> preparedPaths;
 
-		if( !isPathsCorrect( filesOnPartition ) )
+		fatManager.setPartitionPath( partitionDevPath );
+
+		preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+
+		if( !isPathsCorrect( preparedPaths, partitionPath ) )
 			return false;
 
-		freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
+		freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
 		if( getSizeToHide( filesToHide ) > freeSpaceSize )
 			return false;
 
-		if( !mapFreeSpace( filesOnPartition ) )
+		if( !mapFreeSpace( preparedPaths ) )
 			return false;
 
 		seed = getSeed( filesOnPartition );
@@ -290,6 +363,37 @@ public:
 			if( !hideFile( file, rng, freeSpaceSize ) )
 				return false;
 		}
+
+		return true;
+	}
+
+	bool restoreMyFiles( const std::vector<std::wstring> &filesOnPartition,
+					 const std::wstring &partitionPath,
+					 const std::wstring &partitionDevPath,
+					 const std::wstring &pathToStore )
+	{
+		uintmax_t freeSpaceSize;
+		uint32_t seed;
+		boost::random::mt19937 rng;
+		std::vector<std::wstring> preparedPaths;
+
+		fatManager.setPartitionPath( partitionDevPath );
+
+		preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+
+		if( !isPathsCorrect( preparedPaths, partitionPath ) )
+			return false;
+
+		freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
+
+		if( !mapFreeSpace( preparedPaths ) )
+			return false;
+
+		seed = getSeed( filesOnPartition );
+
+		rng.seed( seed );
+
+		while( restoreMyFile( pathToStore, rng, freeSpaceSize ) );
 
 		return true;
 	}

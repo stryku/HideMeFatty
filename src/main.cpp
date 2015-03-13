@@ -6,46 +6,30 @@
 
 using namespace std;
 
-struct Test
+
+std::wstring StringToWString( const std::string &s )
 {
-	std::wstring path;
-	std::wstring expected;
+	std::wstring wsTmp( s.begin( ), s.end( ) );
 
-	Test() {}
-	Test( const std::string &_path,
-		  const std::string &_expected )
-	{
-		path.assign( _path.begin( ), _path.end( ) );
-		expected.assign( _expected.begin( ), _expected.end( ) );
-	}
-
-	void print( std::wostream &out, bool result )
-	{
-		out << "\n==========================\n\n";
-		out << "Path:\t\t" << path << "\n";
-		out << "Expected:\t" << expected << "\n";
-		out << "Test result:\t" << std::boolalpha << result << "\n";
-		out << "\n==========================\n";
-	}
-};
+	return wsTmp;
+}
 
 int main()
 {
-	char tab[100];
+	FileHidder fileHidder;
 
-	DistributedMemoryMapper dmm;
+	vector<wstring> filesToHide;
+	vector<wstring> filesOnPartition;
+	wstring partitionPath = StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc" );
 
-	for( int i = 0; i < 100; ++i )
-		tab[i] = 'a';
+	filesToHide.push_back( StringToWString( "test.txt" ) );
+	filesToHide.push_back( StringToWString( "test.png" ) );
 
-	dmm.addMemoryChunk( tab, 2 );
-	dmm.addMemoryChunk( tab + 4, 2 );
-	dmm.addMemoryChunk( tab + 8, 2 );
-	dmm.addMemoryChunk( tab + 12, 2 );
+	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/plik_2.txt" ) );
 
-	char c = 'b';
-	for( int i = 0; i < 8; ++i, ++c )
-		dmm[i] = c;
+	fileHidder.hideFiles( filesOnPartition, partitionPath, filesToHide, StringToWString( "fat32example" ) );
+
+	fileHidder.restoreMyFiles( filesOnPartition, partitionPath, StringToWString( "fat32example" ), StringToWString( "finded" ) );
 
 	return 0;
 }

@@ -4,8 +4,11 @@
 #include <string>
 #include <set>
 #include <boost\iostreams\device\mapped_file.hpp>
+#include <boost\filesystem\operations.hpp>
 
 typedef boost::iostreams::mapped_file MappedFile;
+
+namespace fs = boost::filesystem;
 
 class MappedFileManager
 {
@@ -27,7 +30,7 @@ private:
 
 	} mappedChunkInfo;
 
-	std::string filePath;
+	fs::path filePath;
 	size_t allocationGranularity,
 		mappingGranularity; //it is also mapped chunk size
 	MappedFile mappedFile;
@@ -82,11 +85,15 @@ private:
 			preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
 		}
 
-		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
+		if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
+		{
+			mappedFile.close();
+
 			mappedFile.open( filePath,
-							std::ios_base::in | std::ios_base::out,
-							preparedSize,
-							preparedOffset );
+							 std::ios_base::in | std::ios_base::out,
+							 preparedSize,
+							 preparedOffset );
+		}
 
 		if( mappedFile.is_open() == false )
 		{
@@ -101,14 +108,11 @@ private:
 
 	char* getUserPtr( uintmax_t startOffset )
 	{
-		uintptr_t intPtr;
 		char *preparedPtr;
 
 		preparedPtr = mappedFile.data();
 
-		intPtr = reinterpret_cast<uintptr_t> ( mappedFile.data() );
-
-		preparedPtr += startOffset - intPtr;
+		preparedPtr += startOffset - mappedChunkInfo.begin;
 
 		return preparedPtr;
 	}
@@ -130,7 +134,7 @@ public:
 		mappedFile.close();
 	}
 
-	void setFilePath( const std::string &pathToFile )
+	void setFilePath( const fs::path &pathToFile )
 	{
 		filePath = pathToFile;
 	}

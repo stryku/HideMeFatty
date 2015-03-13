@@ -17,7 +17,7 @@ T removeExtension( const T& filename )
 }
 
 template <class T>
-T getPathFileName( const T &path ) const
+T getPathFileName( const T &path ) 
 {
 	size_t pos = path.find_last_of( '/' );
 
@@ -27,7 +27,7 @@ T getPathFileName( const T &path ) const
 }
 
 template <class T>
-std::vector<T> getPathFoldersNames( const T &path ) const
+std::vector<T> getPathFoldersNames( const T &path ) 
 {
 	std::vector<T> folders;
 	size_t posBegin = 0, posEnd, numberToCopy;
