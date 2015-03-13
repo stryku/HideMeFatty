@@ -25,9 +25,14 @@ private:
 
 	std::vector<ChunkMetadata> chunks;
 	size_t totalSize;
+	std::vector<uintmax_t> shuffledArray;
+	std::vector<uintmax_t>::iterator shuffledIterator;
+	
 
 public:
-	DistributedMemoryMapper() {}
+	DistributedMemoryMapper() :
+		totalSize( 0 )
+	{}
 	~DistributedMemoryMapper() {}
 
 	void addMemoryChunk( char *ptr, size_t size )
@@ -37,11 +42,9 @@ public:
 		totalSize += size;
 	}
 
-	char& operator[]( size_t no )
+	char& operator[]( uintmax_t no )
 	{
-		size_t size = 0;
-
-		
+		uintmax_t size = 0;
 
 		for( const auto &chunk : chunks )
 		{
@@ -50,6 +53,44 @@ public:
 
 			no -= chunk.size;
 		}
+	}
+
+	char& shuffled()
+	{
+		return (*this)[*shuffledIterator++];
+	}
+
+	template <class T>
+	void createShuffledArray( T &rng )
+	{
+		std::vector<bool> usedBytes( totalSize, false );
+
+		shuffledArray.resize( totalSize );
+
+		for( uintmax_t i = 0; i < totalSize; ++i )
+		{
+			uintmax_t ind;
+
+			ind = rng() % totalSize;
+
+			while( usedBytes[ind] )
+			{
+				++ind;
+				ind %= totalSize;
+			}
+
+			shuffledArray[i] = ind;
+			usedBytes[ind] = true;
+		}
+
+		shuffledIterator = shuffledArray.begin();
+	}
+
+	void clear()
+	{
+		chunks.clear();
+		shuffledArray.clear();
+		totalSize = 0;
 	}
 };
 

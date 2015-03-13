@@ -48,6 +48,7 @@ public:
 	struct HiddenFileMetadata
 	{
 		static const size_t maxFileName = 256;
+		static const size_t fileNameBytesSize = maxFileName*sizeof( wchar_t );
 
 		uint64_t fileSize;
 		wchar_t fileName[maxFileName];
@@ -157,6 +158,8 @@ private:
 		uintmax_t startOffset;
 		char *mappedPtr;
 		
+		dmm.clear();
+
 		mappedPtr = fatManager.mapSpaceAfterFiles( filesOnPartition );
 
 		if( mappedPtr == nullptr )
@@ -172,12 +175,18 @@ private:
 		return true;
 	}
 
+	void hideFileName( const wchar_t *fileName )
+	{
+		const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
+
+		for( size_t i = 0; i < HiddenFileMetadata::fileNameBytesSize; ++i )
+			dmm.shuffled() = fileNamePtr[i];
+	}
+
 	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 	{
-		const char *data = reinterpret_cast<const char*>( &metadata );
-
-		for( size_t i = 0; i < sizeof( HiddenFileMetadata ); ++i )
-			dmm[rng() % freeSpaceSize] = data[i];
+		hideFileSize( metadata.fileSize );
+		hideFileName( metadata.fileName );
 	}
 
 	bool hideFileContents( const std::wstring &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
@@ -194,7 +203,7 @@ private:
 		for( size_t i = 0; i < fileSize; ++i )
 		{
 			ch = file.get();
-			dmm[rng() % freeSpaceSize] = ch;
+			dmm.shuffled() = ch;
 		}
 
 		return true;
@@ -210,6 +219,14 @@ private:
 		return hideFileContents( filePath, rng, freeSpaceSize );
 	}
 
+	void hideFileSize( const uintmax_t &fileSize )
+	{
+		const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
+
+		for( size_t i = 0; i < sizeof( uintmax_t ); ++i )
+			dmm.shuffled( ) = fileSizePtr[i];
+	}
+
 	std::vector<std::wstring> preparePathsOnPartition( const std::vector<std::wstring> &filesOnPartition, const std::wstring &partitionPath ) const
 	{
 		size_t partitionPathLength = partitionPath.length();
@@ -222,15 +239,36 @@ private:
 		return preparedPaths;
 	}
 
+	uintmax_t restoreFileSize()
+	{
+		uintmax_t fileSize;
+
+		char *fileSizePtr = reinterpret_cast<char*>( &fileSize );
+
+		for( size_t i = 0; i < sizeof( uintmax_t ); ++i )
+			fileSizePtr[i] = dmm.shuffled( );
+
+		return fileSize;
+	}
+
+	void restoreFileName( HiddenFileMetadata &metadata )
+	{
+		char *fileNamePtr = reinterpret_cast<char*>( metadata.fileName );
+
+		for( size_t i = 0; i < HiddenFileMetadata::fileNameBytesSize; ++i )
+			fileNamePtr[i] = dmm.shuffled( );
+	}
+
 	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const size_t freeSpaceSize )
 	{
 		HiddenFileMetadata metadata;
-		char *metadataPtr;
 
-		metadataPtr = reinterpret_cast<char*>( &metadata );
+		metadata.fileSize = restoreFileSize();
 
-		for( size_t i = 0; i < sizeof( HiddenFileMetadata ); ++i )
-			metadataPtr[i] = dmm[rng() % freeSpaceSize];
+		if( metadata.fileSize == 0 )
+			return metadata;
+
+		restoreFileName( metadata );
 
 		return metadata;
 	}
@@ -238,7 +276,7 @@ private:
 	void restoreFile( std::ofstream &fileStream, boost::random::mt19937 &rng, const size_t freeSpaceSize, const HiddenFileMetadata &metadata )
 	{
 		for( uintmax_t i = 0; i < metadata.fileSize; ++i )
-			fileStream.put( dmm[rng() % freeSpaceSize] );
+			fileStream.put( dmm.shuffled() );
 	}
 
 	bool restoreMyFile( const std::wstring &pathToStore, boost::random::mt19937 &rng, const size_t freeSpaceSize )
@@ -251,7 +289,7 @@ private:
 		if( fileMetadata.fileSize == 0 )
 			return false;
 
-		file.open( pathToStore + static_cast<wchar_t>('/') + fileMetadata.fileName );
+		file.open( pathToStore + static_cast<wchar_t>('/') + fileMetadata.fileName, std::ios::binary );
 
 		restoreFile( file, rng, freeSpaceSize, fileMetadata );
 
@@ -358,11 +396,15 @@ public:
 
 		rng.seed( seed );
 
+		dmm.createShuffledArray( rng );
+
 		for( const auto &file : filesToHide )
 		{
 			if( !hideFile( file, rng, freeSpaceSize ) )
 				return false;
 		}
+
+		hideFileSize( 0 );
 
 		return true;
 	}
@@ -392,6 +434,8 @@ public:
 		seed = getSeed( filesOnPartition );
 
 		rng.seed( seed );
+
+		dmm.createShuffledArray( rng );
 
 		while( restoreMyFile( pathToStore, rng, freeSpaceSize ) );
 
