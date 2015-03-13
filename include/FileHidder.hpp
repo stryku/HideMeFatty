@@ -3,6 +3,7 @@
 
 #include <boost\filesystem\operations.hpp>
 #include <vector>
+#include <string>
 
 #include <Fat32Manager.hpp>
 
@@ -10,15 +11,52 @@ namespace fs = boost::filesystem;
 
 class FileHidder
 {
+private:
+	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
+	static const size_t maxFileName = 256;
+	Fat32Manager fatManager;
+
+	bool isPathsCorrect( const std::vector<std::wstring> &paths )
+	{
+		for( const auto &path : paths )
+		{
+			if( !fatManager.isPathCorrect( path ) )
+				return false;
+		}
+
+		return true;
+	}
+
+	uintmax_t getFilesSize( const std::vector<std::wstring> &filesPaths )
+	{
+		uintmax_t size = 0;
+
+		for( const auto &path : filesPaths )
+			size += fs::file_size( path );
+
+		return size;
+	}
+
+	uintmax_t getSizeToHide( const std::vector<std::wstring> &filesToHide )
+	{
+		uintmax_t size;
+
+		size = getFilesSize( filesToHide );
+		size += filesToHide.size() * sizeof( HiddenFileMetadata );
+		size += sizeof( uint64_t ); // for last 0 
+
+		return size;
+	}
+
 public:
-	struct HiddenChunkMetadata
+	struct HiddenChunkMetadata2
 	{
 		size_t nextClusterNo, offsetInNextCluster;
 
-		HiddenChunkMetadata() :
+		HiddenChunkMetadata2( ) :
 			nextClusterNo( magicEndOfChain )
 		{}
-		HiddenChunkMetadata( const size_t _nextClusterNo,
+		HiddenChunkMetadata2( const size_t _nextClusterNo,
 							 const size_t _offsetInNextCluster ) :
 							 nextClusterNo( _nextClusterNo ),
 							 offsetInNextCluster( _offsetInNextCluster )
@@ -26,15 +64,27 @@ public:
 						
 	};
 
-private:
-	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
-	Fat32Manager fatManager;
+	struct HiddenFileMetadata
+	{
+		wchar_t fileName[maxFileName];
+		uint64_t fileSize;
+
+		HiddenFileMetadata( ) {}
+
+		HiddenFileMetadata( const std::wstring &fileName,
+							 const uint64_t fileSize ) :
+							 fileSize( fileSize )
+		{
+			std::copy( fileName.begin(), fileName.end(), this->fileName );
+		}
+	};
+
 
 public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFile( const std::string &filePath, const std::string &partitionPath )
+	bool hideFile2( const std::string &filePath, const std::string &partitionPath )
 	{
 		const size_t metadataSize = sizeof( HiddenChunkMetadata );
 
@@ -95,6 +145,18 @@ public:
 		}
 
 		return true;
+	}
+
+	bool hideFiles( const std::vector<std::wstring> &filesOnPartition,
+					const std::vector<std::wstring> &filesToHide,
+					const std::wstring &partitionPath )
+	{
+		uintmax_t sizeToHide;
+
+		if( !isPathsCorrect( filesOnPartition ) )
+			return false;
+
+
 	}
 };
 
