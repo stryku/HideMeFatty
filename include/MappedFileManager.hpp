@@ -47,29 +47,46 @@ private:
 	}
 
 	uintmax_t getSizeForMapGranularity( const uintmax_t offset,
-										  const uintmax_t preparedOffset,
-										 size_t size ) const
+										const uintmax_t preparedOffset,
+										size_t size ) const
 	{
-		
+
 		size_t calculatedSize = mappingGranularity + size - ( preparedOffset + mappingGranularity - offset );
 
 		return ( calculatedSize < mappingGranularity ) ? mappingGranularity : calculatedSize;
 	}
+	
+	uintmax_t getSizeForAllocGranularity( const uintmax_t offset,
+										 const uintmax_t preparedOffset,
+										 size_t size ) const
+	{
 
-	void remapChunk( uintmax_t startOffset, size_t sizeToMap )
+		size_t calculatedSize = allocationGranularity + size - ( preparedOffset + allocationGranularity - offset );
+
+		return ( calculatedSize < allocationGranularity ) ? allocationGranularity : calculatedSize;
+	}
+
+	void remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard )
 	{
 		uint64_t preparedOffset, preparedSize;
 
-		preparedOffset = getOffsetForAllocGranularity( startOffset );
-		preparedOffset = getOffsetForMapGranularity( preparedOffset );
-		preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
+		if( hard )
+		{
+			preparedOffset = getOffsetForAllocGranularity( startOffset );
+			preparedSize = getSizeForAllocGranularity( startOffset, preparedOffset, sizeToMap );
+		}
+		else
+		{
+			preparedOffset = getOffsetForAllocGranularity( startOffset );
+			preparedOffset = getOffsetForMapGranularity( preparedOffset );
+			preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
+		}
 
 		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
-
 			mappedFile.open( filePath,
-			std::ios_base::in | std::ios_base::out,
-			preparedSize,
-			preparedOffset );
+							std::ios_base::in | std::ios_base::out,
+							preparedSize,
+							preparedOffset );
 
 		if( mappedFile.is_open() == false )
 		{
@@ -80,6 +97,20 @@ private:
 		mappedChunkInfo.begin = preparedOffset;
 		mappedChunkInfo.end = preparedOffset + preparedSize;
 		mappedChunkInfo.mapped = true;
+	}
+
+	char* getUserPtr( uintmax_t startOffset )
+	{
+		uintptr_t intPtr;
+		char *preparedPtr;
+
+		preparedPtr = mappedFile.data();
+
+		intPtr = reinterpret_cast<uintptr_t> ( mappedFile.data() );
+
+		preparedPtr += startOffset - intPtr;
+
+		return preparedPtr;
 	}
 
 public:
@@ -104,19 +135,18 @@ public:
 		filePath = pathToFile;
 	}
 
-	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0 )
+	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0, bool hard = false )
 	{
 		char *mappedPtr;
 		uint64_t preparedOffset, preparedSize;
 
-		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
-			remapChunk( startOffset, sizeToMap );
+		if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
+			remapChunk( startOffset, sizeToMap, hard );
 
-		if( mappedFile.is_open( ) == false )
+		if( mappedFile.is_open() == false )
 			return nullptr;
 
-		mappedPtr = mappedFile.data( ) + startOffset;
-
+		mappedPtr = getUserPtr( startOffset );
 
 		return mappedPtr;
 	}
