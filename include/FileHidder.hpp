@@ -9,18 +9,20 @@
 #include <vector>
 #include <string>
 #include <numeric>
-#include <sstream>
 
 #include <Fat32Manager.hpp>
+#include <DistributedMemoryMapper.hpp>
 
 namespace fs = boost::filesystem;
 
 class FileHidder
 {
 private:
+
 	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
 	static const size_t maxFileName = 256;
 	Fat32Manager fatManager;
+	DistributedMemoryMapper dmm;
 
 	bool isPathsCorrect( const std::vector<std::wstring> &paths )
 	{
@@ -95,6 +97,24 @@ private:
 		stringSeed = stringSeed.substr( 0, 8 );
 
 		return boost::lexical_cast<uint32_t>( stringSeed );
+	}
+
+	bool mapFreeSpace( const std::vector<std::wstring> &filesOnPartition )
+	{
+		std::vector<Fat32Manager::FreeSpaceChunk> chunks;
+		uintmax_t startOffset;
+		char *mappedPtr;
+		
+		mappedPtr = fatManager.mapSpaceAfterFiles( filesOnPartition );
+
+		if( mappedPtr == nullptr )
+			return false;
+
+		chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
+
+		startOffset = std::min( chunks.begin(), chunks.end() )->offset;
+
+
 	}
 
 public:

@@ -17,6 +17,25 @@ private:
 	static const unsigned char DELETED_MAGIC = 0xE5;
 	static const unsigned char LFN_ATTRIBUTE = 0x0F;
 
+	struct ClusterWithFreeSpace
+	{
+		size_t clusterNo,
+		freeSpaceOffset;
+
+		ClusterWithFreeSpace( ) {}
+		ClusterWithFreeSpace( size_t clusterNo, size_t freeSpaceOffset ) :
+			clusterNo( clusterNo ),
+			freeSpaceOffset( freeSpaceOffset )
+		{}
+
+		bool operator< ( const ClusterWithFreeSpace &c )
+		{
+			return clusterNo < c.clusterNo;
+		}
+	};
+
+	
+
 	FatBS bootSector;
 	Fat32ExtBS fat32ExtBS;
 	FatInfo fatInfo;
@@ -119,7 +138,7 @@ private:
 	{
 		return ( clusterNo - 2 ) * bootSector.sectors_per_cluster + fatInfo.first_data_sector;
 	}
-	inline uint64_t getClusterStartOffset( size_t clusterNo ) const
+	inline uintmax_t getClusterStartOffset( size_t clusterNo ) const
 	{
 		return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 	}
@@ -345,6 +364,23 @@ private:
 	}
 	
 public:
+	struct FreeSpaceChunk
+	{
+		uintmax_t offset;
+		size_t size;
+
+		FreeSpaceChunk( ) {}
+		FreeSpaceChunk( uintmax_t offset, size_t size ) :
+			offset( offset ),
+			size( size )
+		{}
+
+		bool operator< ( const FreeSpaceChunk &c )
+		{
+			return offset < c.offset;
+		}
+	};
+
 	Fat32Manager() :
 		fatInfoLoaded( false ),
 		bootSectorLoaded( false ),
@@ -465,6 +501,60 @@ public:
 		file = findFile( path );
 
 		return getFreeSpaceAfterFile( file );
+	}
+
+	size_t getFileLastClusterNo( const std::wstring &path )
+	{
+		DirectoryEntry file;
+
+		file = findFile( path );
+
+		return getFileLastClusterNo( file );
+	}
+
+	size_t getFileFreeSpaceOffset( const std::wstring &path )
+	{
+		DirectoryEntry file;
+
+		file = findFile( path );
+
+		return file.getFileSize() % clusterSize();
+	}
+
+	char* mapSpaceAfterFiles( const std::vector<std::wstring> &files )
+	{
+		std::vector<ClusterWithFreeSpace> clusters;
+		uintmax_t preparedOffset, preparedSize;
+		size_t firstCluster, lastCluster;
+
+		for( const auto &file : files )
+		{
+			clusters.push_back( ClusterWithFreeSpace( getFileLastClusterNo( file ),
+													getFileFreeSpaceOffset( file ) ) );
+		}
+
+		firstCluster = std::min( clusters.begin( ), clusters.end( ) )->clusterNo;
+		lastCluster = std::max( clusters.begin( ), clusters.end( ) )->clusterNo;
+
+		preparedOffset = getClusterStartOffset( firstCluster );
+		preparedSize = getClusterStartOffset( lastCluster + 1 ) - preparedOffset;
+
+		return mappedFileMngr.map( preparedOffset, preparedSize, true );
+	}
+
+	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const std::vector<std::wstring> &files )
+	{
+		std::vector<FreeSpaceChunk> chunks;
+
+		for( const auto &file : files )
+		{
+			size_t clusterNo = getFileLastClusterNo(file);
+
+			chunks.push_back( FreeSpaceChunk( getClusterStartOffset( clusterNo ),
+												getFreeSpaceAfterFile( file ) ) );
+		}
+
+		return chunks;
 	}
 };
 
