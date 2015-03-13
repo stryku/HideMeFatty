@@ -314,6 +314,35 @@ private:
 		return ret;
 	}
 
+	DirectoryEntry findFile( const std::wstring &path )
+	{
+		std::vector<std::wstring> foldersNames;
+		std::wstring fileName;
+		DirectoryEntry currentFolder, findedFile;
+
+		foldersNames = getPathFoldersNames( path );
+		fileName = getPathFileName( path );
+
+		currentFolder.setCluster( fat32ExtBS.root_cluster );
+
+		for( const auto &folderName : foldersNames )
+		{
+			currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+
+			if( currentFolder.type( ) == BAD_DIR_ENTRY )
+				return DirectoryEntry();
+		}
+
+		if( fileName.length() == 0 )
+			return DirectoryEntry();
+		
+		findedFile = findDirEntryInFolder( fileName, currentFolder.getCluster() );
+
+		if( findedFile.type( ) == BAD_DIR_ENTRY )
+			return DirectoryEntry( );
+
+		return findedFile;
+	}
 	
 public:
 	Fat32Manager() :
@@ -426,30 +455,17 @@ public:
 
 	bool isPathCorrect( const std::wstring &path )
 	{
-		std::vector<std::wstring> foldersNames;
-		std::wstring fileName;
-		DirectoryEntry currentFolder;
-
-		foldersNames = getPathFoldersNames( path );
-		fileName = getPathFileName( path );
-
-		currentFolder.setCluster( fat32ExtBS.root_cluster );
-
-		for( const auto &folderName : foldersNames )
-		{
-			currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
-
-			if( currentFolder.type( ) == BAD_DIR_ENTRY )
-				return false;
-		}
-
-		if( fileName.length() > 0 &&
-			findDirEntryInFolder( fileName, currentFolder.getCluster() ).type() == BAD_DIR_ENTRY )
-			return false;
-
-		return true;
+		return findFile( path ).type() == BAD_DIR_ENTRY;
 	}
 
+	size_t getFreeSpaceAfterFile( const std::wstring &path )
+	{
+		DirectoryEntry file;
+
+		file = findFile( path );
+
+		return getFreeSpaceAfterFile( file );
+	}
 };
 
 #endif
