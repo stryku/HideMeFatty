@@ -2,6 +2,7 @@
 #define _INCLUDE_FILEHIDDER_HPP_
 
 #include <boost\filesystem\operations.hpp>
+#include <boost/random/mersenne_twister.hpp>
 #include <boost\lexical_cast.hpp>
 #include <cryptopp562\sha.h>
 #include <cryptopp562\hex.h>
@@ -114,7 +115,10 @@ private:
 
 		startOffset = std::min( chunks.begin(), chunks.end() )->offset;
 
+		for( const auto &chunk : chunks )
+			dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
 
+		return true;
 	}
 
 public:
@@ -216,12 +220,15 @@ public:
 		return true;
 	}
 
+	
+
 	bool hideFiles( const std::vector<std::wstring> &filesOnPartition,
 					const std::vector<std::wstring> &filesToHide,
 					const std::wstring &partitionPath )
 	{
 		uintmax_t sizeToHide;
 		uint32_t seed;
+		boost::random::mt19937 rng;
 
 		if( !isPathsCorrect( filesOnPartition ) )
 			return false;
@@ -229,7 +236,14 @@ public:
 		if( getSizeToHide( filesToHide ) > getFreeSpaceAfterFiles( filesOnPartition ) )
 			return false;
 
+		if( !mapFreeSpace( filesOnPartition ) )
+			return false;
+
 		seed = getSeed( filesOnPartition );
+
+		rng.seed( seed );
+
+
 	}
 };
 
