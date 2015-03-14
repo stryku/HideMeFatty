@@ -40,20 +40,19 @@ std::vector<std::wstring> getVectorOfPaths( const char *text )
 	return ret;
 }
 
-
 void hide()
 {
 	std::vector<std::wstring> filesToHide, filesOnPartition;
 	std::wstring partitionPath, partitionDevicePath;
 	FileHidder fileHidder;
 
-	filesToHide = getVectorOfPaths( "Put paths to files to hide. And 'q' after that\n\n>" );
-	filesOnPartition = getVectorOfPaths("Put full paths to files on partiiton. And 'q' after that.\n\
+	filesToHide = getVectorOfPaths( "\nPut paths to files to hide. And 'q' after that\n\n" );
+	filesOnPartition = getVectorOfPaths("\nPut full paths to files on partiiton. And 'q' after that.\n\
 										See documentation for details\n\n>" );
-	partitionPath = getPath( "Put full path to partition\n\n>" );
-	partitionDevicePath = getPath( "Put full path to partition device(that in /dev/ folder)\n\n>" );
+	partitionPath = getPath( "\nPut full path to partition\n\n>" );
+	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n>" );
 
-	std::cout << "Starting hidding files. Be patient...";
+	std::cout << "\nStarting hidding files. Be patient...";
 
 	if( fileHidder.hideFiles( filesOnPartition,
 		partitionPath,
@@ -63,7 +62,7 @@ void hide()
 		std::cout << "\nFiles hidded\n";
 	}
 	else
-		std::cout << "Couldn't hide files. See last output log for details.\n";
+		std::cout << "\nCouldn't hide files. See last output log for details.\n";
 }
 
 void restore()
@@ -72,23 +71,22 @@ void restore()
 	std::wstring partitionPath, partitionDevicePath, pathToStore;
 	FileHidder fileHidder;
 
-	filesOnPartition = getVectorOfPaths( "Put full paths to files on partiiton. And 'q' after that.\n\
-										 										See documentation for details\n\n>" );
-	partitionPath = getPath( "Put full path to partition\n\n>" );
-	partitionDevicePath = getPath( "Put full path to partition device(that in /dev/ folder)\n\n>" );
-	pathToStore = getPath( "Put path where store restored files\n\n>" );
+	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n>" );
+	partitionPath = getPath( "\nPut full path to partition\n\n" );
+	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n>" );
+	pathToStore = getPath( "\nPut path where store restored files\n\n>" );
 
-	std::cout << "Starting restoring files. Be patient...";
+	std::cout << "\nStarting restoring files. Be patient...";
 
 	if( fileHidder.restoreMyFiles( filesOnPartition,
 		partitionPath,
 		partitionDevicePath,
 		pathToStore ) )
 	{
-		std::cout << "Files restored.";
+		std::cout << "\nFiles restored.";
 	}
 	else
-		std::cout << "Couldn't restore files. See last output log for details.\n";
+		std::cout << "\nCouldn't restore files. See last output log for details.\n";
 }
 
 int menu()
@@ -98,6 +96,8 @@ int menu()
 	std::cout << "\n\n\t\tMENU\n\n1. Hide files\n2. Restore files\n0. Exit\n>";
 
 	std::cin >> choice;
+
+	while( std::cin.get() != '\n' ) {}
 
 	return choice;
 }
