@@ -85,7 +85,7 @@ public:
 	};
 
 	Fat32Manager();
-	Fat32Manager( const std::string &partitionPath );
+	Fat32Manager( const std::wstring &partitionPath );
 	~Fat32Manager() {}
 
 	void setPartitionPath( const fs::path &partitionPath );

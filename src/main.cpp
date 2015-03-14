@@ -1,118 +1,126 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <FileHidder.hpp>
 
-std::string getPartitionPath()
+std::wstring stringToWString( const std::string &s )
+{
+	return std::wstring( s.begin( ), s.end( ) );
+}
+
+std::wstring getPath( )
 {
 	std::string ret;
 
-	std::cout << "Put full path to partition\n>";
 	getline( std::cin, ret );
 
-	return ret;
+	return stringToWString( ret );
 }
 
-std::string getPartitionDevPath()
+std::wstring getPath( const char *text )
 {
-	std::string ret;
-
-	std::cout << "Put full path to partition device(that in /dev/ folder)\n>";
-	getline( std::cin, ret );
-
-	return ret;
+	std::cout << text;
+	return getPath();
 }
 
-std::vector<std::string> getFilesOnPartition( )
+std::vector<std::wstring> getVectorOfPaths( const char *text )
 {
-	std::vector<std::string> ret;
-	std::string tmp( "" );
+	std::vector<std::wstring> ret;
+	std::wstring tmp;
 
-	std::cout << "Put full path to files in partition.\n";
-	std::cout << "See documentation for details\n";
-	std::cout << "Put 'q' after all files\n";
+	std::cout << text;
 
-	while( tmp != "q" )
+	while( ( tmp = getPath() ) != stringToWString( "q" ) )
 	{
-		getline( std::cin, tmp );
-
-		if( tmp == "q" )
-			break;
-
 		ret.push_back( tmp );
+		std::cout << ">";
 	}
 
 	return ret;
 }
 
-std::vector<std::string> getFilesToHide( )
+
+void hide()
 {
-	std::vector<std::string> ret;
-	std::string tmp( "" );
+	std::vector<std::wstring> filesToHide, filesOnPartition;
+	std::wstring partitionPath, partitionDevicePath;
+	FileHidder fileHidder;
 
-	std::cout << "Put full path to files to hide.\n";
-	std::cout << "Put 'q' after all files\n";
+	filesToHide = getVectorOfPaths( "Put paths to files to hide. And 'q' after that\n\n>" );
+	filesOnPartition = getVectorOfPaths("Put full paths to files on partiiton. And 'q' after that.\n\
+										See documentation for details\n\n>" );
+	partitionPath = getPath( "Put full path to partition\n\n>" );
+	partitionDevicePath = getPath( "Put full path to partition device(that in /dev/ folder)\n\n>" );
 
-	while( tmp != "q" )
+	std::cout << "Starting hidding files. Be patient...";
+
+	if( fileHidder.hideFiles( filesOnPartition,
+		partitionPath,
+		filesToHide,
+		partitionDevicePath ) )
 	{
-		getline( std::cin, tmp );
-
-		if( tmp == "q" )
-			break;
-
-		ret.push_back( tmp );
+		std::cout << "\nFiles hidded\n";
 	}
-
-	return ret;
+	else
+		std::cout << "Couldn't hide files. See last output log for details.\n";
 }
 
-bool hide()
+void restore()
 {
-	std::vector<std::string> filesOnPartition, filesToHide;
-	std::string partitionPath, partitionDevPath;
+	std::vector<std::wstring> filesOnPartition;
+	std::wstring partitionPath, partitionDevicePath, pathToStore;
+	FileHidder fileHidder;
 
+	filesOnPartition = getVectorOfPaths( "Put full paths to files on partiiton. And 'q' after that.\n\
+										 										See documentation for details\n\n>" );
+	partitionPath = getPath( "Put full path to partition\n\n>" );
+	partitionDevicePath = getPath( "Put full path to partition device(that in /dev/ folder)\n\n>" );
+	pathToStore = getPath( "Put path where store restored files\n\n>" );
 
-	partitionPath = getPartitionPath( );
-	partitionDevPath = getPartitionDevPath( );
-	filesOnPartition = getFilesOnPartition( );
-	filesToHide = getFilesToHide( );
+	std::cout << "Starting restoring files. Be patient...";
 
-
+	if( fileHidder.restoreMyFiles( filesOnPartition,
+		partitionPath,
+		partitionDevicePath,
+		pathToStore ) )
+	{
+		std::cout << "Files restored.";
+	}
+	else
+		std::cout << "Couldn't restore files. See last output log for details.\n";
 }
 
-void execute( int argc, char *argv[] )
+int menu()
 {
-	
+	int choice;
 
+	std::cout << "\n\n\t\tMENU\n\n1. Hide files\n2. Restore files\n0. Exit\n>";
 
+	std::cin >> choice;
+
+	return choice;
+}
+
+void execute()
+{
+
+	while( true )
+	{
+		switch( menu() )
+		{
+			case 1: hide(); break;
+			case 2: restore(); break;
+			case 0: std::cout << "Bye bye"; return; break;
+
+			default: std::cout << "Wrong number\n";
+		}
+	}
 }
 
 int main()
 {
-	FileHidder fileHidder;
-
-	vector<wstring> filesToHide;
-	vector<wstring> filesOnPartition;
-	wstring partitionPath = StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc" );
-
-	filesToHide.push_back( StringToWString( "test.txt" ) );
-	filesToHide.push_back( StringToWString( "test.png" ) );
-
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/linux-2.6.32.64.tar.xz" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/free.jpg" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/[kickass.so]pure.milf.7.xxx.dvdrip.x264.redsection.torrent" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/[kickass.so]the.amazing.spiderman.2012.1080p.brrip.x264.yify.torrent" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/[kickass.so]windows.xp.professional.sp3.nov.2013.sata.drivers.thumperdc.torrent" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/2.rar" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/4689873108.jpg" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/Bespin.zip" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/Diablo II   Pan Zniszczenia [ ISO  BIN] [5CD] [PL][Torrenty.org] (1).torrent" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/main.c" ) );
-	filesOnPartition.push_back( StringToWString( "C:/PROGRAMOWANIE/C++/PROJEKTY/MOJE/HIDE_ME_FATTY/files/zawartosc/pliczki/nieznany_kapsel.jpg" ) );
-	
-	fileHidder.hideFiles( filesOnPartition, partitionPath, filesToHide, StringToWString( "fat32example" ) );
-
-	fileHidder.restoreMyFiles( filesOnPartition, partitionPath, StringToWString( "fat32example" ), StringToWString( "finded" ) );
+	execute();
 
 	return 0;
 }

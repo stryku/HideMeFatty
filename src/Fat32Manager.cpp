@@ -7,7 +7,7 @@ Fat32Manager::Fat32Manager( ) :
 	initOk( false )
 {}
 
-Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
+Fat32Manager::Fat32Manager( const std::wstring &partitionPath ) :
 	fatInfoLoaded( false ),
 	bootSectorLoaded( false ),
 	fatTableLoaded( false )
@@ -257,7 +257,7 @@ std::wstring Fat32Manager::getPathFileName( const std::wstring &path ) const
 {
 	size_t pos = path.find_last_of( '/' );
 
-	pos = ( pos == std::wstring::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
+	pos = ( pos == std::string::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
 
 	return path.substr( pos );
 }
