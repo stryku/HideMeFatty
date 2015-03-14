@@ -3,7 +3,7 @@
 
 #include <boost/random/mersenne_twister.hpp>
 #include <vector>
-#include <stdint.h>
+#include <stdint.h> 
 
 class DistributedMemoryMapper
 {
@@ -14,7 +14,7 @@ private:
 		size_t size;
 
 		ChunkMetadata();
-		ChunkMetadata( char *, size_t  );
+		ChunkMetadata( char *ptr, size_t size );
 		~ChunkMetadata() {}
 	};
 
@@ -30,13 +30,13 @@ public:
 	{}
 	~DistributedMemoryMapper() {}
 
-	void addMemoryChunk( char *, size_t  );
+	void addMemoryChunk( char *ptr, size_t size );
 
-	char& operator[]( uintmax_t );
+	char& operator[]( uintmax_t no );
 
 	char& shuffled();
 
-	void createShuffledArray( boost::random::mt19937 & );
+	void createShuffledArray( boost::random::mt19937 &rng );
 
 	void clear();
 };

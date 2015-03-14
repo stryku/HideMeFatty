@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-
+ 
 #include <FatStructs.h>
 #include <Structs.h>
 
@@ -22,23 +22,25 @@ private:
 	bool deleted;
 
 private:
-	inline std::wstring getPartOfName( const FatRawLongFileName & ) const;
+	inline std::wstring getPartOfName( const FatRawLongFileName &longFileName ) const;
 
-	inline std::wstring extractExtension( const FatRawDirectoryEntry & ) const;
-	inline std::wstring extractShortName( const FatRawDirectoryEntry & ) const;
-	inline std::wstring extractName( const std::vector<FatRawLongFileName> &,
-									 const FatRawDirectoryEntry & ) const;
-	inline Date extractDate( const unsigned short int , const unsigned short int  ) const;
-	inline bool extractIfDeleted( const FatRawDirectoryEntry & ) const;
-	inline size_t extractCluster( const FatRawDirectoryEntry & ) const;
+	inline std::wstring extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline std::wstring extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames,
+									 const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline Date extractDate( const unsigned short int time, const unsigned short int date ) const;
+	inline bool extractIfDeleted( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline size_t extractCluster( const FatRawDirectoryEntry &rawDirEntry ) const;
 
 public:
 	DirectoryEntry();
-	DirectoryEntry( const std::vector<FatRawLongFileName> &,
-					const FatRawDirectoryEntry & );
+	DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames,
+					const FatRawDirectoryEntry &rawDirEntry );
 	~DirectoryEntry() {}
 
-	void assign( const std::vector<FatRawLongFileName> &, const FatRawDirectoryEntry & );
+	void assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry );
+
+	void print( std::wostream &ostream ) const;
 
 	EDirEntryType type() const;
 
@@ -47,7 +49,7 @@ public:
 	size_t getCluster() const;
 
 	void setCluster( size_t cluster );
-	bool operator==( const DirectoryEntry & ) const;
+	bool operator==( const DirectoryEntry &de ) const;
 };
 
 #endif

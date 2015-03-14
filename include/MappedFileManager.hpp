@@ -21,7 +21,7 @@ private:
 
 		MappedChunk();
 
-		bool inside( const uintmax_t, const size_t ) const;
+		bool inside( const uintmax_t offset, const size_t size ) const;
 
 	} mappedChunkInfo;
 
@@ -32,27 +32,27 @@ private:
 
 private:
 
-	uintmax_t getOffsetForAllocGranularity( uintmax_t ) const;
-	uintmax_t getOffsetForMapGranularity( uintmax_t ) const;
-	uintmax_t getSizeForMapGranularity( const uintmax_t,
-										const uintmax_t,
-										size_t ) const;
-	uintmax_t getSizeForAllocGranularity( const uintmax_t,
-										  const uintmax_t,
-										  size_t ) const;
+	uintmax_t getOffsetForAllocGranularity( uintmax_t offset ) const;
+	uintmax_t getOffsetForMapGranularity( uintmax_t offset ) const;
+	uintmax_t getSizeForMapGranularity( const uintmax_t offset,
+										const uintmax_t preparedOffset,
+										size_t size ) const;
+	uintmax_t getSizeForAllocGranularity( const uintmax_t offset,
+										  const uintmax_t preparedOffset,
+										  size_t size ) const;
 
-	void remapChunk( uintmax_t, size_t, bool );
+	void remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard );
 
-	char* getUserPtr( uintmax_t );
+	char* getUserPtr( uintmax_t startOffset );
 
-public:
+public: 
 	MappedFileManager();
-	MappedFileManager( const size_t );
+	MappedFileManager( const size_t _mappingGranularity );
 	~MappedFileManager();
 
-	void setFilePath( const fs::path & );
+	void setFilePath( const fs::path &pathToFile );
 
-	char* map( uintmax_t = 0, size_t = 0, bool = false );
+	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0, bool hard = false );
 
 	void close();
 };
