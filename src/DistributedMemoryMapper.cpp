@@ -36,8 +36,7 @@ char& DistributedMemoryMapper::shuffled( )
 	return ( *this )[*shuffledIterator++];
 }
 
-template <class T>
-void DistributedMemoryMapper::createShuffledArray( T &rng )
+void DistributedMemoryMapper::createShuffledArray( boost::random::mt19937 &rng )
 {
 	std::vector<bool> usedBytes( totalSize, false );
 
@@ -47,7 +46,7 @@ void DistributedMemoryMapper::createShuffledArray( T &rng )
 	{
 		uintmax_t ind;
 
-		ind = rng( ) % totalSize;
+		ind = rng() % totalSize;
 
 		while( usedBytes[ind] )
 		{
@@ -59,7 +58,7 @@ void DistributedMemoryMapper::createShuffledArray( T &rng )
 		usedBytes[ind] = true;
 	}
 
-	shuffledIterator = shuffledArray.begin( );
+	shuffledIterator = shuffledArray.begin();
 }
 
 void DistributedMemoryMapper::clear( )
