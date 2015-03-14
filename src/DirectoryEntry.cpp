@@ -134,15 +134,6 @@ void DirectoryEntry::assign( const std::vector<FatRawLongFileName> &longFileName
 	deleted = extractIfDeleted( rawDirEntry );
 }
 
-void DirectoryEntry::print( std::wostream &ostream ) const
-{
-	ostream << "Deleted: " << ( deleted ? "True" : "False" ) << "\n";
-	ostream << "Name: " << name << "\n";
-	ostream << "Size: " << fileSize << "\n";
-	ostream << "Cluster: " << cluster << "\n";
-	ostream << "Attributes: 0x" << std::hex << attributes << "\n\n";
-}
-
 EDirEntryType DirectoryEntry::type( ) const
 {
 	return static_cast<EDirEntryType>( attributes );

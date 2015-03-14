@@ -22,25 +22,23 @@ private:
 	bool deleted;
 
 private:
-	inline std::wstring getPartOfName( const FatRawLongFileName &longFileName ) const;
+	inline std::wstring getPartOfName( const FatRawLongFileName & ) const;
 
-	inline std::wstring extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const;
-	inline std::wstring extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const;
-	inline std::wstring extractName( const std::vector<FatRawLongFileName> &longFileNames,
-									 const FatRawDirectoryEntry &rawDirEntry ) const;
-	inline Date extractDate( const unsigned short int time, const unsigned short int date ) const;
-	inline bool extractIfDeleted( const FatRawDirectoryEntry &rawDirEntry ) const;
-	inline size_t extractCluster( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline std::wstring extractExtension( const FatRawDirectoryEntry & ) const;
+	inline std::wstring extractShortName( const FatRawDirectoryEntry & ) const;
+	inline std::wstring extractName( const std::vector<FatRawLongFileName> &,
+									 const FatRawDirectoryEntry & ) const;
+	inline Date extractDate( const unsigned short int , const unsigned short int  ) const;
+	inline bool extractIfDeleted( const FatRawDirectoryEntry & ) const;
+	inline size_t extractCluster( const FatRawDirectoryEntry & ) const;
 
 public:
 	DirectoryEntry();
-	DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames,
-					const FatRawDirectoryEntry &rawDirEntry );
+	DirectoryEntry( const std::vector<FatRawLongFileName> &,
+					const FatRawDirectoryEntry & );
 	~DirectoryEntry() {}
 
-	void assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry );
-
-	void print( std::wostream &ostream ) const;
+	void assign( const std::vector<FatRawLongFileName> &, const FatRawDirectoryEntry & );
 
 	EDirEntryType type() const;
 
@@ -49,7 +47,7 @@ public:
 	size_t getCluster() const;
 
 	void setCluster( size_t cluster );
-	bool operator==( const DirectoryEntry &de ) const;
+	bool operator==( const DirectoryEntry & ) const;
 };
 
 #endif

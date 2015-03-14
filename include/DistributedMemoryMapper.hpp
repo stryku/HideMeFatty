@@ -14,7 +14,7 @@ private:
 		size_t size;
 
 		ChunkMetadata();
-		ChunkMetadata( char *ptr, size_t size );
+		ChunkMetadata( char *, size_t  );
 		~ChunkMetadata() {}
 	};
 
@@ -30,13 +30,13 @@ public:
 	{}
 	~DistributedMemoryMapper() {}
 
-	void addMemoryChunk( char *ptr, size_t size );
+	void addMemoryChunk( char *, size_t  );
 
-	char& operator[]( uintmax_t no );
+	char& operator[]( uintmax_t );
 
 	char& shuffled();
 
-	void createShuffledArray( boost::random::mt19937 &rng );
+	void createShuffledArray( boost::random::mt19937 & );
 
 	void clear();
 };
