@@ -1,19 +1,90 @@
 #include <iostream>
+#include <string>
 
 #include <FileHidder.hpp>
-#include <Fat32Manager.hpp>
-#include <DistributedMemoryMapper.hpp>
 
-#include <algorithm>
-
-using namespace std;
-
-
-std::wstring StringToWString( const std::string &s )
+std::string getPartitionPath()
 {
-	std::wstring wsTmp( s.begin( ), s.end( ) );
+	std::string ret;
 
-	return wsTmp;
+	std::cout << "Put full path to partition\n>";
+	getline( std::cin, ret );
+
+	return ret;
+}
+
+std::string getPartitionDevPath()
+{
+	std::string ret;
+
+	std::cout << "Put full path to partition device(that in /dev/ folder)\n>";
+	getline( std::cin, ret );
+
+	return ret;
+}
+
+std::vector<std::string> getFilesOnPartition( )
+{
+	std::vector<std::string> ret;
+	std::string tmp( "" );
+
+	std::cout << "Put full path to files in partition.\n";
+	std::cout << "See documentation for details\n";
+	std::cout << "Put 'q' after all files\n";
+
+	while( tmp != "q" )
+	{
+		getline( std::cin, tmp );
+
+		if( tmp == "q" )
+			break;
+
+		ret.push_back( tmp );
+	}
+
+	return ret;
+}
+
+std::vector<std::string> getFilesToHide( )
+{
+	std::vector<std::string> ret;
+	std::string tmp( "" );
+
+	std::cout << "Put full path to files to hide.\n";
+	std::cout << "Put 'q' after all files\n";
+
+	while( tmp != "q" )
+	{
+		getline( std::cin, tmp );
+
+		if( tmp == "q" )
+			break;
+
+		ret.push_back( tmp );
+	}
+
+	return ret;
+}
+
+bool hide()
+{
+	std::vector<std::string> filesOnPartition, filesToHide;
+	std::string partitionPath, partitionDevPath;
+	FileHidder fileHidder;
+
+	partitionPath = getPartitionPath( );
+	partitionDevPath = getPartitionDevPath( );
+	filesOnPartition = getFilesOnPartition( );
+	filesToHide = getFilesToHide( );
+
+	
+}
+
+void execute( int argc, char *argv[] )
+{
+	
+
+
 }
 
 int main()
