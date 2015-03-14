@@ -70,14 +70,14 @@ bool hide()
 {
 	std::vector<std::string> filesOnPartition, filesToHide;
 	std::string partitionPath, partitionDevPath;
-	FileHidder fileHidder;
+
 
 	partitionPath = getPartitionPath( );
 	partitionDevPath = getPartitionDevPath( );
 	filesOnPartition = getFilesOnPartition( );
 	filesToHide = getFilesToHide( );
 
-	
+
 }
 
 void execute( int argc, char *argv[] )
