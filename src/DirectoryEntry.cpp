@@ -168,3 +168,16 @@ bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
 		de.creationDate == creationDate &&
 		de.lastModificationDate == lastModificationDate;
 }
+
+std::ostream& operator<< ( std::ostream &out, const DirectoryEntry &de )
+{
+	out << "name = " << de.name.c_str( ) << \
+		"file size = " << de.fileSize << \
+		"attributes = 0x" << std::hex << de.attributes << \
+		"cluster = " << std::dec << de.cluster << \
+		"creation date = " << de.creationDate << \
+		"last modification date = " << de.lastModificationDate << \
+		"deleted = " << std::boolalpha << de.deleted;
+
+	return out;
+}

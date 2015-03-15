@@ -1,8 +1,15 @@
+
+
+
 #include <iostream>
 #include <string>
 #include <vector>
 
+#define ELPP_STL_LOGGING
+#include <easyloggingpp_v9.80\easylogging++.h>
+
 #include <FileHidder.hpp>
+
 
 std::wstring stringToWString( const std::string &s )
 {
@@ -70,11 +77,17 @@ void restore()
 	std::vector<std::wstring> filesOnPartition;
 	std::wstring partitionPath, partitionDevicePath, pathToStore;
 	FileHidder fileHidder;
+	el::Logger* defaultLogger = el::Loggers::getLogger( "default" );
 
 	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n>" );
 	partitionPath = getPath( "\nPut full path to partition\n\n" );
 	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n>" );
 	pathToStore = getPath( "\nPut path where store restored files\n\n>" );
+
+	LOG( INFO ) << "Started restoring files";
+	LOG( INFO ) << "Partition path: " << partitionPath;
+	LOG( INFO ) << "Partition device path: " << partitionDevicePath;
+	defaultLogger->info( "Files on partition %v", filesOnPartition );
 
 	std::cout << "\nStarting restoring files. Be patient...";
 
@@ -104,7 +117,6 @@ int menu()
 
 void execute()
 {
-
 	while( true )
 	{
 		switch( menu() )
@@ -118,8 +130,20 @@ void execute()
 	}
 }
 
+void easyLoggingInit()
+{
+	el::Configurations conf( "files/conf/logger.conf" );
+	el::Loggers::reconfigureAllLoggers( conf );
+
+	LOG( INFO ) << "New session";
+
+}
+
+INITIALIZE_EASYLOGGINGPP
+
 int main()
 {
+	easyLoggingInit();
 	execute();
 
 	return 0;

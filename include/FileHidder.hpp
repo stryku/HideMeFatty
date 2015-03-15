@@ -8,13 +8,17 @@
 #  pragma comment ( lib, "cryptlib" )
 #endif
 
-#include <boost\filesystem\operations.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost\lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+
 #include <cryptopp562\sha.h>
 #include <cryptopp562\hex.h>
 #include <cryptopp562\files.h> 
+
+#include <easyloggingpp_v9.80\easylogging++.h>
+
 #include <vector>
 #include <string>
 #include <numeric>

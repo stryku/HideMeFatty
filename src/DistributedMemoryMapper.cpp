@@ -13,6 +13,7 @@ DistributedMemoryMapper::ChunkMetadata::ChunkMetadata( char *ptr,
 
 void DistributedMemoryMapper::addMemoryChunk( char *ptr, size_t size )
 {
+	LOG( INFO ) << "Adding chunk. Ptr: 0x" << std::hex << ptr << ", size: " << std::dec << size;
 	chunks.push_back( ChunkMetadata( ptr, size ) );
 
 	totalSize += size;
@@ -39,6 +40,8 @@ char& DistributedMemoryMapper::shuffled( )
 void DistributedMemoryMapper::createShuffledArray( boost::random::mt19937 &rng )
 {
 	std::vector<bool> usedBytes( totalSize, false );
+
+	LOG( INFO ) << "Creating shuffled array";
 
 	shuffledArray.resize( totalSize );
 

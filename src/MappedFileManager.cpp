@@ -64,29 +64,30 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, size_t sizeToMap, boo
 {
 	uint64_t preparedOffset, preparedSize;
 
+	LOG( INFO ) << "Remapping chunk";
+
 	if( hard )
 	{
 		preparedOffset = getOffsetForAllocGranularity( startOffset );
 		preparedSize = getSizeForAllocGranularity( startOffset, preparedOffset, sizeToMap );
+		LOG( INFO ) << "Hard remapping. Prepared offset = " << preparedOffset << ", prepared size: " << preparedSize;
 	}
 	else
 	{
 		preparedOffset = getOffsetForAllocGranularity( startOffset );
 		preparedOffset = getOffsetForMapGranularity( preparedOffset );
 		preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
+		LOG( INFO ) << "Soft remapping. Prepared offset = " << preparedOffset << ", prepared size: " << preparedSize;
 	}
 
-	if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
-	{
-		mappedFile.close( );
+	mappedFile.close();
 
-		mappedFile.open( filePath,
-						 std::ios_base::in | std::ios_base::out,
-						 preparedSize,
-						 preparedOffset );
-	}
+	mappedFile.open( filePath,
+					 std::ios_base::in | std::ios_base::out,
+					 preparedSize,
+					 preparedOffset );
 
-	if( mappedFile.is_open( ) == false )
+	if( mappedFile.is_open() == false )
 	{
 		mappedChunkInfo.mapped = false;
 		return;
@@ -95,11 +96,24 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, size_t sizeToMap, boo
 	mappedChunkInfo.begin = preparedOffset;
 	mappedChunkInfo.end = preparedOffset + preparedSize;
 	mappedChunkInfo.mapped = true;
+
+	LOG( INFO ) << "Mapped chunk info: " << mappedChunkInfo;
+}
+
+std::ostream& operator<<( std::ostream &out, const MappedFileManager::MappedChunk &mc )
+{
+	out << "Begin = " << mc.begin\
+		<< "End = " << mc.end\
+		<< "Mapped = " << mc.mapped;
+
+	return out;
 }
 
 char* MappedFileManager::getUserPtr( uintmax_t startOffset )
 {
 	char *preparedPtr;
+
+	LOG( INFO ) << "Preparing mapped ptr to what user wanted. Oryginally mapped at: 0x" << std::hex << mappedFile.data();
 
 	preparedPtr = mappedFile.data( );
 
@@ -118,18 +132,31 @@ char* MappedFileManager::map( uintmax_t startOffset, size_t sizeToMap, bool hard
 	char *mappedPtr;
 	uint64_t preparedOffset, preparedSize;
 
-	if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
-		remapChunk( startOffset, sizeToMap, hard );
+	LOG( INFO ) << "Mapping. Start offset = " << startOffset \
+		<< ", size to map = " << sizeToMap \
+		<< ", hard = " << std::boolalpha << hard \
+		<< ", already mapped: " << std::boolalpha<<mappedChunkInfo.mapped;
 
-	if( mappedFile.is_open( ) == false )
+	if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
+	{
+		LOG( INFO ) << "Need to remap";
+		remapChunk( startOffset, sizeToMap, hard );
+	}
+
+	if( mappedFile.is_open() == false )
+	{
+		LOG( INFO ) << "Mapped file isn't open. Returning nullptr";
 		return nullptr;
+	}
 
 	mappedPtr = getUserPtr( startOffset );
 
+	LOG( INFO ) << "Returning 0x" << std::hex << mappedPtr;
 	return mappedPtr;
 }
 
 void MappedFileManager::close( )
 {
+	LOG( INFO ) << "Closing";
 	mappedFile.close( );
 }

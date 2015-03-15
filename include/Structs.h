@@ -29,7 +29,15 @@ struct Date
 				d.month == month &&
 				d.year == year;
 	}
+
+	
 };
+
+inline std::ostream& operator<<( std::ostream &out, const Date &d )
+{
+	out << d.day << "." << d.month << "." << d.year << " " << d.hour << ":" << d.minute << ":" << d.second;
+	return out;
+}
 
 struct ClusterInfo
 {

@@ -4,8 +4,11 @@
 #include <memory>
 #include <vector>
 #include <algorithm> 
+
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
+
+#include <easyloggingpp_v9.80\easylogging++.h>
 
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
@@ -68,7 +71,6 @@ private:
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
 
 	DirectoryEntry findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() );
-	DirectoryEntry findNextFile( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() );
 	DirectoryEntry findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster );
 	DirectoryEntry findFile( const std::wstring &path );
 	
@@ -82,6 +84,7 @@ public:
 		FreeSpaceChunk( uintmax_t offset, size_t size );
 
 		bool operator< ( const FreeSpaceChunk &c ) const;
+		friend std::ostream& operator<< ( std::ostream&, FreeSpaceChunk const& );
 	};
 
 	Fat32Manager();

@@ -3,8 +3,11 @@
 
 #include <string>
 #include <set>
+
 #include <boost\iostreams\device\mapped_file.hpp>
 #include <boost\filesystem\operations.hpp>
+
+#include <easyloggingpp_v9.80\easylogging++.h>
 
 typedef boost::iostreams::mapped_file MappedFile;
 
@@ -55,6 +58,8 @@ public:
 	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0, bool hard = false );
 
 	void close();
+
+	friend std::ostream& operator<<( std::ostream &, const MappedChunk & );
 };
 
 #endif 

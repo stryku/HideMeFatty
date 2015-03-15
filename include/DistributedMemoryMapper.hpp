@@ -2,6 +2,9 @@
 #define _INCLUDE_DISTRIBUTEDMEMORYMAPPER_HPP_
 
 #include <boost/random/mersenne_twister.hpp>
+
+#include <easyloggingpp_v9.80\easylogging++.h>
+
 #include <vector>
 #include <stdint.h> 
 

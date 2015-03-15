@@ -50,6 +50,9 @@ public:
 
 	void setCluster( size_t cluster );
 	bool operator==( const DirectoryEntry &de ) const;
+
+	friend std::ostream& operator<< ( std::ostream&, const DirectoryEntry & );
+
 };
 
 #endif
