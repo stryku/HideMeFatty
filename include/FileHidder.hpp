@@ -86,6 +86,15 @@ private:
 						const uintmax_t freeSpaceSize );
 
 	bool prepareFatManager( const std::wstring &partitionPath );
+	bool checkPaths( const std::vector<std::wstring> &paths );
+	bool checkPaths( const std::vector<std::wstring> &filesOnPartition,
+					 const std::wstring &partitionPath,
+					 const std::vector<std::wstring> &filesToHide,
+					 const std::wstring &partitionDevPath );
+	bool checkPaths( const std::vector<std::wstring> &filesOnPartition,
+					 const std::wstring &partitionPath,
+					 const std::wstring &partitionDevPath,
+					 const std::wstring &pathToStore );
 
 public:
 	FileHidder() {}

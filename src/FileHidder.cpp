@@ -255,6 +255,9 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
 
+	if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
+		return false;
+
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
@@ -262,9 +265,6 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 	}
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
-
-	if( !isPathsCorrect( preparedPaths, partitionPath ) )
-		return false;
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 	sizeToHide = getSizeToHide( filesToHide );
@@ -282,9 +282,7 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 	}
 
 	seed = getSeed( filesOnPartition );
-
 	rng.seed( seed );
-
 	dmm.createShuffledArray( rng );
 
 	for( const auto &file : filesToHide )
@@ -308,6 +306,9 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
 
+	if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
+		return false;
+
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
@@ -315,12 +316,6 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 	}
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
-
-	if( !isPathsCorrect( preparedPaths, partitionPath ) )
-	{
-		LOG( INFO ) << "One or more paths on partition are wrong";
-		return false;
-	}
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
@@ -331,9 +326,7 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 	}
 
 	seed = getSeed( filesOnPartition );
-	
 	rng.seed( seed );
-
 	dmm.createShuffledArray( rng );
 
 	while( restoreMyFile( pathToStore, rng, freeSpaceSize ) ) {}
@@ -350,9 +343,82 @@ std::ostream& operator<<( std::ostream &out, const FileHidder::HiddenFileMetadat
 
 bool FileHidder::prepareFatManager( const std::wstring &partitionPath )
 {
-	fatManager.clear();
+	fatManager.clear( );
 	fatManager.setPartitionPath( partitionPath );
-	fatManager.init();
+	fatManager.init( );
 
-	return fatManager.good();
+	return fatManager.good( );
+}
+
+bool FileHidder::checkPaths( const std::vector<std::wstring> &filesOnPartition,
+							 const std::wstring &partitionPath,
+							 const std::vector<std::wstring> &filesToHide,
+							 const std::wstring &partitionDevPath )
+{
+	if( !checkPaths( filesOnPartition ) )
+	{
+		LOG( INFO ) << "One or more path on partition isn't correct";
+		return false;
+	}
+
+	if( !checkPaths( filesToHide ) )
+	{
+		LOG( INFO ) << "One or more path to hide isn't correct";
+		return false;
+	}
+
+	if( !fs::exists( partitionPath ) )
+	{
+		LOG( INFO ) << "Partition path isn't correct";
+		return false;
+	}
+
+	if( !fs::exists( partitionDevPath ) )
+	{
+		LOG( INFO ) << "Partition device path isn't correct";
+		return false;
+	}
+
+	return true;
+}
+
+bool FileHidder::checkPaths( const std::vector<std::wstring> &filesOnPartition,
+							 const std::wstring &partitionPath,
+							 const std::wstring &partitionDevPath,
+							 const std::wstring &pathToStore )
+{
+	if( !checkPaths( filesOnPartition ) )
+	{
+		LOG( INFO ) << "One or more path on partition isn't correct";
+		return false;
+	}
+
+	if( !fs::exists( pathToStore ) )
+	{
+		LOG( INFO ) << "Path to store isn't correct";
+		return false;
+	}
+
+	if( !fs::exists( partitionPath ) )
+	{
+		LOG( INFO ) << "Partition path isn't correct";
+		return false;
+	}
+
+	if( !fs::exists( partitionDevPath ) )
+	{
+		LOG( INFO ) << "Partition device path isn't correct";
+		return false;
+	}
+
+	return true;
+}
+
+bool FileHidder::checkPaths( const std::vector<std::wstring> &paths )
+{
+	for(const auto &path : paths)
+		if( !fs::exists( path ) )
+			return false;
+
+	return true;
 }
