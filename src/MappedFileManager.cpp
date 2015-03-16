@@ -113,7 +113,8 @@ char* MappedFileManager::getUserPtr( uintmax_t startOffset )
 {
 	char *preparedPtr;
 
-	LOG( INFO ) << "Preparing mapped ptr to what user wanted. Oryginally mapped at: 0x" << std::hex << mappedFile.data();
+	LOG( INFO ) << "Preparing mapped ptr to what user wanted. Oryginally mapped at: 0x" \
+		<< std::hex << static_cast<uintptr_t>( reinterpret_cast<uint32_t>( mappedFile.data() ) );
 
 	preparedPtr = mappedFile.data( );
 
@@ -151,7 +152,9 @@ char* MappedFileManager::map( uintmax_t startOffset, size_t sizeToMap, bool hard
 
 	mappedPtr = getUserPtr( startOffset );
 
-	LOG( INFO ) << "Returning 0x" << std::hex << mappedPtr;
+	LOG( INFO ) << "Returning 0x" << std::hex \
+		<< static_cast<uintptr_t>( reinterpret_cast<uint32_t>( mappedPtr ) );
+
 	return mappedPtr;
 }
 

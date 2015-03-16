@@ -171,13 +171,14 @@ bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
 
 std::ostream& operator<< ( std::ostream &out, const DirectoryEntry &de )
 {
-	out << "name = " << de.name.c_str( ) << \
-		"file size = " << de.fileSize << \
-		"attributes = 0x" << std::hex << de.attributes << \
-		"cluster = " << std::dec << de.cluster << \
-		"creation date = " << de.creationDate << \
-		"last modification date = " << de.lastModificationDate << \
-		"deleted = " << std::boolalpha << de.deleted;
+	out << std::dec;
+	out << "\nname = " << de.name.c_str() <</*TODO*/ \
+		"\nfile size = " << de.fileSize << \
+		"\nattributes = 0x" << std::hex << static_cast<size_t>( de.attributes ) << \
+		"\ncluster = " << std::dec << de.cluster << \
+		"\ncreation date = " << de.creationDate << \
+		"\nlast modification date = " << de.lastModificationDate << \
+		"\ndeleted = " << std::boolalpha << de.deleted;
 
 	return out;
 }

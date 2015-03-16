@@ -358,7 +358,7 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( std::wstring searchedDirEntry
 	DirectoryEntry currentDirEntry;
 	std::wstring dirEntryName;
 
-	LOG( INFO ) << "Finding dir entry in folder. Searched dir entry name: " << searchedDirEntryName << "Folder first cluster: " << folderCluster;
+	LOG( INFO ) << "\nFinding dir entry in folder. \nSearched dir entry name: " << searchedDirEntryName << "\nFolder first cluster: " << folderCluster;
 
 	boost::to_upper( searchedDirEntryName );
 
