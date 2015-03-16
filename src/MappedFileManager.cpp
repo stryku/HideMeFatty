@@ -28,36 +28,21 @@ bool MappedFileManager::MappedChunk::inside( const uintmax_t offset, const size_
 }
 
 
-uintmax_t MappedFileManager::getOffsetForAllocGranularity( uintmax_t offset ) const
+uintmax_t MappedFileManager::getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const
 {
-	offset = offset / allocationGranularity * allocationGranularity;
+	offset = offset / granularity * granularity;
 	return offset;
 }
 
-uintmax_t MappedFileManager::getOffsetForMapGranularity( uintmax_t offset ) const
-{
-	offset = offset / mappingGranularity * mappingGranularity;
-	return offset;
-}
-
-uintmax_t MappedFileManager::getSizeForMapGranularity( const uintmax_t offset,
-									const uintmax_t preparedOffset,
-									size_t size ) const
+uintmax_t MappedFileManager::getSizeForGranularity( const uintmax_t offset,
+													const uintmax_t preparedOffset,
+													size_t size,
+													const size_t granularity) const
 {
 
-	size_t calculatedSize = mappingGranularity + size - ( preparedOffset + mappingGranularity - offset );
+	size_t calculatedSize = granularity + size - ( preparedOffset + granularity - offset );
 
-	return ( calculatedSize < mappingGranularity ) ? mappingGranularity : calculatedSize;
-}
-
-uintmax_t MappedFileManager::getSizeForAllocGranularity( const uintmax_t offset,
-									  const uintmax_t preparedOffset,
-									  size_t size ) const
-{
-
-	size_t calculatedSize = allocationGranularity + size - ( preparedOffset + allocationGranularity - offset );
-
-	return ( calculatedSize < allocationGranularity ) ? allocationGranularity : calculatedSize;
+	return ( calculatedSize < granularity ) ? granularity : calculatedSize;
 }
 
 void MappedFileManager::remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard )
@@ -68,15 +53,15 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, size_t sizeToMap, boo
 
 	if( hard )
 	{
-		preparedOffset = getOffsetForAllocGranularity( startOffset );
-		preparedSize = getSizeForAllocGranularity( startOffset, preparedOffset, sizeToMap );
+		preparedOffset = getOffsetForGranularity( startOffset, allocationGranularity );
+		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, allocationGranularity );
 		LOG( INFO ) << "Hard remapping. Prepared offset = " << preparedOffset << ", prepared size: " << preparedSize;
 	}
 	else
 	{
-		preparedOffset = getOffsetForAllocGranularity( startOffset );
-		preparedOffset = getOffsetForMapGranularity( preparedOffset );
-		preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
+		preparedOffset = getOffsetForGranularity( startOffset, allocationGranularity );
+		preparedOffset = getOffsetForGranularity( preparedOffset, mappingGranularity );
+		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, mappingGranularity );
 		LOG( INFO ) << "Soft remapping. Prepared offset = " << preparedOffset << ", prepared size: " << preparedSize;
 	}
 

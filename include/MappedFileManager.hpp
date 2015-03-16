@@ -35,14 +35,11 @@ private:
 
 private:
 
-	uintmax_t getOffsetForAllocGranularity( uintmax_t offset ) const;
-	uintmax_t getOffsetForMapGranularity( uintmax_t offset ) const;
-	uintmax_t getSizeForMapGranularity( const uintmax_t offset,
-										const uintmax_t preparedOffset,
-										size_t size ) const;
-	uintmax_t getSizeForAllocGranularity( const uintmax_t offset,
-										  const uintmax_t preparedOffset,
-										  size_t size ) const;
+	uintmax_t getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const;
+	uintmax_t getSizeForGranularity( const uintmax_t offset,
+									 const uintmax_t preparedOffset,
+									 size_t size,
+									 const size_t granularity) const;
 
 	void remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard );
 
