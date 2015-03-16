@@ -49,37 +49,24 @@ bool Fat32Manager::FreeSpaceChunk::operator< ( const FreeSpaceChunk &c ) const
 
 bool Fat32Manager::_init( )
 {
-	LOG( INFO ) << "Initializating";
-
 	if( loadBootSector() == false )
-	{
-		LOG( INFO ) << "Loading boot sector failed. Returning false";
 		return false;
-	}
 
 	loadFatInfo();
 
 	if( loadFatTable() == false )
-	{
-		LOG( INFO ) << "Loading fat table failed. Returning false";
 		return false;
-	}
-
-	LOG( INFO ) << "Initializating successed. Returning true";
 	
 	return true;
 }
 
 bool Fat32Manager::init( )
 {
-	LOG( INFO ) << "Initializating";
-
 	return _init();
 }
 
 void Fat32Manager::clear( )
 {
-	LOG( INFO ) << "Clearing ";
 	fatInfoLoaded = false;
 	bootSectorLoaded = false;
 	fatTableLoaded = false;
@@ -90,34 +77,24 @@ void Fat32Manager::loadFat32ExtBS( )
 {
 	fat32ExtBS = *( reinterpret_cast<Fat32ExtBS*>( &bootSector.extended_section ) );
 }
+
 bool Fat32Manager::loadBootSector( )
 {
 	FatBS *mappedPtr;
 
-	LOG( INFO ) << "Loading boot sector";
-
 	if( bootSectorLoaded )
-	{
-		LOG( INFO ) << "Boot sector was already loaded. Returning true";
 		return true;
-	}
 
-	LOG( INFO ) << "Mapping boot sector";
 	mappedPtr = reinterpret_cast<FatBS*>( mappedFileMngr.map( 0, bootSectorSize ) );
 
 	if( mappedPtr == nullptr )
-	{
-		LOG( INFO ) << "Mapped ptr == nullptr. Returning false";
 		return false;
-	}
 
 	bootSector = *mappedPtr;
 
 	loadFat32ExtBS();
 
 	bootSectorLoaded = true;
-
-	LOG( INFO ) << "Loadding successed. Returning true";
 
 	return true;
 }
@@ -328,9 +305,6 @@ DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const Direc
 {
 	std::vector<DirectoryEntry> dirEntries;
 
-	LOG( INFO ) << "Finding next dir entry";
-	LOG( INFO ) << "Prev dir entry: " << prevDirEntry;
-
 	dirEntries = getDirEntriesFromFolder( folderCluster );
 
 	auto it = dirEntries.begin( );
@@ -339,25 +313,16 @@ DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const Direc
 		it = std::find( dirEntries.begin( ), dirEntries.end( ), prevDirEntry ) + 1;
 
 	if( it == dirEntries.end() )
-	{
-		LOG( INFO ) << "Dir entry not found. Returning bad dir entry";
 		return DirectoryEntry();
-	}
 	else
-	{
-		LOG( INFO ) << "Returning found dir entry: " << *it;
 		return *it;
-	}
 
-	LOG( INFO ) << "Dir entry not found. Returning bad dir entry";
 	return DirectoryEntry( );
 }
 DirectoryEntry Fat32Manager::findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster )
 {
 	DirectoryEntry currentDirEntry;
 	std::wstring dirEntryName;
-
-	LOG( INFO ) << "\nFinding dir entry in folder. \nSearched dir entry name: " << searchedDirEntryName << "\nFolder first cluster: " << folderCluster;
 
 	boost::to_upper( searchedDirEntryName );
 
@@ -367,16 +332,11 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( std::wstring searchedDirEntry
 		boost::to_upper( dirEntryName );
 
 		if( dirEntryName == searchedDirEntryName )
-		{
-			LOG( INFO ) << "Returning found dir entry: " << currentDirEntry;
 			return currentDirEntry;
-		}
 
 		currentDirEntry = findNextDirEntry( folderCluster, currentDirEntry );
 
 	} while( currentDirEntry.type( ) != BAD_DIR_ENTRY );
-
-	LOG( INFO ) << "Dir entry not found. Returning bad dir entry";
 
 	return DirectoryEntry();
 }
@@ -386,52 +346,32 @@ DirectoryEntry Fat32Manager::findFile( const std::wstring &path )
 	std::wstring fileName;
 	DirectoryEntry currentFolder, foundFile;
 
-	LOG( INFO ) << "Finding file: " << path;
-
 	foldersNames = getPathFoldersNames( path );
 	fileName = getPathFileName( path );
 
 	currentFolder.setCluster( fat32ExtBS.root_cluster );
 
-	LOG( INFO ) << "Following folders";
-
 	for( const auto &folderName : foldersNames )
 	{
 		currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
 
-		LOG( INFO ) << folderName;
-
 		if( currentFolder.type() == BAD_DIR_ENTRY )
-		{
-			LOG( INFO ) << folderName << "not found. Returning bad dir entry";
 			return DirectoryEntry();
-		}
 	}
-
-	LOG( INFO ) << "Searching for last entry: " << fileName;
 
 	if( fileName.length() == 0 )
-	{
-		LOG( INFO ) << "Last entry name empty. Returning bad dir entry";
 		return DirectoryEntry();
-	}
 
 	foundFile = findDirEntryInFolder( fileName, currentFolder.getCluster( ) );
 
 	if( foundFile.type() == BAD_DIR_ENTRY )
-	{
-		LOG( INFO ) << fileName << " not found. Returning bad dir entry";
 		return DirectoryEntry();
-	}
-
-	LOG( INFO ) << "Returning found file: " << foundFile;
 
 	return foundFile;
 }
 
 void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
 {
-	LOG( INFO ) << "Setting partition path: " << partitionPath;
 	mappedFileMngr.setFilePath( partitionPath );
 
 	initOk = init();
@@ -440,19 +380,13 @@ void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
 bool Fat32Manager::isValidFat32( )
 {
 	if( !initOk )
-	{
-		LOG( INFO ) << "Fat manager not initialized correctly. Returning false";
 		return false;
-	}
-
-	LOG( INFO ) << "Returning " << std::boolalpha << ( getFatType() == FAT32 );
 
 	return getFatType( ) == FAT32;
 }
 
 void Fat32Manager::close( )
 {
-	LOG( INFO ) << "Closing";
 	mappedFileMngr.close( );
 }
 
@@ -460,30 +394,19 @@ bool Fat32Manager::isPathCorrect( const std::wstring &path )
 {
 	bool isCorrect = findFile( path ).type() != BAD_DIR_ENTRY;
 
-	LOG( INFO ) << "Is path: " << path << " correct = " << std::boolalpha << isCorrect;
-
 	return isCorrect;
 }
 
 EFatType Fat32Manager::getFatType( )
 {
 	if( fatInfo.total_clusters < 4085 )
-	{
-		LOG( INFO ) << "Returning fat12";
 		return FAT12;
-	}
 	else
 	{
 		if( fatInfo.total_clusters < 65525 )
-		{
-			LOG( INFO ) << "Returning fat16";
 			return FAT16;
-		}
 		else
-		{
-			LOG( INFO ) << "Returning fat32";
 			return FAT32;
-		}
 	}
 }
 
@@ -491,12 +414,7 @@ size_t Fat32Manager::getFreeSpaceAfterFile( const std::wstring &path )
 {
 	DirectoryEntry file;
 
-	LOG( INFO ) << "Getting size of free space after file: " << path;
-
 	file = findFile( path );
-
-	LOG( INFO ) << "found file: " << file;
-	LOG( INFO ) << "Returning " << getFreeSpaceAfterFile( file );
 
 	return getFreeSpaceAfterFile( file );
 }
@@ -505,13 +423,7 @@ size_t Fat32Manager::getFileLastClusterNo( const std::wstring &path )
 {
 	DirectoryEntry file;
 
-	LOG( INFO ) << "Getting las cluster no of file: " << path;
-
 	file = findFile( path );
-
-	LOG( INFO ) << "found file: " << file;
-
-	LOG( INFO ) << "Returning " << getFileLastClusterNo( file );
 
 	return getFileLastClusterNo( file );
 }
@@ -520,13 +432,7 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const std::wstring &path )
 {
 	DirectoryEntry file;
 
-	LOG( INFO ) << "Getting free space offset of file: " << path;
-
 	file = findFile( path );
-
-	LOG( INFO ) << "found file: " << file;
-
-	LOG( INFO ) << "Returning " << file.getFileSize() % clusterSize();
 
 	return file.getFileSize() % clusterSize();
 }
@@ -534,21 +440,14 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const std::wstring &path )
 std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const std::vector<std::wstring> &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
-	el::Logger* defaultLogger = el::Loggers::getLogger( "default" );
-
-	LOG( INFO ) << "Getting spaces after files";
 
 	for( const auto &file : files )
 	{
-		LOG( INFO ) << "Getting free space info from file: " << file.c_str();
-
 		size_t clusterNo = getFileLastClusterNo( file );
 
 		chunks.push_back( FreeSpaceChunk(	getClusterStartOffset( clusterNo ),
 											getFreeSpaceAfterFile( file ) ) );
 	}
-
-	defaultLogger->info( "Collected chunks: %v", chunks );
 
 	return chunks;
 }
@@ -558,8 +457,6 @@ char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::wstring> &files )
 	std::vector<ClusterWithFreeSpace> clusters;
 	uintmax_t preparedOffset, preparedSize;
 	size_t firstCluster, lastCluster;
-
-	LOG( INFO ) << "Mapping space after files";
 
 	for( const auto &file : files )
 	{
@@ -572,12 +469,6 @@ char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::wstring> &files )
 
 	preparedOffset = getClusterStartOffset( firstCluster );
 	preparedSize = getClusterStartOffset( lastCluster + 1 ) - preparedOffset;
-
-	LOG( INFO ) << "Mapping variables: \n\
-				   first cluster = " << firstCluster << "\n\
-				   last cluster = " << lastCluster << "\n\
-				   prepared offset = " << preparedOffset << "\n\
-				   preparedSize = " << preparedSize;
 
 	return mappedFileMngr.map( preparedOffset, preparedSize, true );
 }
@@ -596,6 +487,6 @@ std::ostream& operator<< ( std::ostream &out, const Fat32Manager &fm )
 		<< "\nExtended boot sector: " << fm.fat32ExtBS \
 		<< "\nFat info: " << fm.fatInfo;
 
-	return out;;
+	return out;
 }
 

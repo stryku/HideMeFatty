@@ -17,8 +17,6 @@
 #include <cryptopp562\hex.h>
 #include <cryptopp562\files.h> 
 
-#include <easyloggingpp_v9.80\easylogging++.h>
-
 #include <vector>
 #include <string>
 #include <numeric>

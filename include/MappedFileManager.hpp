@@ -7,8 +7,6 @@
 #include <boost\iostreams\device\mapped_file.hpp>
 #include <boost\filesystem\operations.hpp>
 
-#include <easyloggingpp_v9.80\easylogging++.h>
-
 typedef boost::iostreams::mapped_file MappedFile;
 typedef boost::iostreams::mapped_file::size_type boostSize_t;
 

@@ -8,8 +8,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include <easyloggingpp_v9.80\easylogging++.h>
-
 #include <FatStructs.h>
 #include <MappedFileManager.hpp>
 #include <DirectoryEntry.hpp>

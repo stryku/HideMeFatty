@@ -17,15 +17,10 @@ bool FileHidder::isPathsCorrect( const std::vector<std::wstring> &paths, const s
 {
 	for( const auto &path : paths )
 	{
-		LOG( INFO ) << "Checking file: " << path;
 		if( !fatManager.isPathCorrect( path ) )
-		{
-			LOG( INFO ) << "Wrong path. Returning false";
 			return false;
-		}
 	}
 
-	LOG( INFO ) << "All paths are correct. Returning true";
 	return true;
 }
 
@@ -54,12 +49,9 @@ uintmax_t FileHidder::getFreeSpaceAfterFiles( const std::vector<std::wstring> &f
 {
 	uintmax_t totalSize = 0;
 
-	LOG( INFO ) << "Getting size of free space after files";
-
 	for( const auto &file : filesOnPartition )
 		totalSize += fatManager.getFreeSpaceAfterFile( file );
 
-	LOG( INFO ) << "Returning " << totalSize;
 	return totalSize;
 }
 
@@ -70,12 +62,8 @@ uint32_t FileHidder::getSeed( const std::vector<std::wstring> &filesOnPartition 
 	std::stringstream ss;
 	uint32_t seed;
 
-	LOG( INFO ) << "Generating seed";
-
 	for( const auto &file : filesOnPartition )
 		stringSeed += hashFile( file );
-
-	LOG( INFO ) << "Hashing string seed from files";
 
 	CryptoPP::StringSource( stringSeed,
 							true,
@@ -85,8 +73,6 @@ uint32_t FileHidder::getSeed( const std::vector<std::wstring> &filesOnPartition 
 
 	ss << std::hex << stringSeed;
 	ss >> seed;
-
-	LOG( INFO ) << "Returning " << seed;
 
 	return seed;
 }
@@ -99,8 +85,6 @@ std::string FileHidder::hashFile( const fs::path &path )
 						  new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
 						  new CryptoPP::StringSink( result ), true ) ) );
 
-	LOG( INFO ) << "Hashing file: " << path;
-
 	return result;
 }
 
@@ -110,8 +94,6 @@ bool FileHidder::mapFreeSpace( const std::vector<std::wstring> &filesOnPartition
 	uintmax_t startOffset;
 	char *mappedPtr;
 
-	LOG( INFO ) << "Mapping free space";
-
 	chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
 
 	dmm.clear();
@@ -119,18 +101,13 @@ bool FileHidder::mapFreeSpace( const std::vector<std::wstring> &filesOnPartition
 	mappedPtr = fatManager.mapSpaceAfterFiles( filesOnPartition );
 
 	if( mappedPtr == nullptr )
-	{
-		LOG( INFO ) << "Mapping free space went wrong. Returning false";
 		return false;
-	}
 
 	startOffset = std::min_element( chunks.begin( ), chunks.end( ) )->offset;
 
-	LOG( INFO ) << "Adding chunks to distributed memor manager";
 	for( const auto &chunk : chunks )
 		dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
 
-	LOG( INFO ) << "Returning true";
 	return true;
 }
 
@@ -167,7 +144,6 @@ void FileHidder::hideMetadata( const HiddenFileMetadata &metadata,
 							   boost::random::mt19937 &rng, 
 							   const uintmax_t freeSpaceSize )
 {
-	LOG( INFO ) << "Hidding file metadata: " << metadata;
 	hideFileSize( metadata.fileSize );
 	hideFileName( metadata.fileName );
 }
@@ -180,13 +156,8 @@ bool FileHidder::hideFileContents( const std::wstring &filePath,
 	char ch;
 	std::ifstream file( filePath, std::ios::binary );
 
-	LOG( INFO ) << "Hidding file";
-
 	if( !file.is_open() )
-	{
-		LOG( INFO ) << "Opening file went wrong. Returning false";
 		return false;
-	}
 
 	fileSize = fs::file_size( filePath );
 
@@ -205,20 +176,10 @@ bool FileHidder::hideFile( const std::wstring &filePath,
 {
 	HiddenFileMetadata fileMetadata( getPathFileName( filePath ),
 									 fs::file_size( filePath ) );
-	bool hideFileContentsResult;
 
-	LOG( INFO ) << "Hidding file";
-	
 	hideMetadata( fileMetadata, rng, freeSpaceSize );
 
-	hideFileContentsResult = hideFileContents( filePath, rng, freeSpaceSize );
-
-	if( hideFileContentsResult == false )
-		LOG( INFO ) << "Hidding file contents went wrong.";
-
-	LOG( INFO ) << "Returning" << std::boolalpha << hideFileContentsResult;
-
-	return hideFileContentsResult;
+	return hideFileContents( filePath, rng, freeSpaceSize );
 }
 
 uintmax_t FileHidder::restoreFileSize( )
@@ -245,16 +206,11 @@ FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt199
 {
 	HiddenFileMetadata metadata;
 
-	LOG( INFO ) << "Restoring file metadata";
-
 	metadata.fileSize = restoreFileSize( );
 
 
 	if( metadata.fileSize == 0 )
-	{	
-		LOG( INFO ) << "Restored metadata file size = 0. Not restoring rest.";
 		return metadata;
-	}
 
 	restoreFileName( metadata );
 
@@ -266,8 +222,6 @@ void FileHidder::restoreFile( std::ofstream &fileStream,
 				  const uintmax_t freeSpaceSize,
 				  const HiddenFileMetadata &metadata )
 {
-	LOG( INFO ) << "Restoring file";
-
 	for( uintmax_t i = 0; i < metadata.fileSize; ++i )
 		fileStream.put( dmm.shuffled( ) );
 }
@@ -279,23 +233,15 @@ bool FileHidder::restoreMyFile( const std::wstring &pathToStore,
 	HiddenFileMetadata fileMetadata;
 	std::ofstream file;
 
-	LOG( INFO ) << "Restoring file";
-
 	fileMetadata = restoreMetadata( rng, freeSpaceSize );
 
-	LOG( INFO ) << "Restored metadata: " << fileMetadata;
-
 	if( fileMetadata.fileSize == 0 )
-	{
-		LOG( INFO ) << "Found end of chain. Returning false";
 		return false;
-	}
 
 	file.open( pathToStore + static_cast<wchar_t>( '/' ) + fileMetadata.fileName, std::ios::binary );
 
 	restoreFile( file, rng, freeSpaceSize, fileMetadata );
 
-	LOG( INFO ) << "Returning true";
 	return true;
 }
 
@@ -308,49 +254,22 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 	uint32_t seed;
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
-	el::Logger* defaultLogger = el::Loggers::getLogger( "default" );
-
-	LOG( INFO ) << "Started hidding files";
-	LOG( INFO ) << "Partition path: " << partitionPath;
-	LOG( INFO ) << "Partition device path: " << partitionDevPath;
-
-	LOG( INFO ) << "Files on partition: " << partitionDevPath;
-	for( const auto &i : filesOnPartition )
-		LOG( INFO ) << i;
-
-	LOG( INFO ) << "Files to hide: " << partitionDevPath;
-	for( const auto &i : filesToHide )
-		LOG( INFO ) << i;
 
 	fatManager.setPartitionPath( partitionDevPath );
 	fatManager.init();
 
-	LOG( INFO ) << "Fat Manager:\n" << fatManager;
-
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
-	LOG( INFO ) << "Checking if paths are correct";
 	if( !isPathsCorrect( preparedPaths, partitionPath ) )
-	{
-		LOG( INFO ) << "One or more path aren't correct. Returning false";
 		return false;
-	}
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
-	LOG( INFO ) <<"Free space: " << freeSpaceSize << ", size to hide: " << getSizeToHide( filesToHide );
 	if( getSizeToHide( filesToHide ) > freeSpaceSize )
-	{
-		LOG( INFO ) << "Size to hide > free space size. Returning false";
 		return false;
-	}
 
-	LOG( INFO ) << "Trying map free space after files";
 	if( !mapFreeSpace( preparedPaths ) )
-	{
-		LOG( INFO ) << "Not successfully mapped. Returning false";
 		return false;
-	}
 
 	seed = getSeed( filesOnPartition );
 
@@ -358,20 +277,13 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 
 	dmm.createShuffledArray( rng );
 
-	LOG( INFO ) << "Hiding files";
 	for( const auto &file : filesToHide )
 	{
-		LOG( INFO ) << "Trying to hide file: " << file;
 		if( !hideFile( file, rng, freeSpaceSize ) )
-		{
-			LOG( INFO ) << "Hidding file went wrong. Returning false";
 			return false;
-		}
 	}
 
 	hideFileSize( 0 );
-
-	LOG( INFO ) << "Hidding files went ok. Returning true";
 
 	return true;
 }
@@ -386,31 +298,17 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
 
-	LOG( INFO ) << "Started restoring files";
-	LOG( INFO ) << "Partition path: " << partitionPath;
-	LOG( INFO ) << "Partition device path: " << partitionDevPath;
-	for( const auto &i : filesOnPartition )
-		LOG( INFO ) << i;
-
 	fatManager.setPartitionPath( partitionDevPath );
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
-	LOG( INFO ) << "Checking if paths are correct";
 	if( !isPathsCorrect( preparedPaths, partitionPath ) )
-	{
-		LOG( INFO ) << "One or more path aren't correct. Returning false";
 		return false;
-	}
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
-	LOG( INFO ) << "Trying map free space after files";
 	if( !mapFreeSpace( preparedPaths ) )
-	{
-		LOG( INFO ) << "Not successfully mapped. Returning false";
 		return false;
-	}
 
 	seed = getSeed( filesOnPartition );
 	
@@ -418,10 +316,7 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 
 	dmm.createShuffledArray( rng );
 
-	LOG( INFO ) << "Restoring files";
 	while( restoreMyFile( pathToStore, rng, freeSpaceSize ) ) {}
-
-	LOG( INFO ) << "Restoring files went ok. Returning true";
 
 	return true;
 }
