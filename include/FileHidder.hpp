@@ -76,14 +76,14 @@ private:
 
 	uintmax_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
-	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const size_t freeSpaceSize );
+	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
 	void restoreFile( std::ofstream &fileStream,
 					  boost::random::mt19937 &rng,
-					  const size_t freeSpaceSize,
+					  const uintmax_t freeSpaceSize,
 					  const HiddenFileMetadata &metadata );
 	bool restoreMyFile( const std::wstring &pathToStore,
 						boost::random::mt19937 &rng,
-						const size_t freeSpaceSize );
+						const uintmax_t freeSpaceSize );
 
 	
 

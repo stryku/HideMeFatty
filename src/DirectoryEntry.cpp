@@ -120,7 +120,7 @@ inline bool DirectoryEntry::extractIfDeleted( const FatRawDirectoryEntry &rawDir
 
 inline size_t DirectoryEntry::extractCluster( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	return ( static_cast<size_t>( rawDirEntry.highCluster ) << 32 ) + rawDirEntry.lowCluster;
+	return ( static_cast<uint32_t>( rawDirEntry.highCluster ) << 31 ) + rawDirEntry.lowCluster;
 }
 
 void DirectoryEntry::assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry )

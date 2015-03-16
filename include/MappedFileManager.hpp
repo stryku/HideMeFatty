@@ -10,6 +10,7 @@
 #include <easyloggingpp_v9.80\easylogging++.h>
 
 typedef boost::iostreams::mapped_file MappedFile;
+typedef boost::iostreams::mapped_file::size_type boostSize_t;
 
 namespace fs = boost::filesystem;
 
@@ -19,12 +20,12 @@ private:
 
 	struct MappedChunk
 	{
-		intmax_t begin, end;
+		uintmax_t begin, end;
 		bool mapped;
 
 		MappedChunk();
 
-		bool inside( const uintmax_t offset, const size_t size ) const;
+		bool inside( const uintmax_t offset, const uintmax_t size ) const;
 
 	} mappedChunkInfo;
 
@@ -38,10 +39,10 @@ private:
 	uintmax_t getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const;
 	uintmax_t getSizeForGranularity( const uintmax_t offset,
 									 const uintmax_t preparedOffset,
-									 size_t size,
+									 uintmax_t size,
 									 const size_t granularity) const;
 
-	void remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard );
+	void remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, bool hard );
 
 	char* getUserPtr( uintmax_t startOffset );
 
@@ -52,7 +53,7 @@ public:
 
 	void setFilePath( const fs::path &pathToFile );
 
-	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0, bool hard = false );
+	char* map( uintmax_t startOffset = 0, uintmax_t sizeToMap = 0, bool hard = false );
 
 	void close();
 

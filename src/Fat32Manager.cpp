@@ -192,7 +192,6 @@ inline uintmax_t Fat32Manager::getClusterStartOffset( size_t clusterNo ) const
 std::vector<FatRawLongFileName> Fat32Manager::extractLongFileNames( char *&ptrInCluster ) const
 {
 	FatRawLongFileName *longFileNamePtr;
-	char *charPtr;
 	std::vector<FatRawLongFileName> ret;
 
 	longFileNamePtr = reinterpret_cast<FatRawLongFileName*>( ptrInCluster );

@@ -22,7 +22,7 @@ MappedFileManager::MappedChunk::MappedChunk() :
 	mapped( false )
 {}
 
-bool MappedFileManager::MappedChunk::inside( const uintmax_t offset, const size_t size ) const
+bool MappedFileManager::MappedChunk::inside( const uintmax_t offset, const uintmax_t size ) const
 {
 	return offset >= begin && offset + size <= end;
 }
@@ -36,18 +36,18 @@ uintmax_t MappedFileManager::getOffsetForGranularity( uintmax_t offset, const si
 
 uintmax_t MappedFileManager::getSizeForGranularity( const uintmax_t offset,
 													const uintmax_t preparedOffset,
-													size_t size,
+													uintmax_t size,
 													const size_t granularity) const
 {
 
-	size_t calculatedSize = granularity + size - ( preparedOffset + granularity - offset );
+	uintmax_t calculatedSize = granularity + size - ( preparedOffset + granularity - offset );
 
 	return ( calculatedSize < granularity ) ? granularity : calculatedSize;
 }
 
-void MappedFileManager::remapChunk( uintmax_t startOffset, size_t sizeToMap, bool hard )
+void MappedFileManager::remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, bool hard )
 {
-	uint64_t preparedOffset, preparedSize;
+	uintmax_t preparedOffset, preparedSize;
 
 	LOG( INFO ) << "Remapping chunk";
 
@@ -113,10 +113,9 @@ void MappedFileManager::setFilePath( const fs::path &pathToFile )
 	filePath = pathToFile;
 }
 
-char* MappedFileManager::map( uintmax_t startOffset, size_t sizeToMap, bool hard )
+char* MappedFileManager::map( uintmax_t startOffset, uintmax_t sizeToMap, bool hard )
 {
 	char *mappedPtr;
-	uint64_t preparedOffset, preparedSize;
 
 	LOG( INFO ) << "Mapping. Start offset = " << startOffset \
 		<< ", size to map = " << sizeToMap \

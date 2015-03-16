@@ -241,7 +241,7 @@ void FileHidder::restoreFileName( HiddenFileMetadata &metadata )
 		fileNamePtr[i] = dmm.shuffled( );
 }
 
-FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt19937 &rng, const size_t freeSpaceSize )
+FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize )
 {
 	HiddenFileMetadata metadata;
 
@@ -263,7 +263,7 @@ FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt199
 
 void FileHidder::restoreFile( std::ofstream &fileStream,
 				  boost::random::mt19937 &rng,
-				  const size_t freeSpaceSize,
+				  const uintmax_t freeSpaceSize,
 				  const HiddenFileMetadata &metadata )
 {
 	LOG( INFO ) << "Restoring file";
@@ -274,7 +274,7 @@ void FileHidder::restoreFile( std::ofstream &fileStream,
 
 bool FileHidder::restoreMyFile( const std::wstring &pathToStore,
 					boost::random::mt19937 &rng,
-					const size_t freeSpaceSize )
+					const uintmax_t freeSpaceSize )
 {
 	HiddenFileMetadata fileMetadata;
 	std::ofstream file;
