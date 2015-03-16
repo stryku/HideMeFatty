@@ -45,7 +45,7 @@ private:
 	
 private:
 
-	bool init();
+	bool _init();
 
 	void clear();
 
@@ -95,6 +95,8 @@ public:
 
 	bool isValidFat32();
 
+	bool init();
+
 	void close();
 
 	bool isPathCorrect( const std::wstring &path );
@@ -106,6 +108,8 @@ public:
 	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const std::vector<std::wstring> &files );
 
 	char* mapSpaceAfterFiles( const std::vector<std::wstring> &files );
+
+	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
 };
 
 #endif

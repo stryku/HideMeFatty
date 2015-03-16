@@ -323,6 +323,9 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 		LOG( INFO ) << i;
 
 	fatManager.setPartitionPath( partitionDevPath );
+	fatManager.init();
+
+	LOG( INFO ) << "Fat Manager:\n" << fatManager;
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 

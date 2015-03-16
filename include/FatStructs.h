@@ -24,14 +24,13 @@ struct Fat32ExtBS
 	unsigned int 		volume_id;
 	unsigned char		volume_label[11];
 	unsigned char		fat_type_label[8];
-
 };
 
 struct FatBS
 {
 	unsigned char 		bootjmp[3];
 	unsigned char 		oem_name[8];
-	unsigned short 	        bytes_per_sector;
+	unsigned short 	    bytes_per_sector;
 	unsigned char		sectors_per_cluster;
 	unsigned short		reserved_sector_count;
 	unsigned char		table_count;
