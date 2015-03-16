@@ -13,7 +13,7 @@ Fat32Manager::Fat32Manager( const std::wstring &partitionPath ) :
 	fatTableLoaded( false )
 {
 	mappedFileMngr.setFilePath( partitionPath );
-	initOk = init( );
+	initOk = _init( );
 }
 
 Fat32Manager::ClusterWithFreeSpace::ClusterWithFreeSpace( size_t clusterNo, 
@@ -60,13 +60,19 @@ bool Fat32Manager::_init( )
 	return true;
 }
 
-bool Fat32Manager::init( )
+void Fat32Manager::init( )
 {
-	return _init();
+	initOk = _init();
 }
 
-void Fat32Manager::clear( )
+bool Fat32Manager::good( )
 {
+	return initOk;
+}
+
+void Fat32Manager::clear()
+{
+	mappedFileMngr.close();
 	fatInfoLoaded = false;
 	bootSectorLoaded = false;
 	fatTableLoaded = false;
@@ -373,8 +379,6 @@ DirectoryEntry Fat32Manager::findFile( const std::wstring &path )
 void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
 {
 	mappedFileMngr.setFilePath( partitionPath );
-
-	initOk = init();
 }
 
 bool Fat32Manager::isValidFat32( )

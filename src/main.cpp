@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include <easyloggingpp_v9.80\easylogging++.h>
+
 #include <FileHidder.hpp>
 
 
@@ -118,8 +120,19 @@ void execute()
 	}
 }
 
+void easyLoggingInit( )
+{
+	el::Configurations conf( "files/conf/logger.conf" );
+	el::Loggers::reconfigureAllLoggers( conf );
+
+	LOG( INFO ) << "New session";
+}
+
+INITIALIZE_EASYLOGGINGPP
+
 int main()
 {
+	easyLoggingInit();
 	execute();
 
 	return 0;

@@ -49,6 +49,9 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, 
 {
 	uintmax_t preparedOffset, preparedSize;
 
+	if( !fs::exists( filePath ) )
+		return;
+
 	if( hard )
 	{
 		preparedOffset = getOffsetForGranularity( startOffset, allocationGranularity );

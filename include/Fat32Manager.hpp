@@ -45,7 +45,6 @@ private:
 
 	bool _init();
 
-	void clear();
 
 	void loadFat32ExtBS();
 	bool loadBootSector();
@@ -93,9 +92,10 @@ public:
 
 	bool isValidFat32();
 
-	bool init();
-
+	void init();
 	void close();
+	bool good();
+	void clear( );
 
 	bool isPathCorrect( const std::wstring &path );
 

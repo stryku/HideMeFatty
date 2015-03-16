@@ -250,13 +250,16 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 				const std::vector<std::wstring> &filesToHide,
 				const std::wstring &partitionDevPath )
 {
-	uintmax_t freeSpaceSize;
+	uintmax_t freeSpaceSize, sizeToHide;
 	uint32_t seed;
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
 
-	fatManager.setPartitionPath( partitionDevPath );
-	fatManager.init();
+	if( prepareFatManager( partitionDevPath ) == false )
+	{
+		LOG( INFO ) << "Fail preparing fat manager";
+		return false;
+	}
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
@@ -264,12 +267,19 @@ bool FileHidder::hideFiles( const std::vector<std::wstring> &filesOnPartition,
 		return false;
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
+	sizeToHide = getSizeToHide( filesToHide );
 
-	if( getSizeToHide( filesToHide ) > freeSpaceSize )
+	if( sizeToHide > freeSpaceSize )
+	{
+		LOG( INFO ) << "Size to hide("<<sizeToHide<<") > free space after files("<<freeSpaceSize<<"). Not enough space fo hide files";
 		return false;
+	}
 
 	if( !mapFreeSpace( preparedPaths ) )
+	{
+		LOG( INFO ) << "Mapping free space after files went wrong";
 		return false;
+	}
 
 	seed = getSeed( filesOnPartition );
 
@@ -298,17 +308,27 @@ bool FileHidder::restoreMyFiles( const std::vector<std::wstring> &filesOnPartiti
 	boost::random::mt19937 rng;
 	std::vector<std::wstring> preparedPaths;
 
-	fatManager.setPartitionPath( partitionDevPath );
+	if( prepareFatManager( partitionDevPath ) == false )
+	{
+		LOG( INFO ) << "Fail preparing fat manager";
+		return false;
+	}
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
 	if( !isPathsCorrect( preparedPaths, partitionPath ) )
+	{
+		LOG( INFO ) << "One or more paths on partition are wrong";
 		return false;
+	}
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
 	if( !mapFreeSpace( preparedPaths ) )
+	{
+		LOG( INFO ) << "Mapping free space after files went wrong";
 		return false;
+	}
 
 	seed = getSeed( filesOnPartition );
 	
@@ -328,3 +348,11 @@ std::ostream& operator<<( std::ostream &out, const FileHidder::HiddenFileMetadat
 	return out;
 }
 
+bool FileHidder::prepareFatManager( const std::wstring &partitionPath )
+{
+	fatManager.clear();
+	fatManager.setPartitionPath( partitionPath );
+	fatManager.init();
+
+	return fatManager.good();
+}
