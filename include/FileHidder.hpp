@@ -12,12 +12,13 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/nowide/fstream.hpp>
 
 #include <cryptopp562\sha.h>
 #include <cryptopp562\hex.h>
 #include <cryptopp562\files.h> 
 
-#include <easyloggingpp_v9.80\easylogging++.h>
+#include <easylogging++.h>
 
 #include <vector>
 #include <string>
@@ -31,6 +32,7 @@
 #include <iostream>
 
 namespace fs = boost::filesystem;
+namespace nowide = boost::nowide;
 using namespace pathOperations;
 
 class FileHidder

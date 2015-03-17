@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include <easyloggingpp_v9.80\easylogging++.h>
+#include <easylogging++.h>
 
 #include <FileHidder.hpp>
 
