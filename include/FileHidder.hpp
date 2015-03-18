@@ -23,7 +23,6 @@
 #include <vector>
 #include <string>
 #include <numeric>
-#include <fstream>
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
@@ -32,7 +31,7 @@
 #include <iostream>
 
 namespace fs = boost::filesystem;
-namespace nowide = boost::nowide;
+using namespace boost::nowide;
 using namespace pathOperations;
 
 class FileHidder
@@ -79,11 +78,11 @@ private:
 	uintmax_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
 	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	void restoreFile( std::ofstream &fileStream,
+	void restoreFile( ofstream &fileStream,
 					  boost::random::mt19937 &rng,
 					  const uintmax_t freeSpaceSize,
 					  const HiddenFileMetadata &metadata );
-	bool restoreMyFile( const std::wstring &pathToStore,
+	bool restoreMyFile( std::wstring pathToStore,
 						boost::random::mt19937 &rng,
 						const uintmax_t freeSpaceSize );
 

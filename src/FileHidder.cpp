@@ -129,7 +129,7 @@ void FileHidder::hideFileSize( const uintmax_t &fileSize )
 	const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
 
 	for( size_t i = 0; i < sizeof( uintmax_t ); ++i )
-		dmm.shuffled( ) = fileSizePtr[i];
+		dmm.shuffled() = fileSizePtr[i];
 }
 
 void FileHidder::hideFileName( const wchar_t *fileName )
@@ -137,7 +137,7 @@ void FileHidder::hideFileName( const wchar_t *fileName )
 	const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
 
 	for( size_t i = 0; i < HiddenFileMetadata::fileNameBytesSize; ++i )
-		dmm.shuffled( ) = fileNamePtr[i];
+		dmm.shuffled() = fileNamePtr[i];
 }
 
 void FileHidder::hideMetadata( const HiddenFileMetadata &metadata, 
@@ -154,7 +154,7 @@ bool FileHidder::hideFileContents( const std::wstring &filePath,
 {
 	uintmax_t fileSize;
 	char ch;
-	std::ifstream file( filePath, std::ios::binary );
+	ifstream file( narrow( filePath ).c_str(), std::ios::binary );
 
 	if( !file.is_open() )
 		return false;
@@ -217,28 +217,30 @@ FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt199
 	return metadata;
 }
 
-void FileHidder::restoreFile( std::ofstream &fileStream,
-				  boost::random::mt19937 &rng,
-				  const uintmax_t freeSpaceSize,
-				  const HiddenFileMetadata &metadata )
+void FileHidder::restoreFile( ofstream &fileStream,
+							  boost::random::mt19937 &rng,
+							  const uintmax_t freeSpaceSize,
+							  const HiddenFileMetadata &metadata )
 {
 	for( uintmax_t i = 0; i < metadata.fileSize; ++i )
 		fileStream.put( dmm.shuffled( ) );
 }
 
-bool FileHidder::restoreMyFile( const std::wstring &pathToStore,
-					boost::random::mt19937 &rng,
-					const uintmax_t freeSpaceSize )
+bool FileHidder::restoreMyFile( std::wstring pathToStore,
+								boost::random::mt19937 &rng,
+								const uintmax_t freeSpaceSize )
 {
 	HiddenFileMetadata fileMetadata;
-	std::ofstream file;
+	ofstream file;
 
 	fileMetadata = restoreMetadata( rng, freeSpaceSize );
 
 	if( fileMetadata.fileSize == 0 )
 		return false;
 
-	file.open( pathToStore + static_cast<wchar_t>( '/' ) + fileMetadata.fileName, std::ios::binary );
+	pathToStore = pathToStore + static_cast<wchar_t>( '/' ) + fileMetadata.fileName;
+
+	file.open( narrow( pathToStore ).c_str(), std::ios::binary );
 
 	restoreFile( file, rng, freeSpaceSize, fileMetadata );
 
