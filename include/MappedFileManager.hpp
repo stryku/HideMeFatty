@@ -4,8 +4,8 @@
 #include <string>
 #include <set>
 
-#include <boost\iostreams\device\mapped_file.hpp>
-#include <boost\filesystem\operations.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/filesystem/operations.hpp>
 
 typedef boost::iostreams::mapped_file MappedFile;
 typedef boost::iostreams::mapped_file::size_type boostSize_t;
@@ -44,7 +44,7 @@ private:
 
 	char* getUserPtr( uintmax_t startOffset );
 
-public: 
+public:
 	MappedFileManager();
 	MappedFileManager( const size_t _mappingGranularity );
 	~MappedFileManager();
@@ -58,4 +58,4 @@ public:
 	friend std::ostream& operator<<( std::ostream &, const MappedChunk & );
 };
 
-#endif 
+#endif

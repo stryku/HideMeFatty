@@ -14,9 +14,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/nowide/fstream.hpp>
 
-#include <cryptopp562\sha.h>
-#include <cryptopp562\hex.h>
-#include <cryptopp562\files.h> 
+#include <crypto++/sha.h>
+#include <crypto++/hex.h>
+#include <crypto++/files.h>
 
 #include <easylogging++.h>
 
