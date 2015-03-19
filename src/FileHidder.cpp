@@ -55,12 +55,15 @@ uintmax_t FileHidder::getFreeSpaceAfterFiles( const std::vector<std::string> &fi
 	return totalSize;
 }
 
-uint32_t FileHidder::getSeed( const std::vector<std::string> &filesOnPartition )
+uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
 {
 	std::string stringSeed( "" ), stringHash( "" );
 	CryptoPP::SHA1 sha1;
 	std::stringstream ss;
 	uint32_t seed;
+
+	std::sort( filesOnPartition.begin(),
+			   filesOnPartition.end() );
 
 	for( const auto &file : filesOnPartition )
 		stringSeed += hashFile( file );
@@ -247,7 +250,7 @@ bool FileHidder::restoreMyFile( std::string pathToStore,
 	return true;
 }
 
-bool FileHidder::hideFiles( const std::vector<std::string> &filesOnPartition,
+bool FileHidder::hideFiles( std::vector<std::string> &filesOnPartition,
 							const std::string &partitionPath,
 							const std::vector<std::string> &filesToHide,
 							const std::string &partitionDevPath )
@@ -298,7 +301,7 @@ bool FileHidder::hideFiles( const std::vector<std::string> &filesOnPartition,
 	return true;
 }
 
-bool FileHidder::restoreMyFiles( const std::vector<std::string> &filesOnPartition,
+bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 								 const std::string &partitionPath,
 								 const std::string &partitionDevPath,
 								 const std::string &pathToStore )

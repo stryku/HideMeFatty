@@ -21,8 +21,9 @@
 #include <easylogging++.h>
 
 #include <vector>
-#include <string>
 #include <numeric>
+#include <algorithm>
+#include <string>
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
@@ -59,7 +60,7 @@ private:
 	uintmax_t getFilesSize( const std::vector<std::string> &filesPaths );
 	uintmax_t getSizeToHide( const std::vector<std::string> &filesToHide );
 	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::string> &filesOnPartition );
-	uint32_t getSeed( const std::vector<std::string> &filesOnPartition );
+	uint32_t getSeed( std::vector<std::string> &filesOnPartition );
 
 	std::string hashFile( const fs::path &path );
 
@@ -100,12 +101,12 @@ public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFiles( const std::vector<std::string> &filesOnPartition,
+	bool hideFiles( std::vector<std::string> &filesOnPartition,
 					const std::string &partitionPath,
 					const std::vector<std::string> &filesToHide,
 					const std::string &partitionDevPath );
 
-	bool restoreMyFiles( const std::vector<std::string> &filesOnPartition,
+	bool restoreMyFiles( std::vector<std::string> &filesOnPartition,
 						 const std::string &partitionPath,
 						 const std::string &partitionDevPath,
 						 const std::string &pathToStore );
