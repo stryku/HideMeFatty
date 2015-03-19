@@ -40,14 +40,13 @@ public:
 	struct HiddenFileMetadata
 	{
 		static const size_t maxFileName = 256;
-		static const size_t fileNameBytesSize = maxFileName*sizeof( wchar_t );
 
 		uint64_t fileSize;
-		wchar_t fileName[maxFileName];
+		char fileName[maxFileName];
 
 		HiddenFileMetadata();
-		HiddenFileMetadata( const std::wstring &fileName,
-							const uint64_t fileSize );
+		HiddenFileMetadata( const std::string &fileName,
+							const uintmax_t fileSize );
 	};
 
 private:
@@ -55,61 +54,61 @@ private:
 	Fat32Manager fatManager;
 	DistributedMemoryMapper dmm;
 
-	bool isPathsCorrect( const std::vector<std::wstring> &paths, const std::wstring &partitionPath );
+	bool isPathsCorrect( const std::vector<std::string> &paths, const std::string &partitionPath );
 
-	uintmax_t getFilesSize( const std::vector<std::wstring> &filesPaths );
-	uintmax_t getSizeToHide( const std::vector<std::wstring> &filesToHide );
-	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::wstring> &filesOnPartition );
-	uint32_t getSeed( const std::vector<std::wstring> &filesOnPartition );
+	uintmax_t getFilesSize( const std::vector<std::string> &filesPaths );
+	uintmax_t getSizeToHide( const std::vector<std::string> &filesToHide );
+	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::string> &filesOnPartition );
+	uint32_t getSeed( const std::vector<std::string> &filesOnPartition );
 
 	std::string hashFile( const fs::path &path );
 
-	bool mapFreeSpace( const std::vector<std::wstring> &filesOnPartition );
+	bool mapFreeSpace( const std::vector<std::string> &filesOnPartition );
 
-	std::vector<std::wstring> preparePathsOnPartition( const std::vector<std::wstring> &filesOnPartition,
-													   const std::wstring &partitionPath ) const;
+	std::vector<std::string> preparePathsOnPartition( const std::vector<std::string> &filesOnPartition,
+													  const std::string &partitionPath ) const;
 
 	void hideFileSize( const uintmax_t &fileSize );
-	void hideFileName( const wchar_t *fileName );
+	void hideFileName( const char *fileName );
 	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	bool hideFileContents( const std::wstring &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	bool hideFile( const std::wstring &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	bool hideFileContents( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	bool hideFile( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
 
 	uintmax_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
 	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	void restoreFile( ofstream &fileStream,
+	void restoreFile( std::ofstream &fileStream,
 					  boost::random::mt19937 &rng,
 					  const uintmax_t freeSpaceSize,
 					  const HiddenFileMetadata &metadata );
-	bool restoreMyFile( std::wstring pathToStore,
+	bool restoreMyFile( std::string pathToStore,
 						boost::random::mt19937 &rng,
 						const uintmax_t freeSpaceSize );
 
-	bool prepareFatManager( const std::wstring &partitionPath );
-	bool checkPaths( const std::vector<std::wstring> &paths );
-	bool checkPaths( const std::vector<std::wstring> &filesOnPartition,
-					 const std::wstring &partitionPath,
-					 const std::vector<std::wstring> &filesToHide,
-					 const std::wstring &partitionDevPath );
-	bool checkPaths( const std::vector<std::wstring> &filesOnPartition,
-					 const std::wstring &partitionPath,
-					 const std::wstring &partitionDevPath,
-					 const std::wstring &pathToStore );
+	bool prepareFatManager( const std::string &partitionPath );
+	bool checkPaths( const std::vector<std::string> &paths );
+	bool checkPaths( const std::vector<std::string> &filesOnPartition,
+					 const std::string &partitionPath,
+					 const std::vector<std::string> &filesToHide,
+					 const std::string &partitionDevPath );
+	bool checkPaths( const std::vector<std::string> &filesOnPartition,
+					 const std::string &partitionPath,
+					 const std::string &partitionDevPath,
+					 const std::string &pathToStore );
 
 public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFiles( const std::vector<std::wstring> &filesOnPartition,
-					const std::wstring &partitionPath,
-					const std::vector<std::wstring> &filesToHide,
-					const std::wstring &partitionDevPath );
+	bool hideFiles( const std::vector<std::string> &filesOnPartition,
+					const std::string &partitionPath,
+					const std::vector<std::string> &filesToHide,
+					const std::string &partitionDevPath );
 
-	bool restoreMyFiles( const std::vector<std::wstring> &filesOnPartition,
-						 const std::wstring &partitionPath,
-						 const std::wstring &partitionDevPath,
-						 const std::wstring &pathToStore );
+	bool restoreMyFiles( const std::vector<std::string> &filesOnPartition,
+						 const std::string &partitionPath,
+						 const std::string &partitionDevPath,
+						 const std::string &pathToStore );
 };
 
 #endif

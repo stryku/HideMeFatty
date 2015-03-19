@@ -11,9 +11,9 @@ DirectoryEntry::DirectoryEntry( const std::vector<FatRawLongFileName> &longFileN
 	assign( longFileNames, rawDirEntry );
 }
 
-inline std::wstring DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
+inline std::string DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
 {
-	std::wstring namePart;
+	std::string namePart;
 
 	for( size_t i = 0; i < 5; ++i )
 	{
@@ -42,9 +42,9 @@ inline std::wstring DirectoryEntry::getPartOfName( const FatRawLongFileName &lon
 	return namePart;
 }
 
-inline std::wstring DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::string DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::wstring tempExtension;
+	std::string tempExtension;
 
 	for( size_t i = 8; i < 11; ++i )
 	{
@@ -57,9 +57,9 @@ inline std::wstring DirectoryEntry::extractExtension( const FatRawDirectoryEntry
 	return tempExtension;
 }
 
-inline std::wstring DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::string DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::wstring tempName, tempExtension;
+	std::string tempName, tempExtension;
 
 	for( size_t i = 0; i < 8; ++i )
 	{
@@ -80,10 +80,10 @@ inline std::wstring DirectoryEntry::extractShortName( const FatRawDirectoryEntry
 	return tempName;
 }
 
-inline std::wstring DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
+inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
 												 const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::wstring tempName;
+	std::string tempName;
 
 	if( longFileNames.size( ) == 0 )
 		tempName = extractShortName( rawDirEntry );
@@ -139,7 +139,7 @@ EDirEntryType DirectoryEntry::type( ) const
 	return static_cast<EDirEntryType>( attributes );
 }
 
-std::wstring DirectoryEntry::getName( ) const
+std::string DirectoryEntry::getName( ) const
 {
 	return name;
 }

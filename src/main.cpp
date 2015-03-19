@@ -7,34 +7,29 @@
 #include <FileHidder.hpp>
 
 
-std::wstring stringToWString( const std::string &s )
-{
-	return std::wstring( s.begin( ), s.end( ) );
-}
-
-std::wstring getPath( )
+std::string getPath( )
 {
 	std::string ret;
 
 	getline( std::cin, ret );
 
-	return stringToWString( ret );
+	return ret;
 }
 
-std::wstring getPath( const char *text )
+std::string getPath( const char *text )
 {
 	std::cout << text;
 	return getPath();
 }
 
-std::vector<std::wstring> getVectorOfPaths( const char *text )
+std::vector<std::string> getVectorOfPaths( const char *text )
 {
-	std::vector<std::wstring> ret;
-	std::wstring tmp;
+	std::vector<std::string> ret;
+	std::string tmp;
 
 	std::cout << text;
 
-	while( ( tmp = getPath() ) != stringToWString( "q" ) )
+	while( ( tmp = getPath() ) != "q" && tmp != "Q" )
 	{
 		ret.push_back( tmp );
 		std::cout << ">";
@@ -45,8 +40,8 @@ std::vector<std::wstring> getVectorOfPaths( const char *text )
 
 void hide()
 {
-	std::vector<std::wstring> filesToHide, filesOnPartition;
-	std::wstring partitionPath, partitionDevicePath;
+	std::vector<std::string> filesToHide, filesOnPartition;
+	std::string partitionPath, partitionDevicePath;
 	FileHidder fileHidder;
 
 	filesToHide = getVectorOfPaths( "\nPut paths to files to hide. And 'q' after that\n\n" );
@@ -70,8 +65,8 @@ void hide()
 
 void restore()
 {
-	std::vector<std::wstring> filesOnPartition;
-	std::wstring partitionPath, partitionDevicePath, pathToStore;
+	std::vector<std::string> filesOnPartition;
+	std::string partitionPath, partitionDevicePath, pathToStore;
 	FileHidder fileHidder;
 
 	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n>" );

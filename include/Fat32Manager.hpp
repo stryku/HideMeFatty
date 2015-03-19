@@ -61,15 +61,15 @@ private:
 	std::vector<size_t> getClusterChain( size_t firstCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster );
-	std::vector<std::wstring> getPathFoldersNames( const std::wstring &path ) const;
-	std::wstring getPathFileName( const std::wstring &path ) const;
+	std::vector<std::string> getPathFoldersNames( const std::string &path ) const;
+	std::string getPathFileName( const std::string &path ) const;
 	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const;
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const;
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
 
 	DirectoryEntry findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() );
-	DirectoryEntry findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster );
-	DirectoryEntry findFile( const std::wstring &path );
+	DirectoryEntry findDirEntryInFolder( std::string searchedDirEntryName, const size_t folderCluster );
+	DirectoryEntry findFile( const std::string &path );
 	
 public:
 	struct FreeSpaceChunk
@@ -85,7 +85,7 @@ public:
 	};
 
 	Fat32Manager();
-	Fat32Manager( const std::wstring &partitionPath );
+	Fat32Manager( const std::string &partitionPath );
 	~Fat32Manager() {}
 
 	void setPartitionPath( const fs::path &partitionPath );
@@ -97,15 +97,15 @@ public:
 	bool good();
 	void clear( );
 
-	bool isPathCorrect( const std::wstring &path );
+	bool isPathCorrect( const std::string &path );
 
 	EFatType getFatType();
-	size_t getFreeSpaceAfterFile( const std::wstring &path );
-	size_t getFileLastClusterNo( const std::wstring &path );
-	size_t getFileFreeSpaceOffset( const std::wstring &path );
-	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const std::vector<std::wstring> &files );
+	size_t getFreeSpaceAfterFile( const std::string &path );
+	size_t getFileLastClusterNo( const std::string &path );
+	size_t getFileFreeSpaceOffset( const std::string &path );
+	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const std::vector<std::string> &files );
 
-	char* mapSpaceAfterFiles( const std::vector<std::wstring> &files );
+	char* mapSpaceAfterFiles( const std::vector<std::string> &files );
 
 	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
 };

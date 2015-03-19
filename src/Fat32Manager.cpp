@@ -7,7 +7,7 @@ Fat32Manager::Fat32Manager( ) :
 	initOk( false )
 {}
 
-Fat32Manager::Fat32Manager( const std::wstring &partitionPath ) :
+Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
 	fatInfoLoaded( false ),
 	bootSectorLoaded( false ),
 	fatTableLoaded( false )
@@ -256,12 +256,12 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstC
 
 	return dirEntries;
 }
-std::vector<std::wstring> Fat32Manager::getPathFoldersNames( const std::wstring &path ) const
+std::vector<std::string> Fat32Manager::getPathFoldersNames( const std::string &path ) const
 {
-	std::vector<std::wstring> folders;
+	std::vector<std::string> folders;
 	size_t posBegin = 0, posEnd, numberToCopy;
 
-	while( ( posEnd = path.find( '/', posBegin ) ) != std::wstring::npos )
+	while( ( posEnd = path.find( '/', posBegin ) ) != std::string::npos )
 	{
 		numberToCopy = posEnd - posBegin;
 		folders.push_back( path.substr( posBegin, numberToCopy ) );
@@ -270,7 +270,7 @@ std::vector<std::wstring> Fat32Manager::getPathFoldersNames( const std::wstring 
 
 	return folders;
 }
-std::wstring Fat32Manager::getPathFileName( const std::wstring &path ) const
+std::string Fat32Manager::getPathFileName( const std::string &path ) const
 {
 	size_t pos = path.find_last_of( '/' );
 
@@ -325,10 +325,10 @@ DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const Direc
 
 	return DirectoryEntry( );
 }
-DirectoryEntry Fat32Manager::findDirEntryInFolder( std::wstring searchedDirEntryName, const size_t folderCluster )
+DirectoryEntry Fat32Manager::findDirEntryInFolder( std::string searchedDirEntryName, const size_t folderCluster )
 {
 	DirectoryEntry currentDirEntry;
-	std::wstring dirEntryName;
+	std::string dirEntryName;
 
 	boost::to_upper( searchedDirEntryName );
 
@@ -346,10 +346,10 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( std::wstring searchedDirEntry
 
 	return DirectoryEntry();
 }
-DirectoryEntry Fat32Manager::findFile( const std::wstring &path )
+DirectoryEntry Fat32Manager::findFile( const std::string &path )
 {
-	std::vector<std::wstring> foldersNames;
-	std::wstring fileName;
+	std::vector<std::string> foldersNames;
+	std::string fileName;
 	DirectoryEntry currentFolder, foundFile;
 
 	foldersNames = getPathFoldersNames( path );
@@ -394,7 +394,7 @@ void Fat32Manager::close( )
 	mappedFileMngr.close( );
 }
 
-bool Fat32Manager::isPathCorrect( const std::wstring &path )
+bool Fat32Manager::isPathCorrect( const std::string &path )
 {
 	bool isCorrect = findFile( path ).type() != BAD_DIR_ENTRY;
 
@@ -414,7 +414,7 @@ EFatType Fat32Manager::getFatType( )
 	}
 }
 
-size_t Fat32Manager::getFreeSpaceAfterFile( const std::wstring &path )
+size_t Fat32Manager::getFreeSpaceAfterFile( const std::string &path )
 {
 	DirectoryEntry file;
 
@@ -423,7 +423,7 @@ size_t Fat32Manager::getFreeSpaceAfterFile( const std::wstring &path )
 	return getFreeSpaceAfterFile( file );
 }
 
-size_t Fat32Manager::getFileLastClusterNo( const std::wstring &path )
+size_t Fat32Manager::getFileLastClusterNo( const std::string &path )
 {
 	DirectoryEntry file;
 
@@ -432,7 +432,7 @@ size_t Fat32Manager::getFileLastClusterNo( const std::wstring &path )
 	return getFileLastClusterNo( file );
 }
 
-size_t Fat32Manager::getFileFreeSpaceOffset( const std::wstring &path )
+size_t Fat32Manager::getFileFreeSpaceOffset( const std::string &path )
 {
 	DirectoryEntry file;
 
@@ -441,7 +441,7 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const std::wstring &path )
 	return file.getFileSize() % clusterSize();
 }
 
-std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const std::vector<std::wstring> &files )
+std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const std::vector<std::string> &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
 
@@ -456,7 +456,7 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
 	return chunks;
 }
 
-char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::wstring> &files )
+char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::string> &files )
 {
 	std::vector<ClusterWithFreeSpace> clusters;
 	uintmax_t preparedOffset, preparedSize;
