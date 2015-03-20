@@ -112,11 +112,10 @@ bool FileHidder::mapFreeSpace( const std::vector<std::string> &filesOnPartition 
 }
 
 std::vector<std::string> FileHidder::preparePathsOnPartition( const std::vector<std::string> &filesOnPartition,
-															   const std::string &partitionPath ) const
+															  const std::string &partitionPath ) const
 {
-	size_t partitionPathLength = partitionPath.length( );
+	size_t partitionPathLength = partitionPath.length();
 	std::vector<std::string> preparedPaths;
-
 
 	for( auto &path : filesOnPartition )
 		preparedPaths.push_back( path.substr( partitionPathLength + 1 ) );
@@ -206,7 +205,7 @@ FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt199
 {
 	HiddenFileMetadata metadata;
 
-	metadata.fileSize = restoreFileSize( );
+	metadata.fileSize = restoreFileSize();
 
 
 	if( metadata.fileSize == 0 )
@@ -263,20 +262,20 @@ bool FileHidder::hideFiles( std::vector<std::string> &filesOnPartition,
 	std::sort( filesOnPartition.begin( ),
 			   filesOnPartition.end( ) );
 
+	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
 		return false;
 	}
 
-	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
-
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 	sizeToHide = getSizeToHide( filesToHide );
 
 	if( sizeToHide > freeSpaceSize )
 	{
-		LOG( INFO ) << "Size to hide("<<sizeToHide<<") > free space after files("<<freeSpaceSize<<"). Not enough space fo hide files";
+		LOG( INFO ) << "Size to hide(" << sizeToHide << ") > free space after files(" << freeSpaceSize << "). Not enough space fo hide files";
 		return false;
 	}
 
@@ -314,16 +313,16 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 	if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
 		return false;
 
-	std::sort( filesOnPartition.begin( ),
-			   filesOnPartition.end( ) );
+	std::sort( filesOnPartition.begin(), 
+			   filesOnPartition.end() );
+
+	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
 		return false;
 	}
-
-	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
@@ -351,11 +350,11 @@ std::ostream& operator<<( std::ostream &out, const FileHidder::HiddenFileMetadat
 
 bool FileHidder::prepareFatManager( const std::string &partitionPath )
 {
-	fatManager.clear( );
+	fatManager.clear();
 	fatManager.setPartitionPath( partitionPath );
-	fatManager.init( );
+	fatManager.init();
 
-	return fatManager.good( );
+	return fatManager.good();
 }
 
 bool FileHidder::checkPaths( const std::vector<std::string> &filesOnPartition,
