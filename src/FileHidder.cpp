@@ -62,9 +62,6 @@ uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
 	std::stringstream ss;
 	uint32_t seed;
 
-	std::sort( filesOnPartition.begin(),
-			   filesOnPartition.end() );
-
 	for( const auto &file : filesOnPartition )
 		stringSeed += hashFile( file );
 
@@ -263,6 +260,9 @@ bool FileHidder::hideFiles( std::vector<std::string> &filesOnPartition,
 	if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
 		return false;
 
+	std::sort( filesOnPartition.begin( ),
+			   filesOnPartition.end( ) );
+
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
@@ -313,6 +313,9 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 
 	if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
 		return false;
+
+	std::sort( filesOnPartition.begin( ),
+			   filesOnPartition.end( ) );
 
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
