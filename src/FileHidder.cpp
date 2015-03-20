@@ -77,11 +77,11 @@ uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
 	return seed;
 }
 
-std::string FileHidder::hashFile( const fs::path &path )
+std::string FileHidder::hashFile( const std::string &path )
 {
 	std::string result;
 	CryptoPP::SHA1 hash;
-	CryptoPP::FileSource( path.string( ).c_str( ), true,
+	CryptoPP::FileSource( path.c_str( ), true,
 						  new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
 						  new CryptoPP::StringSink( result ), true ) ) );
 

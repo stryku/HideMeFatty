@@ -63,7 +63,7 @@ private:
 	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::string> &filesOnPartition );
 	uint32_t getSeed( std::vector<std::string> &filesOnPartition );
 
-	std::string hashFile( const fs::path &path );
+	std::string hashFile( const std::string &path );
 
 	bool mapFreeSpace( const std::vector<std::string> &filesOnPartition );
 
