@@ -20,7 +20,7 @@ private:
 	};
 
 	std::vector<ChunkMetadata> chunks;
-	size_t totalSize;
+	uintmax_t totalSize;
 	std::vector<uintmax_t> shuffledArray;
 	std::vector<uintmax_t>::iterator shuffledIterator;
 	

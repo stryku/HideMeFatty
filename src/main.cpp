@@ -11,7 +11,11 @@ std::string getPath( )
 {
 	std::string ret;
 
-	getline( std::cin, ret );
+	while( ret.length() == 0 )
+	{
+		std::cout << ">";
+		getline( std::cin, ret );
+	}
 
 	return ret;
 }
@@ -30,10 +34,7 @@ std::vector<std::string> getVectorOfPaths( const char *text )
 	std::cout << text;
 
 	while( ( tmp = getPath() ) != "q" && tmp != "Q" )
-	{
 		ret.push_back( tmp );
-		std::cout << ">";
-	}
 
 	return ret;
 }
@@ -45,10 +46,9 @@ void hide()
 	FileHidder fileHidder;
 
 	filesToHide = getVectorOfPaths( "\nPut paths to files to hide. And 'q' after that\n\n" );
-	filesOnPartition = getVectorOfPaths("\nPut full paths to files on partiiton. And 'q' after that.\n\
-										See documentation for details\n\n>" );
-	partitionPath = getPath( "\nPut full path to partition\n\n>" );
-	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n>" );
+	filesOnPartition = getVectorOfPaths("\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
+	partitionPath = getPath( "\nPut full path to partition\n\n" );
+	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n" );
 
 	std::cout << "\nStarting hidding files. Be patient...";
 
@@ -69,10 +69,10 @@ void restore()
 	std::string partitionPath, partitionDevicePath, pathToStore;
 	FileHidder fileHidder;
 
-	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n>" );
+	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
 	partitionPath = getPath( "\nPut full path to partition\n\n" );
-	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n>" );
-	pathToStore = getPath( "\nPut path where store restored files\n\n>" );
+	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n" );
+	pathToStore = getPath( "\nPut path where store restored files\n\n" );
 
 	std::cout << "\nStarting restoring files. Be patient...";
 
