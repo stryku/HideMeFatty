@@ -24,6 +24,7 @@
 #include <numeric>
 #include <algorithm>
 #include <string>
+#include <map>
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
@@ -68,6 +69,9 @@ private:
 
 	std::vector<std::string> preparePathsOnPartition( const std::vector<std::string> &filesOnPartition,
 													  const std::string &partitionPath ) const;
+	std::string preparePathToStore( const std::string &pathToStore,
+									const FileHidder::HiddenFileMetadata &fileMetadata,
+									std::map<std::string, size_t> &restoredFiles ) const;
 
 	void hideFileSize( const uintmax_t &fileSize );
 	void hideFileName( const char *fileName );
@@ -84,7 +88,8 @@ private:
 					  const HiddenFileMetadata &metadata );
 	bool restoreMyFile( std::string pathToStore,
 						boost::random::mt19937 &rng,
-						const uintmax_t freeSpaceSize );
+						const uintmax_t freeSpaceSize,
+					  std::map<std::string, size_t> &restoredFiles );
 
 	bool prepareFatManager( const std::string &partitionPath );
 	bool checkPaths( const std::vector<std::string> &paths );

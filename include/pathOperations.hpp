@@ -17,6 +17,17 @@ T removeExtension( const T& filename )
 }
 
 template <class T>
+T getExtension( const T& filename )
+{
+	size_t lastdot = filename.find_last_of( '.' );
+
+	if( lastdot == T::npos )
+		return T();
+
+	return filename.substr( lastdot + 1 );
+}
+
+template <class T>
 T getPathFileName( const T &path ) 
 {
 	size_t pos = path.find_last_of( '/' );

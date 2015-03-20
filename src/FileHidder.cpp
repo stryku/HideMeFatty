@@ -225,23 +225,49 @@ void FileHidder::restoreFile( std::ofstream &fileStream,
 		fileStream.put( dmm.shuffled( ) );
 }
 
+std::string FileHidder::preparePathToStore( const std::string &pathToStore,
+											const FileHidder::HiddenFileMetadata &fileMetadata,
+											std::map<std::string, size_t> &restoredFiles ) const
+{
+	std::string extension, preparedPath;
+
+	preparedPath = pathToStore + '/' + fileMetadata.fileName;
+
+	if( restoredFiles.find( fileMetadata.fileName ) == restoredFiles.end() )
+	{
+		restoredFiles.insert( std::pair<std::string, size_t>
+							( fileMetadata.fileName, 0 ) );
+	}
+	else
+	{
+		restoredFiles[fileMetadata.fileName]++;
+
+		extension = getExtension( preparedPath );
+		preparedPath = removeExtension( preparedPath );
+		preparedPath += " (" + std::to_string( restoredFiles[fileMetadata.fileName] ) + ")." + extension;
+	}
+
+	return preparedPath;
+}
+
 bool FileHidder::restoreMyFile( std::string pathToStore,
 								boost::random::mt19937 &rng,
-								const uintmax_t freeSpaceSize )
+								const uintmax_t freeSpaceSize,
+								std::map<std::string, size_t> &restoredFiles )
 {
 	HiddenFileMetadata fileMetadata;
-	std::ofstream file;
+	std::ofstream fileStream;
 
 	fileMetadata = restoreMetadata( rng, freeSpaceSize );
 
 	if( fileMetadata.fileSize == 0 )
 		return false;
 
-	pathToStore = pathToStore + '/' + fileMetadata.fileName;
+	pathToStore = preparePathToStore( pathToStore, fileMetadata, restoredFiles );
 
-	file.open( pathToStore, std::ios::binary );
+	fileStream.open( pathToStore, std::ios::binary );
 
-	restoreFile( file, rng, freeSpaceSize, fileMetadata );
+	restoreFile( fileStream, rng, freeSpaceSize, fileMetadata );
 
 	return true;
 }
@@ -309,6 +335,7 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 	uint32_t seed;
 	boost::random::mt19937 rng;
 	std::vector<std::string> preparedPaths;
+	std::map<std::string, size_t> restoredFiles;
 
 	if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
 		return false;
@@ -336,7 +363,8 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
 
-	while( restoreMyFile( pathToStore, rng, freeSpaceSize ) ) {}
+	while( restoreMyFile( pathToStore, rng, freeSpaceSize, restoredFiles ) ) 
+	{}
 
 	return true;
 }
