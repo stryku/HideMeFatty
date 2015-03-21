@@ -13,7 +13,7 @@ Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
 	fatTableLoaded( false )
 {
 	mappedFileMngr.setFilePath( partitionPath );
-	initOk = _init( );
+	initOk = _init();
 }
 
 Fat32Manager::ClusterWithFreeSpace::ClusterWithFreeSpace( size_t clusterNo, 
