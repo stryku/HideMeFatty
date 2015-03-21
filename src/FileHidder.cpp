@@ -323,13 +323,14 @@ bool FileHidder::hideFiles( std::vector<std::string> &filesOnPartition,
 		return false;
 	}
 
+	seed = getSeed( partitionPath, preparedPaths );
+
 	if( !mapFreeSpace( preparedPaths ) )
 	{
 		LOG( INFO ) << "Mapping free space after files went wrong";
 		return false;
 	}
 
-	seed = getSeed( partitionPath, filesOnPartition );
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
 
@@ -371,13 +372,14 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 
 	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
 
+	seed = getSeed( partitionPath, preparedPaths );
+
 	if( !mapFreeSpace( preparedPaths ) )
 	{
 		LOG( INFO ) << "Mapping free space after files went wrong";
 		return false;
 	}
 
-	seed = getSeed( partitionPath, filesOnPartition );
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
 
