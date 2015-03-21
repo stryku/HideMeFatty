@@ -75,6 +75,7 @@ private:
 
 		dest.write( cluster.data(), dataSize );
 	}
+
 	template <class T>
 	void extractCluster( const size_t clusterNo, T &dest )
 	{

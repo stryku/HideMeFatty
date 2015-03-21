@@ -55,7 +55,8 @@ uintmax_t FileHidder::getFreeSpaceAfterFiles( const std::vector<std::string> &fi
 	return totalSize;
 }
 
-uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
+uint32_t FileHidder::getSeed( const std::string &pathToPartition,
+							  const std::vector<std::string> &filesOnPartition )
 {
 	std::string stringSeed( "" ), stringHash( "" );
 	CryptoPP::SHA1 sha1;
@@ -63,7 +64,7 @@ uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
 	uint32_t seed;
 
 	for( const auto &file : filesOnPartition )
-		stringSeed += hashFile( file );
+		stringSeed += hashFile( pathToPartition, file );
 
 	CryptoPP::StringSource( stringSeed,
 							true,
@@ -77,13 +78,30 @@ uint32_t FileHidder::getSeed( std::vector<std::string> &filesOnPartition )
 	return seed;
 }
 
-std::string FileHidder::hashFile( const std::string &path )
+std::string FileHidder::hashFile( const std::string &pathToPartition, const std::string &pathOnPartition )
 {
 	std::string result;
 	CryptoPP::SHA1 hash;
-	CryptoPP::FileSource( path.c_str( ), true,
-						  new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
-						  new CryptoPP::StringSink( result ), true ) ) );
+	uintmax_t fileSize = fs::file_size( pathToPartition + '/' + pathOnPartition );
+
+	result.resize( CryptoPP::SHA1::DIGESTSIZE );
+
+	if( fileSize > 100 * 1024 * 1024 ) //100MB
+	{
+		std::string extractedFilePath = fatManager.extractFileToDisc( pathOnPartition );
+
+		CryptoPP::FileSource( extractedFilePath.c_str( ), true,
+							  new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
+							  new CryptoPP::StringSink( result ), true ) ) );
+	}
+	else
+	{
+		std::shared_ptr<char> extractedFilePtr = fatManager.extractFileToMem( pathOnPartition );
+
+		hash.CalculateDigest( reinterpret_cast<byte*>( &result[0] ),
+							  reinterpret_cast<const byte*>( extractedFilePtr.get() ) ,
+							  fileSize );
+	}
 
 	return result;
 }
@@ -311,7 +329,7 @@ bool FileHidder::hideFiles( std::vector<std::string> &filesOnPartition,
 		return false;
 	}
 
-	seed = getSeed( filesOnPartition );
+	seed = getSeed( partitionPath, filesOnPartition );
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
 
@@ -359,7 +377,7 @@ bool FileHidder::restoreMyFiles( std::vector<std::string> &filesOnPartition,
 		return false;
 	}
 
-	seed = getSeed( filesOnPartition );
+	seed = getSeed( partitionPath, filesOnPartition );
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
 

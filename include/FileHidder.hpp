@@ -61,9 +61,10 @@ private:
 	uintmax_t getFilesSize( const std::vector<std::string> &filesPaths );
 	uintmax_t getSizeToHide( const std::vector<std::string> &filesToHide );
 	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::string> &filesOnPartition );
-	uint32_t getSeed( std::vector<std::string> &filesOnPartition );
+	uint32_t getSeed( const std::string &pathToPartition,
+					  const std::vector<std::string> &filesOnPartition );
 
-	std::string hashFile( const std::string &path );
+	std::string hashFile( const std::string &pathToPartition, const std::string &pathOnPartition );
 
 	bool mapFreeSpace( const std::vector<std::string> &filesOnPartition );
 
