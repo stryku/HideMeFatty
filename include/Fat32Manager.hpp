@@ -27,7 +27,7 @@ private:
 		size_t clusterNo,
 		freeSpaceOffset;
 
-		ClusterWithFreeSpace( ) {}
+		ClusterWithFreeSpace() {}
 		ClusterWithFreeSpace( size_t clusterNo, size_t freeSpaceOffset );
 
 		bool operator< ( const ClusterWithFreeSpace &c );
@@ -40,7 +40,7 @@ private:
 	bool fatInfoLoaded, bootSectorLoaded, fatTableLoaded, initOk;
 	MappedFileManager mappedFileMngr;
 	std::vector<uint32_t> fatTable;
-	
+
 private:
 
 	bool _init();
@@ -57,6 +57,29 @@ private:
 	inline uintmax_t getClusterStartOffset( size_t clusterNo ) const;
 
 	std::vector<FatRawLongFileName> extractLongFileNames( char *&ptrInCluster ) const;
+	void extractCluster( const size_t clusterNo, char *dest, const size_t dataSize )
+	{
+		char *mappedClusterPtr;
+
+		mappedClusterPtr = loadCluster( clusterNo );
+
+		std::copy( mappedClusterPtr,
+				   mappedClusterPtr + dataSize,
+				   dest );
+	}
+	void extractCluster( const size_t clusterNo, std::ostream &dest, const size_t dataSize )
+	{
+		std::vector<char> cluster( dataSize );
+
+		extractCluster( clusterNo, cluster.data(), dataSize );
+
+		dest.write( cluster.data(), dataSize );
+	}
+	template <class T>
+	void extractCluster( const size_t clusterNo, T &dest )
+	{
+		extractCluster( clusterNo, dest, clusterSize() );
+	}
 
 	std::vector<size_t> getClusterChain( size_t firstCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
@@ -110,22 +133,14 @@ public:
 		auto file = findFile( path );
 		auto clusterChain = getClusterChain( file.getCluster() );
 		std::shared_ptr<char> fileInMem( new char[file.getFileSize()] );
-		char *mappedClusterPtr, *destToCopy;
+		char *destToCopy;
 
-		destToCopy = fileInMem.get( );
+		destToCopy = fileInMem.get();
 
 		for( size_t i = 0; i < clusterChain.size() - 1; ++i, destToCopy += clusterSize() )
-		{
-			mappedClusterPtr = loadCluster( clusterChain[i] );
-			std::copy( mappedClusterPtr, 
-					   mappedClusterPtr + clusterSize(), 
-					   destToCopy );
-		}
+			extractCluster( clusterChain[i], destToCopy );
 
-		mappedClusterPtr = loadCluster( clusterChain.back() );
-		std::copy( mappedClusterPtr,
-				   mappedClusterPtr + file.getFileSize() % clusterSize(),
-				   destToCopy );
+		extractCluster( clusterChain.back(), destToCopy, file.getFileSize() % clusterSize() );
 
 		return fileInMem;
 	}
@@ -135,27 +150,12 @@ public:
 		auto clusterChain = getClusterChain( file.getCluster( ) );
 		std::string pathToExtract = "files/tmp/extracted";
 		std::ofstream fileInDisc( pathToExtract, std::ios::binary );
-		std::vector<char> cluster;
-		char *mappedClusterPtr;
 
 		for( size_t i = 0; i < clusterChain.size() - 1; ++i )
-		{
-			mappedClusterPtr = loadCluster( clusterChain[i] );
+			extractCluster( clusterChain[i], fileInDisc );
 
-			std::copy( mappedClusterPtr,
-					   mappedClusterPtr + clusterSize(), 
-					   cluster.data() );
 
-			fileInDisc.write( cluster.data(), clusterSize() );
-		}
-
-		mappedClusterPtr = loadCluster( clusterChain.back() );
-
-		std::copy( mappedClusterPtr,
-				   mappedClusterPtr + file.getFileSize() % clusterSize(), 
-				   cluster.data() );
-
-		fileInDisc.write( cluster.data(), file.getFileSize() % clusterSize() );
+		extractCluster( clusterChain.back(), fileInDisc, file.getFileSize() % clusterSize() );
 
 		return pathToExtract;
 	}
