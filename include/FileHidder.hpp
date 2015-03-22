@@ -17,6 +17,7 @@
 #include <crypto++/sha.h>
 #include <crypto++/hex.h>
 #include <crypto++/files.h>
+#include <crypto++/base64.h>
 
 #include <easylogging++.h>
 

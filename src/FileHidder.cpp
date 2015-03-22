@@ -84,8 +84,6 @@ std::string FileHidder::hashFile( const std::string &pathToPartition, const std:
 	CryptoPP::SHA1 hash;
 	uintmax_t fileSize = fs::file_size( pathToPartition + '/' + pathOnPartition );
 
-	result.resize( CryptoPP::SHA1::DIGESTSIZE );
-
 	if( fileSize > 100 * 1024 * 1024 ) //100MB
 	{
 		std::string extractedFilePath = fatManager.extractFileToDisc( pathOnPartition );
@@ -97,10 +95,16 @@ std::string FileHidder::hashFile( const std::string &pathToPartition, const std:
 	else
 	{
 		std::shared_ptr<char> extractedFilePtr = fatManager.extractFileToMem( pathOnPartition );
+		byte digest[CryptoPP::SHA1::DIGESTSIZE];
 
-		hash.CalculateDigest( reinterpret_cast<byte*>( &result[0] ),
-							  reinterpret_cast<const byte*>( extractedFilePtr.get() ) ,
+		hash.CalculateDigest( digest, 
+							  reinterpret_cast<const byte*>( extractedFilePtr.get( ) ), 
 							  fileSize );
+
+		CryptoPP::HexEncoder encoder;
+		encoder.Attach( new CryptoPP::StringSink( result ) );
+		encoder.Put( digest, sizeof( digest ) );
+		encoder.MessageEnd( );
 	}
 
 	return result;
