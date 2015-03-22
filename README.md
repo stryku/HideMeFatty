@@ -1,9 +1,12 @@
-### Hide Me Fatty
+﻿# Hide Me Fatty
 <a href="#about">About</a>
 <a href="#latest-version">Latest version</a>
 <a href="#download">Downloads</a>
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
 <a href="#usage">Usage</a>
+	<a href="#usage-general">General info</a>
+	<a href="#usage-hidding">Hidding example</a>
+	<a href="#usage-restoring">Restoring example</a>
 
 
 ## About
@@ -22,13 +25,19 @@ First of all you must run it with root permissions.
 After hidding some files you can view/copy etc. files on partition (more about that below) but you can't modify/remove them because you will lose hidded files.
 
 ## Usage
+### General info
 Program will ask you for four things.
 1. Files to hide - paths to files you want to hide.
 2. Files on partition - FULL paths to files on partition after what you want to hide your files.
 3. Path to partition - FULL path to partition. On most linux it is that in /media folder.
 4. Path to partition device file - FULL path to partition device file. That on /dev folder.
 
-# Here is usage example
+### Hidding example
+<code>
+
+</code>
+
+### Restoring example
 <code>
 
 </code>
