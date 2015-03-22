@@ -1,4 +1,4 @@
-#include <iostream> 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -49,8 +49,8 @@ void hide()
 
 	filesToHide = getVectorOfPaths( "\nPut paths to files to hide. And 'q' after that\n\n" );
 	filesOnPartition = getVectorOfPaths("\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
-	partitionPath = getPath( "\nPut full path to partition\n\n" );
-	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n" );
+	partitionPath = getPath( "\nPut full path to partition (that in /media folder)\n\n" );
+	partitionDevicePath = getPath( "\nPut full path to partition device (that in /dev/ folder)\n\n" );
 
 	std::cout << "\nStarting hidding files. Be patient...";
 
@@ -59,10 +59,10 @@ void hide()
 		filesToHide,
 		partitionDevicePath ) )
 	{
-		std::cout << "\nFiles hidded\n";
+		std::cout << "\nFiles hidded\nDon't forget to unmount parition\n";
 	}
 	else
-		std::cout << "\nCouldn't hide files. See last output log for details.\n";
+		std::cout << "\nCouldn't hide files. See last output files/logs/global.log for details.\n";
 }
 
 void restore()
@@ -72,8 +72,8 @@ void restore()
 	FileHidder fileHidder;
 
 	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
-	partitionPath = getPath( "\nPut full path to partition\n\n" );
-	partitionDevicePath = getPath( "\nPut full path to partition device(that in /dev/ folder)\n\n" );
+	partitionPath = getPath( "\nPut full path to partition (that in /media folder)\n\n" );
+	partitionDevicePath = getPath( "\nPut full path to partition device (that in /dev/ folder)\n\n" );
 	pathToStore = getPath( "\nPut path where store restored files\n\n" );
 
 	std::cout << "\nStarting restoring files. Be patient...";
@@ -86,7 +86,7 @@ void restore()
 		std::cout << "\nFiles restored.";
 	}
 	else
-		std::cout << "\nCouldn't restore files. See last output log for details.\n";
+		std::cout << "\nCouldn't restore files. See last output files/logs/global.log for details.\n";
 }
 
 int menu()
