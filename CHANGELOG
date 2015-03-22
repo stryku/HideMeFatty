@@ -1,2 +1,11 @@
-v0.1 04.03.15 2:37 
+v0.3 22.03.15
+-Hidding more than one file
+-Can hide files with the same name. Will be added serial number when restoring.
+-Generating logs
+-Still console but more user-friendly
+-Added licence
+-Added readme
+-Created git repo
+
+v0.1 04.03.15 
 -Hidding single file. Working only if on partition root directory is file, and after file is enought space to hide your file.
