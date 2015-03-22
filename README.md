@@ -35,10 +35,99 @@ Program will ask you for four things.<br />
 
 ### Hidding example
 <code>
+root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ./HideMeFatty-v0.3-release 
 
+
+		MENU
+
+1. Hide files
+2. Restore files
+0. Exit
+>1
+
+Put paths to files to hide. And 'q' after that
+
+>test.png
+>anotherTest.png
+>test/test.png
+>q
+
+Put full paths to files on partiiton. And 'q' after that.
+See documentation for details
+
+>/media/stryku/GIS/test-hideAfterMe.xz
+>/media/stryku/GIS/test-hideAfterMe.bmp
+>/media/stryku/GIS/test-hideAfterMe.txt
+>q
+
+Put full path to partition (that in /media folder)
+
+>/media/stryku/GIS
+
+Put full path to partition device (that in /dev/ folder)
+
+>/dev/sdb1
+
+Starting hidding files. Be patient...
+Files hidded
+Don't forget to unmount parition
+
+
+		MENU
+
+1. Hide files
+2. Restore files
+0. Exit
+>0
+Bye bye
 </code>
 
 ### Restoring example
 <code>
+root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ./HideMeFatty-v0.3-release 
 
+
+		MENU
+
+1. Hide files
+2. Restore files
+0. Exit
+>2
+
+Put full paths to files on partiiton. And 'q' after that.
+See documentation for details
+
+>/media/stryku/GIS/test-hideAfterMe.bmp
+>/media/stryku/GIS/test-hideAfterMe.xz
+>/media/stryku/GIS/test-hideAfterMe.txt
+>q
+
+Put full path to partition (that in /media folder)
+
+>/media/stryku/GIS
+
+Put full path to partition device (that in /dev/ folder)
+
+>/dev/sdb1
+
+Put path where store restored files
+
+>restored
+
+Starting restoring files. Be patient...
+Files restored.
+
+		MENU
+
+1. Hide files
+2. Restore files
+0. Exit
+>0
+Bye bye
+</code>
+
+ And as you can se below we have our hidded files in "restored" folder
+<code>
+root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ls restored/
+anotherTest.png  test.png  test (1).png
 </code>
