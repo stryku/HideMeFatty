@@ -7,7 +7,7 @@
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
 <a href="#usage">Usage</a>
 	<a href="#general-info">General info</a>
-	<a href="#hidding-example">Hidding example</a>
+	<a href="#hiding-example">Hiding example</a>
 	<a href="#restoring-example">Restoring example</a>
 </pre>
 
@@ -27,7 +27,7 @@ Last release: https://sourceforge.net/projects/hidemefatty/
 ## Before hide-and-seek
 There are things you must to know before using this program.<br />
 First of all you need run it with root permissions.<br />
-After hidding some files you can view/copy etc. files on partition (more about that below) but you can't modify/remove them because you will lose hidded files.<br />
+After hiding some files you can view/copy etc. files on partition (more about that below) but you can't modify/remove them because you will lose hidded files.<br />
 
 ## Usage
 ### General info
@@ -37,7 +37,7 @@ Program will ask you for four things.<br />
 3. Path to partition - FULL path to partition. On most linux it is that in /media folder.<br />
 4. Path to partition device file - FULL path to partition device file. That on /dev folder.<br />
 
-### Hidding example
+### Hiding example
 <pre>
 <code>
 root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ./HideMeFatty-v0.3-release 
@@ -73,7 +73,7 @@ Put full path to partition device (that in /dev/ folder)
 
 >/dev/sdb1
 
-Starting hidding files. Be patient...
+Starting hiding files. Be patient...
 Files hidded
 Don't forget to unmount parition
 
