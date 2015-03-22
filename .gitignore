@@ -225,6 +225,7 @@ FakesAssemblies/
 
 *.depend 
 *.layout 
+*.cbp
 
 ############  
 ## Windows  
