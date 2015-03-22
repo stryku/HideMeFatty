@@ -1,5 +1,6 @@
 ﻿# Hide Me Fatty
-<a href="#about">About</a></br>
+<pre>
+<a href="#about">About</a>
 <a href="#latest-version">Latest version</a>
 <a href="#download">Downloads</a>
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
@@ -7,7 +8,7 @@
 	<a href="#usage-general">General info</a>
 	<a href="#usage-hidding">Hidding example</a>
 	<a href="#usage-restoring">Restoring example</a>
-
+</pre>
 
 ## About
 Hide Me Fatty is simple program that is able to hide files on the partition with (for now only) FAT32 filesystem.
