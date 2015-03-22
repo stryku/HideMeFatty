@@ -1,5 +1,5 @@
 ﻿# Hide Me Fatty
-<a href="#about">About</a>
+<a href="#about">About</a></br>
 <a href="#latest-version">Latest version</a>
 <a href="#download">Downloads</a>
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
