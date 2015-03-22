@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/HideMeFatty-v0.3
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/DirectoryEntry.o $(OBJDIR_DEBUG)/src/DistributedMemoryMapper.o $(OBJDIR_DEBUG)/src/Fat32Manager.o $(OBJDIR_DEBUG)/src/FatStructs.o $(OBJDIR_DEBUG)/src/FileHidder.o $(OBJDIR_DEBUG)/src/MappedFileManager.o $(OBJDIR_DEBUG)/src/main.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/src/DirectoryEntry.o $(OBJDIR_DEBUG)/src/DistributedMemoryMapper.o $(OBJDIR_DEBUG)/src/Fat32Manager.o $(OBJDIR_DEBUG)/src/FatStructs.o $(OBJDIR_DEBUG)/src/FileHider.o $(OBJDIR_DEBUG)/src/MappedFileManager.o $(OBJDIR_DEBUG)/src/main.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/DirectoryEntry.o $(OBJDIR_RELEASE)/src/DistributedMemoryMapper.o $(OBJDIR_RELEASE)/src/Fat32Manager.o $(OBJDIR_RELEASE)/src/FatStructs.o $(OBJDIR_RELEASE)/src/FileHidder.o $(OBJDIR_RELEASE)/src/MappedFileManager.o $(OBJDIR_RELEASE)/src/main.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/DirectoryEntry.o $(OBJDIR_RELEASE)/src/DistributedMemoryMapper.o $(OBJDIR_RELEASE)/src/Fat32Manager.o $(OBJDIR_RELEASE)/src/FatStructs.o $(OBJDIR_RELEASE)/src/FileHider.o $(OBJDIR_RELEASE)/src/MappedFileManager.o $(OBJDIR_RELEASE)/src/main.o
 
 all: debug release
 
@@ -71,8 +71,8 @@ $(OBJDIR_DEBUG)/src/Fat32Manager.o: src/Fat32Manager.cpp
 $(OBJDIR_DEBUG)/src/FatStructs.o: src/FatStructs.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/FatStructs.cpp -o $(OBJDIR_DEBUG)/src/FatStructs.o
 
-$(OBJDIR_DEBUG)/src/FileHidder.o: src/FileHidder.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/FileHidder.cpp -o $(OBJDIR_DEBUG)/src/FileHidder.o
+$(OBJDIR_DEBUG)/src/FileHider.o: src/FileHider.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/FileHider.cpp -o $(OBJDIR_DEBUG)/src/FileHider.o
 
 $(OBJDIR_DEBUG)/src/MappedFileManager.o: src/MappedFileManager.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/MappedFileManager.cpp -o $(OBJDIR_DEBUG)/src/MappedFileManager.o
@@ -108,8 +108,8 @@ $(OBJDIR_RELEASE)/src/Fat32Manager.o: src/Fat32Manager.cpp
 $(OBJDIR_RELEASE)/src/FatStructs.o: src/FatStructs.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/FatStructs.cpp -o $(OBJDIR_RELEASE)/src/FatStructs.o
 
-$(OBJDIR_RELEASE)/src/FileHidder.o: src/FileHidder.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/FileHidder.cpp -o $(OBJDIR_RELEASE)/src/FileHidder.o
+$(OBJDIR_RELEASE)/src/FileHider.o: src/FileHider.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/FileHider.cpp -o $(OBJDIR_RELEASE)/src/FileHider.o
 
 $(OBJDIR_RELEASE)/src/MappedFileManager.o: src/MappedFileManager.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/MappedFileManager.cpp -o $(OBJDIR_RELEASE)/src/MappedFileManager.o
