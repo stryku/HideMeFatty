@@ -4,7 +4,7 @@
 
 #include <easylogging++.h>
 
-#include <FileHidder.hpp>
+#include <FileHider.hpp>
 
 typedef StringVector StringVector;
 
@@ -45,21 +45,21 @@ void hide()
 {
 	StringVector filesToHide, filesOnPartition;
 	std::string partitionPath, partitionDevicePath;
-	FileHidder fileHidder;
+	FileHider fileHider;
 
 	filesToHide = getVectorOfPaths( "\nPut paths to files to hide. And 'q' after that\n\n" );
 	filesOnPartition = getVectorOfPaths("\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
 	partitionPath = getPath( "\nPut full path to partition (that in /media folder)\n\n" );
 	partitionDevicePath = getPath( "\nPut full path to partition device (that in /dev/ folder)\n\n" );
 
-	std::cout << "\nStarting hidding files. Be patient...";
+	std::cout << "\nStarting hiding files. Be patient...";
 
-	if( fileHidder.hideFiles( filesOnPartition,
+	if( fileHider.hideFiles( filesOnPartition,
 		partitionPath,
 		filesToHide,
 		partitionDevicePath ) )
 	{
-		std::cout << "\nFiles hidded\nDon't forget to unmount parition\n";
+		std::cout << "\nFiles hided\nDon't forget to unmount parition\n";
 	}
 	else
 		std::cout << "\nCouldn't hide files. See last output files/logs/global.log for details.\n";
@@ -69,7 +69,7 @@ void restore()
 {
 	StringVector filesOnPartition;
 	std::string partitionPath, partitionDevicePath, pathToStore;
-	FileHidder fileHidder;
+	FileHider fileHider;
 
 	filesOnPartition = getVectorOfPaths( "\nPut full paths to files on partiiton. And 'q' after that.\nSee documentation for details\n\n" );
 	partitionPath = getPath( "\nPut full path to partition (that in /media folder)\n\n" );
@@ -78,7 +78,7 @@ void restore()
 
 	std::cout << "\nStarting restoring files. Be patient...";
 
-	if( fileHidder.restoreMyFiles( filesOnPartition,
+	if( fileHider.restoreMyFiles( filesOnPartition,
 		partitionPath,
 		partitionDevicePath,
 		pathToStore ) )

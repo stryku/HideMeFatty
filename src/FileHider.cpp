@@ -1,11 +1,11 @@
-#include <FileHidder.hpp>
+#include <FileHider.hpp>
 
-FileHidder::HiddenFileMetadata::HiddenFileMetadata( )
+FileHider::HiddenFileMetadata::HiddenFileMetadata( )
 {
 	std::memset( this->fileName, '\0', maxFileName );
 }
 
-FileHidder::HiddenFileMetadata::HiddenFileMetadata( const std::string &fileName,
+FileHider::HiddenFileMetadata::HiddenFileMetadata( const std::string &fileName,
 													const uintmax_t fileSize ) :
 													fileSize( fileSize )
 {
@@ -13,7 +13,7 @@ FileHidder::HiddenFileMetadata::HiddenFileMetadata( const std::string &fileName,
 	std::copy( fileName.begin( ), fileName.end( ), this->fileName );
 }
 
-bool FileHidder::isPathsCorrect( const StringVector &paths, const std::string &partitionPath )
+bool FileHider::isPathsCorrect( const StringVector &paths, const std::string &partitionPath )
 {
 	for( const auto &path : paths )
 	{
@@ -24,7 +24,7 @@ bool FileHidder::isPathsCorrect( const StringVector &paths, const std::string &p
 	return true;
 }
 
-uintmax_t FileHidder::getFilesSize( const StringVector &filesPaths )
+uintmax_t FileHider::getFilesSize( const StringVector &filesPaths )
 {
 	uintmax_t totalSize = 0;
 
@@ -34,7 +34,7 @@ uintmax_t FileHidder::getFilesSize( const StringVector &filesPaths )
 	return totalSize;
 }
 
-uintmax_t FileHidder::getSizeToHide( const StringVector &filesToHide )
+uintmax_t FileHider::getSizeToHide( const StringVector &filesToHide )
 {
 	uintmax_t size;
 
@@ -45,7 +45,7 @@ uintmax_t FileHidder::getSizeToHide( const StringVector &filesToHide )
 	return size;
 }
 
-uintmax_t FileHidder::getFreeSpaceAfterFiles( const StringVector &filesOnPartition )
+uintmax_t FileHider::getFreeSpaceAfterFiles( const StringVector &filesOnPartition )
 {
 	uintmax_t totalSize = 0;
 
@@ -55,7 +55,7 @@ uintmax_t FileHidder::getFreeSpaceAfterFiles( const StringVector &filesOnPartiti
 	return totalSize;
 }
 
-uint32_t FileHidder::getSeed( const StringVector &filesOnPartition )
+uint32_t FileHider::getSeed( const StringVector &filesOnPartition )
 {
 	std::string stringSeed( "" ), stringHash( "" );
 	CryptoPP::SHA1 sha1;
@@ -77,7 +77,7 @@ uint32_t FileHidder::getSeed( const StringVector &filesOnPartition )
 	return seed;
 }
 
-std::string FileHidder::hashFile( const std::string &path )
+std::string FileHider::hashFile( const std::string &path )
 {
 	std::string result;
 	CryptoPP::SHA1 hash;
@@ -88,7 +88,7 @@ std::string FileHidder::hashFile( const std::string &path )
 	return result;
 }
 
-bool FileHidder::mapFreeSpace( const StringVector &filesOnPartition )
+bool FileHider::mapFreeSpace( const StringVector &filesOnPartition )
 {
 	std::vector<Fat32Manager::FreeSpaceChunk> chunks;
 	uintmax_t startOffset;
@@ -111,7 +111,7 @@ bool FileHidder::mapFreeSpace( const StringVector &filesOnPartition )
 	return true;
 }
 
-StringVector FileHidder::preparePathsOnPartition( const StringVector &filesOnPartition,
+StringVector FileHider::preparePathsOnPartition( const StringVector &filesOnPartition,
 															  const std::string &partitionPath ) const
 {
 	size_t partitionPathLength = partitionPath.length();
@@ -123,7 +123,7 @@ StringVector FileHidder::preparePathsOnPartition( const StringVector &filesOnPar
 	return preparedPaths;
 }
 
-void FileHidder::hideFileSize( const uintmax_t &fileSize )
+void FileHider::hideFileSize( const uintmax_t &fileSize )
 {
 	const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
 
@@ -131,7 +131,7 @@ void FileHidder::hideFileSize( const uintmax_t &fileSize )
 		dmm.shuffled() = fileSizePtr[i];
 }
 
-void FileHidder::hideFileName( const char *fileName )
+void FileHider::hideFileName( const char *fileName )
 {
 	const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
 
@@ -139,7 +139,7 @@ void FileHidder::hideFileName( const char *fileName )
 		dmm.shuffled() = fileNamePtr[i];
 }
 
-void FileHidder::hideMetadata( const HiddenFileMetadata &metadata, 
+void FileHider::hideMetadata( const HiddenFileMetadata &metadata, 
 							   boost::random::mt19937 &rng, 
 							   const uintmax_t freeSpaceSize )
 {
@@ -147,7 +147,7 @@ void FileHidder::hideMetadata( const HiddenFileMetadata &metadata,
 	hideFileName( metadata.fileName );
 }
 
-bool FileHidder::hideFileContents( const std::string &filePath, 
+bool FileHider::hideFileContents( const std::string &filePath, 
 								   boost::random::mt19937 &rng, 
 								   const uintmax_t freeSpaceSize )
 {
@@ -169,7 +169,7 @@ bool FileHidder::hideFileContents( const std::string &filePath,
 	return true;
 }
 
-bool FileHidder::hideFile( const std::string &filePath,
+bool FileHider::hideFile( const std::string &filePath,
 						   boost::random::mt19937 &rng,
 						   const uintmax_t freeSpaceSize )
 {
@@ -181,7 +181,7 @@ bool FileHidder::hideFile( const std::string &filePath,
 	return hideFileContents( filePath, rng, freeSpaceSize );
 }
 
-uintmax_t FileHidder::restoreFileSize( )
+uintmax_t FileHider::restoreFileSize( )
 {
 	uintmax_t fileSize;
 
@@ -193,7 +193,7 @@ uintmax_t FileHidder::restoreFileSize( )
 	return fileSize;
 }
 
-void FileHidder::restoreFileName( HiddenFileMetadata &metadata )
+void FileHider::restoreFileName( HiddenFileMetadata &metadata )
 {
 	char *fileNamePtr = reinterpret_cast<char*>( metadata.fileName );
 
@@ -201,7 +201,7 @@ void FileHidder::restoreFileName( HiddenFileMetadata &metadata )
 		fileNamePtr[i] = dmm.shuffled( );
 }
 
-FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt19937 &rng, 
+FileHider::HiddenFileMetadata FileHider::restoreMetadata( boost::random::mt19937 &rng, 
 															const uintmax_t freeSpaceSize )
 {
 	HiddenFileMetadata metadata;
@@ -217,7 +217,7 @@ FileHidder::HiddenFileMetadata FileHidder::restoreMetadata( boost::random::mt199
 	return metadata;
 }
 
-void FileHidder::restoreFile( std::ofstream &fileStream,
+void FileHider::restoreFile( std::ofstream &fileStream,
 							  boost::random::mt19937 &rng,
 							  const uintmax_t freeSpaceSize,
 							  const HiddenFileMetadata &metadata )
@@ -226,8 +226,8 @@ void FileHidder::restoreFile( std::ofstream &fileStream,
 		fileStream.put( dmm.shuffled( ) );
 }
 
-std::string FileHidder::preparePathToStore( const std::string &pathToStore,
-											const FileHidder::HiddenFileMetadata &fileMetadata,
+std::string FileHider::preparePathToStore( const std::string &pathToStore,
+											const FileHider::HiddenFileMetadata &fileMetadata,
 											std::map<std::string, size_t> &restoredFiles ) const
 {
 	std::string extension, preparedPath;
@@ -251,7 +251,7 @@ std::string FileHidder::preparePathToStore( const std::string &pathToStore,
 	return preparedPath;
 }
 
-bool FileHidder::restoreMyFile( std::string pathToStore,
+bool FileHider::restoreMyFile( std::string pathToStore,
 								boost::random::mt19937 &rng,
 								const uintmax_t freeSpaceSize,
 								std::map<std::string, size_t> &restoredFiles )
@@ -273,7 +273,7 @@ bool FileHidder::restoreMyFile( std::string pathToStore,
 	return true;
 }
 
-bool FileHidder::hideFiles( StringVector &filesOnPartition,
+bool FileHider::hideFiles( StringVector &filesOnPartition,
 							const std::string &partitionPath,
 							const StringVector &filesToHide,
 							const std::string &partitionDevPath )
@@ -328,7 +328,7 @@ bool FileHidder::hideFiles( StringVector &filesOnPartition,
 	return true;
 }
 
-bool FileHidder::restoreMyFiles( StringVector &filesOnPartition,
+bool FileHider::restoreMyFiles( StringVector &filesOnPartition,
 								 const std::string &partitionPath,
 								 const std::string &partitionDevPath,
 								 const std::string &pathToStore )
@@ -372,14 +372,14 @@ bool FileHidder::restoreMyFiles( StringVector &filesOnPartition,
 	return true;
 }
 
-std::ostream& operator<<( std::ostream &out, const FileHidder::HiddenFileMetadata &hfm )
+std::ostream& operator<<( std::ostream &out, const FileHider::HiddenFileMetadata &hfm )
 {
 	out << "File name = " << hfm.fileName << "\nFile size = " << hfm.fileSize;
 
 	return out;
 }
 
-bool FileHidder::prepareFatManager( const std::string &partitionPath )
+bool FileHider::prepareFatManager( const std::string &partitionPath )
 {
 	fatManager.clear();
 	fatManager.setPartitionPath( partitionPath );
@@ -391,7 +391,7 @@ bool FileHidder::prepareFatManager( const std::string &partitionPath )
 	return true;
 }
 
-bool FileHidder::checkPaths( const StringVector &filesOnPartition,
+bool FileHider::checkPaths( const StringVector &filesOnPartition,
 							 const std::string &partitionPath,
 							 const StringVector &filesToHide,
 							 const std::string &partitionDevPath )
@@ -423,7 +423,7 @@ bool FileHidder::checkPaths( const StringVector &filesOnPartition,
 	return true;
 }
 
-bool FileHidder::checkPaths( const StringVector &filesOnPartition,
+bool FileHider::checkPaths( const StringVector &filesOnPartition,
 							 const std::string &partitionPath,
 							 const std::string &partitionDevPath,
 							 const std::string &pathToStore )
@@ -455,7 +455,7 @@ bool FileHidder::checkPaths( const StringVector &filesOnPartition,
 	return true;
 }
 
-bool FileHidder::checkPaths( const StringVector &paths )
+bool FileHider::checkPaths( const StringVector &paths )
 {
 	for(const auto &path : paths)
 		if( !fs::exists( path ) )

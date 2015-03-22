@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_FILEHIDDER_HPP_
-#define _INCLUDE_FILEHIDDER_HPP_
+#ifndef _INCLUDE_FILEHIDER_HPP_
+#define _INCLUDE_FILEHIDER_HPP_
 
 #ifdef _MSC_VER
 // Crypto++ Library
@@ -41,7 +41,7 @@ using namespace pathOperations;
 
 typedef std::vector<std::string> StringVector;
 
-class FileHidder
+class FileHider
 {
 public:
 	struct HiddenFileMetadata
@@ -75,7 +75,7 @@ private:
 	StringVector preparePathsOnPartition( const StringVector &filesOnPartition,
 													  const std::string &partitionPath ) const;
 	std::string preparePathToStore( const std::string &pathToStore,
-									const FileHidder::HiddenFileMetadata &fileMetadata,
+									const FileHider::HiddenFileMetadata &fileMetadata,
 									std::map<std::string, size_t> &restoredFiles ) const;
 
 	void hideFileSize( const uintmax_t &fileSize );
@@ -108,8 +108,8 @@ private:
 					 const std::string &pathToStore );
 
 public:
-	FileHidder() {}
-	~FileHidder() {}
+	FileHider() {}
+	~FileHider() {}
 
 	bool hideFiles( StringVector &filesOnPartition,
 					const std::string &partitionPath,
