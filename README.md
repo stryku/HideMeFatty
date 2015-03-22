@@ -34,6 +34,7 @@ Program will ask you for four things.<br />
 4. Path to partition device file - FULL path to partition device file. That on /dev folder.<br />
 
 ### Hidding example
+<pre>
 <code>
 root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ./HideMeFatty-v0.3-release 
 
@@ -81,8 +82,10 @@ Don't forget to unmount parition
 >0
 Bye bye
 </code>
+</pre>
 
 ### Restoring example
+<pre>
 <code>
 root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ./HideMeFatty-v0.3-release 
 
@@ -125,9 +128,12 @@ Files restored.
 >0
 Bye bye
 </code>
+</pre>
 
  And as you can se below we have our hidded files in "restored" folder
+<pre>
 <code>
 root@centrum-dowodzenia:/tmp/test/HideMeFatty-v0.3/release# ls restored/
 anotherTest.png  test.png  test (1).png
 </code>
+</pre>
