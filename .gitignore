@@ -223,8 +223,8 @@ FakesAssemblies/
 ## Code::Blocks  
 #################  
 
-*.depend 
-*.layout 
+*.depend
+*.layout
 *.cbp
 
 ############  
