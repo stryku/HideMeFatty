@@ -19,6 +19,7 @@ Like in linux kernel odd minor (v0.>>3<<) represent beta release. Even represent
 So now you know that current release is beta. If you want help me with finding bugs you are free to download and play with version with log generation. That version generate lots of logs (located in files/logs/global.log) which may help me with bugs.<br />
 
 ## Downloads
+Last release: [![https://sourceforge.net/projects/hidemefatty/]](https://sourceforge.net/projects/hidemefatty/) 
 
 ## Before hide-and-seek
 There are things you must to know before using this program.<br />
