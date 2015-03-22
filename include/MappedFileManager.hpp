@@ -3,9 +3,14 @@
 
 #include <string>
 #include <set>
-#include <boost\iostreams\device\mapped_file.hpp>
+
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/filesystem/operations.hpp>
 
 typedef boost::iostreams::mapped_file MappedFile;
+typedef boost::iostreams::mapped_file::size_type boostSize_t;
+
+namespace fs = boost::filesystem;
 
 class MappedFileManager
 {
@@ -13,118 +18,44 @@ private:
 
 	struct MappedChunk
 	{
-		intmax_t begin, end;
+		uintmax_t begin, end;
 		bool mapped;
 
-		MappedChunk() :
-			mapped( false )
-		{}
+		MappedChunk();
 
-		bool inside( const uintmax_t offset, const size_t size ) const
-		{
-			return offset >= begin && offset + size <= end;
-		}
+		bool inside( const uintmax_t offset, const uintmax_t size ) const;
 
 	} mappedChunkInfo;
 
-	std::string filePath;
+	fs::path filePath;
 	size_t allocationGranularity,
 		mappingGranularity; //it is also mapped chunk size
 	MappedFile mappedFile;
 
 private:
 
-	uintmax_t getOffsetForAllocGranularity( uintmax_t offset ) const
-	{
-		offset = offset / allocationGranularity * allocationGranularity;
-		return offset;
-	}
+	uintmax_t getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const;
+	uintmax_t getSizeForGranularity( const uintmax_t offset,
+									 const uintmax_t preparedOffset,
+									 uintmax_t size,
+									 const size_t granularity) const;
 
-	uintmax_t getOffsetForMapGranularity( uintmax_t offset ) const
-	{
-		offset = offset / mappingGranularity * mappingGranularity;
-		return offset;
-	}
+	void remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, bool hard );
 
-	uintmax_t getSizeForMapGranularity( const uintmax_t offset,
-										  const uintmax_t preparedOffset,
-										 size_t size ) const
-	{
-		
-		size_t calculatedSize = mappingGranularity + size - ( preparedOffset + mappingGranularity - offset );
-
-		return ( calculatedSize < mappingGranularity ) ? mappingGranularity : calculatedSize;
-	}
-
-	void remapChunk( uintmax_t startOffset, size_t sizeToMap )
-	{
-		uint64_t preparedOffset, preparedSize;
-
-		preparedOffset = getOffsetForAllocGranularity( startOffset );
-		preparedOffset = getOffsetForMapGranularity( preparedOffset );
-		preparedSize = getSizeForMapGranularity( startOffset, preparedOffset, sizeToMap );
-
-		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, preparedSize ) )
-
-			mappedFile.open( filePath,
-			std::ios_base::in | std::ios_base::out,
-			preparedSize,
-			preparedOffset );
-
-		if( mappedFile.is_open() == false )
-		{
-			mappedChunkInfo.mapped = false;
-			return;
-		}
-
-		mappedChunkInfo.begin = preparedOffset;
-		mappedChunkInfo.end = preparedOffset + preparedSize;
-		mappedChunkInfo.mapped = true;
-	}
+	char* getUserPtr( uintmax_t startOffset );
 
 public:
-	MappedFileManager( ) :
-		mappingGranularity( 1073741824 ) // default: 1 gigabyte
-	{
-		allocationGranularity = mappedFile.alignment( );
-	}
-	MappedFileManager( const size_t _mappingGranularity ) :
-		mappingGranularity( _mappingGranularity )
-	{
-		allocationGranularity = mappedFile.alignment( );
-	}
+	MappedFileManager();
+	MappedFileManager( const size_t _mappingGranularity );
+	~MappedFileManager();
 
-	~MappedFileManager()
-	{
-		mappedFile.close();
-	}
+	void setFilePath( const fs::path &pathToFile );
 
-	void setFilePath( const std::string &pathToFile )
-	{
-		filePath = pathToFile;
-	}
+	char* map( uintmax_t startOffset = 0, uintmax_t sizeToMap = 0, bool hard = false );
 
-	char* map( uintmax_t startOffset = 0, size_t sizeToMap = 0 )
-	{
-		char *mappedPtr;
-		uint64_t preparedOffset, preparedSize;
+	void close();
 
-		if( !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
-			remapChunk( startOffset, sizeToMap );
-
-		if( mappedFile.is_open( ) == false )
-			return nullptr;
-
-		mappedPtr = mappedFile.data( ) + startOffset;
-
-
-		return mappedPtr;
-	}
-
-	void close()
-	{
-		mappedFile.close();
-	}
+	friend std::ostream& operator<<( std::ostream &, const MappedChunk & );
 };
 
 #endif

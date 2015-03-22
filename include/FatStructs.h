@@ -5,12 +5,13 @@ credits: http://wiki.osdev.org/FAT
 #ifndef _INCLUDE_FATSTRUCTS_
 #define _INCLUDE_FATSTRUCTS_
 
+#include <ostream>
+
 #pragma pack(push)
 #pragma pack(1)
 
 struct Fat32ExtBS
 {
-	//extended fat32 stuff
 	unsigned int		table_size_32;
 	unsigned short		extended_flags;
 	unsigned short		fat_version;
@@ -24,14 +25,13 @@ struct Fat32ExtBS
 	unsigned int 		volume_id;
 	unsigned char		volume_label[11];
 	unsigned char		fat_type_label[8];
-
 };
 
 struct FatBS
 {
 	unsigned char 		bootjmp[3];
 	unsigned char 		oem_name[8];
-	unsigned short 	        bytes_per_sector;
+	unsigned short 	    bytes_per_sector;
 	unsigned char		sectors_per_cluster;
 	unsigned short		reserved_sector_count;
 	unsigned char		table_count;
@@ -48,8 +48,6 @@ struct FatBS
 	unsigned char		extended_section[54];
 
 };
-
-
 
 struct FatRawDirectoryEntry
 {
@@ -109,7 +107,11 @@ enum EDirEntryType
 	DIRECTORY = 0x10,
 	ARCHIVE = 0x20,
 	LFN = READ_ONLY | HIDDEN | SYSTEM | VOLUME_ID,
-	BAD_DIR_ENTRY
+	BAD_DIR_ENTRY = 0
 };
+
+std::ostream& operator<< ( std::ostream &out, const FatBS &bs );
+std::ostream& operator<< ( std::ostream &out, const Fat32ExtBS &bs );
+std::ostream& operator<< ( std::ostream &out, const FatInfo &bs );
 
 #endif

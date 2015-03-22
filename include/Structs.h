@@ -19,7 +19,25 @@ struct Date
 		year( 0 )
 	{}
 	~Date() {}
+
+	bool operator==( const Date &d ) const
+	{
+		return d.second == second &&
+				d.minute == minute &&
+				d.hour == hour &&
+				d.day == day &&
+				d.month == month &&
+				d.year == year;
+	}
+
+	
 };
+
+inline std::ostream& operator<<( std::ostream &out, const Date &d )
+{
+	out << d.day << "." << d.month << "." << d.year << " " << d.hour << ":" << d.minute << ":" << d.second;
+	return out;
+}
 
 struct ClusterInfo
 {

@@ -1,101 +1,125 @@
 #ifndef _INCLUDE_FILEHIDDER_HPP_
 #define _INCLUDE_FILEHIDDER_HPP_
 
-#include <boost\filesystem\operations.hpp>
+#ifdef _MSC_VER
+// Crypto++ Library
+#ifdef _DEBUG
+#  pragma comment ( lib, "cryptlib" )
+#else
+#  pragma comment ( lib, "cryptlib" )
+#endif
+#endif
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/nowide/fstream.hpp>
+
+#include <crypto++/sha.h>
+#include <crypto++/hex.h>
+#include <crypto++/files.h>
+#include <crypto++/base64.h>
+
+#include <easylogging++.h>
+
 #include <vector>
+#include <numeric>
+#include <algorithm>
+#include <string>
+#include <map>
 
 #include <Fat32Manager.hpp>
+#include <DistributedMemoryMapper.hpp>
+#include <pathOperations.hpp>
+
+#include <iostream>
 
 namespace fs = boost::filesystem;
+using namespace boost::nowide;
+using namespace pathOperations;
+
+typedef std::vector<std::string> StringVector;
 
 class FileHidder
 {
 public:
-	struct HiddenChunkMetadata
+	struct HiddenFileMetadata
 	{
-		size_t nextClusterNo, offsetInNextCluster;
+		static const size_t maxFileName = 256;
 
-		HiddenChunkMetadata() :
-			nextClusterNo( magicEndOfChain )
-		{}
-		HiddenChunkMetadata( const size_t _nextClusterNo,
-							 const size_t _offsetInNextCluster ) :
-							 nextClusterNo( _nextClusterNo ),
-							 offsetInNextCluster( _offsetInNextCluster )
-		{}
-						
+		uint64_t fileSize;
+		char fileName[maxFileName];
+
+		HiddenFileMetadata();
+		HiddenFileMetadata( const std::string &fileName,
+							const uintmax_t fileSize );
 	};
 
 private:
-	static const size_t magicEndOfChain = static_cast <size_t>( -1 );
+
 	Fat32Manager fatManager;
+	DistributedMemoryMapper dmm;
+
+	bool isPathsCorrect( const StringVector &paths, const std::string &partitionPath );
+
+	uintmax_t getFilesSize( const StringVector &filesPaths );
+	uintmax_t getSizeToHide( const StringVector &filesToHide );
+	uintmax_t getFreeSpaceAfterFiles( const StringVector &filesOnPartition );
+	uint32_t getSeed( const StringVector &filesOnPartition );
+
+	std::string hashFile( const std::string &path );
+
+	bool mapFreeSpace( const StringVector &filesOnPartition );
+
+	StringVector preparePathsOnPartition( const StringVector &filesOnPartition,
+													  const std::string &partitionPath ) const;
+	std::string preparePathToStore( const std::string &pathToStore,
+									const FileHidder::HiddenFileMetadata &fileMetadata,
+									std::map<std::string, size_t> &restoredFiles ) const;
+
+	void hideFileSize( const uintmax_t &fileSize );
+	void hideFileName( const char *fileName );
+	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	bool hideFileContents( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	bool hideFile( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+
+	uintmax_t restoreFileSize();
+	void restoreFileName( HiddenFileMetadata &metadata );
+	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	void restoreFile( std::ofstream &fileStream,
+					  boost::random::mt19937 &rng,
+					  const uintmax_t freeSpaceSize,
+					  const HiddenFileMetadata &metadata );
+	bool restoreMyFile( std::string pathToStore,
+						boost::random::mt19937 &rng,
+						const uintmax_t freeSpaceSize,
+					  std::map<std::string, size_t> &restoredFiles );
+
+	bool prepareFatManager( const std::string &partitionPath );
+	bool checkPaths( const StringVector &paths );
+	bool checkPaths( const StringVector &filesOnPartition,
+					 const std::string &partitionPath,
+					 const StringVector &filesToHide,
+					 const std::string &partitionDevPath );
+	bool checkPaths( const StringVector &filesOnPartition,
+					 const std::string &partitionPath,
+					 const std::string &partitionDevPath,
+					 const std::string &pathToStore );
 
 public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFile( const std::string &filePath, const std::string &partitionPath )
-	{
-		const size_t metadataSize = sizeof( HiddenChunkMetadata );
+	bool hideFiles( StringVector &filesOnPartition,
+					const std::string &partitionPath,
+					const StringVector &filesToHide,
+					const std::string &partitionDevPath );
 
-		std::vector<ClusterInfo> clustersWithFreeBytes;
-		uintmax_t fileSize,
-			copiedBytes = 0;
-		MappedFileManager mappedFileMngr;
-		char *mappedPtr;
-		HiddenChunkMetadata hiddenChunkMetadata;
-
-		fatManager.setPartitionPath( partitionPath );
-
-		fileSize = fs::file_size( filePath );
-
-		if( fileSize == static_cast<uintmax_t>( -1 ) )
-			return false;
-
-		clustersWithFreeBytes = fatManager.getClustersWithFreeBytes( fileSize, metadataSize );
-
-		if( clustersWithFreeBytes.size() == 0 )
-			return false;
-
-		mappedFileMngr.setFilePath( filePath );
-		mappedPtr = mappedFileMngr.map( );
-
-		fatManager.writeToCluster( clustersWithFreeBytes[0].clusterNo,
-								   clustersWithFreeBytes[0].freeBytesOffset,
-								   sizeof( uintmax_t ),
-								   reinterpret_cast<char*>( &fileSize ) );
-
-		clustersWithFreeBytes[0].freeBytesOffset += sizeof( uintmax_t );
-		clustersWithFreeBytes[0].freeBytes -= sizeof( uintmax_t );
-
-		for( auto it = clustersWithFreeBytes.begin(); it != clustersWithFreeBytes.end(); ++it )
-		{
-			size_t bytesToCopy = it->freeBytes - metadataSize;
-			auto nextCluster = it + 1;
-
-			if( nextCluster == clustersWithFreeBytes.end() )
-				hiddenChunkMetadata.nextClusterNo = magicEndOfChain;
-			else
-			{
-				hiddenChunkMetadata.nextClusterNo = nextCluster->clusterNo;
-				hiddenChunkMetadata.offsetInNextCluster = nextCluster->freeBytesOffset;
-			}
-
-			fatManager.writeToCluster( it->clusterNo,
-									   it->freeBytesOffset,
-									   metadataSize,
-									   reinterpret_cast<char*>  ( &hiddenChunkMetadata ) );
-
-			fatManager.writeToCluster( it->clusterNo,
-									   it->freeBytesOffset + metadataSize,
-									   bytesToCopy,
-									   mappedPtr + copiedBytes );
-
-			copiedBytes += bytesToCopy;
-		}
-
-		return true;
-	}
+	bool restoreMyFiles( StringVector &filesOnPartition,
+						 const std::string &partitionPath,
+						 const std::string &partitionDevPath,
+						 const std::string &pathToStore );
 };
 
 #endif

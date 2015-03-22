@@ -1,12 +1,13 @@
 #my ignores
-files/
-files/*
+pliki/
+filse/*
 HideMeFatty/
 HideMeFatty/*
 hmf/
 hmf/*
 czasomierz/
 czasomierz/*
+cbp2make*
 
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -223,8 +224,9 @@ FakesAssemblies/
 ## Code::Blocks  
 #################  
 
-*.depend 
-*.layout 
+*.depend
+*.layout
+*.cbp
 
 ############  
 ## Windows  
