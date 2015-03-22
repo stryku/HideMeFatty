@@ -2,7 +2,7 @@
 <pre>
 <a href="#about">About</a>
 <a href="#latest-version">Latest version</a>
-<a href="#download">Downloads</a>
+<a href="#downloads">Downloads</a>
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
 <a href="#usage">Usage</a>
 	<a href="#general-info">General info</a>
@@ -19,7 +19,7 @@ Like in linux kernel odd minor (v0.>>3<<) represent beta release. Even represent
 So now you know that current release is beta. If you want help me with finding bugs you are free to download and play with version with log generation. That version generate lots of logs (located in files/logs/global.log) which may help me with bugs.<br />
 
 ## Downloads
-Last release: [![https://sourceforge.net/projects/hidemefatty/]](https://sourceforge.net/projects/hidemefatty/) 
+Last release: https://sourceforge.net/projects/hidemefatty/
 
 ## Before hide-and-seek
 There are things you must to know before using this program.<br />
