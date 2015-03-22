@@ -1,11 +1,13 @@
 #ifndef _INCLUDE_FILEHIDDER_HPP_
 #define _INCLUDE_FILEHIDDER_HPP_
 
+#ifdef _MSC_VER
 // Crypto++ Library
 #ifdef _DEBUG
 #  pragma comment ( lib, "cryptlib" )
 #else
 #  pragma comment ( lib, "cryptlib" )
+#endif
 #endif
 
 #include <boost/filesystem/operations.hpp>

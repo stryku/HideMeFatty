@@ -16,7 +16,7 @@ Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
 	initOk = _init();
 }
 
-Fat32Manager::ClusterWithFreeSpace::ClusterWithFreeSpace( size_t clusterNo, 
+Fat32Manager::ClusterWithFreeSpace::ClusterWithFreeSpace( size_t clusterNo,
 														  size_t freeSpaceOffset ) :
 	clusterNo( clusterNo ),
 	freeSpaceOffset( freeSpaceOffset )
@@ -56,7 +56,7 @@ bool Fat32Manager::_init( )
 
 	if( loadFatTable() == false )
 		return false;
-	
+
 	return true;
 }
 
@@ -151,8 +151,6 @@ bool Fat32Manager::loadFatTable()
 char* Fat32Manager::loadCluster( size_t clusterNo )
 {
 	char *mappedPtr;
-
-	uintmax_t clusterStart = getClusterStartOffset( clusterNo );
 
 	mappedPtr = mappedFileMngr.map( getClusterStartOffset( clusterNo ),
 									clusterSize( ) );

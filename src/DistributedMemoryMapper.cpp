@@ -5,7 +5,7 @@ DistributedMemoryMapper::ChunkMetadata::ChunkMetadata() :
 	size( 0 )
 {}
 
-DistributedMemoryMapper::ChunkMetadata::ChunkMetadata( char *ptr, 
+DistributedMemoryMapper::ChunkMetadata::ChunkMetadata( char *ptr,
 													   size_t size ) :
 	ptr( ptr ),
 	size( size )
@@ -20,8 +20,6 @@ void DistributedMemoryMapper::addMemoryChunk( char *ptr, size_t size )
 
 char& DistributedMemoryMapper::operator[]( uintmax_t no )
 {
-	uintmax_t size = 0;
-
 	for( const auto &chunk : chunks )
 	{
 		if( no < chunk.size )
