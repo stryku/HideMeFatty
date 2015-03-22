@@ -6,6 +6,8 @@
 
 #include <FileHidder.hpp>
 
+typedef StringVector StringVector;
+
 
 std::string getPath( )
 {
@@ -26,9 +28,9 @@ std::string getPath( const char *text )
 	return getPath();
 }
 
-std::vector<std::string> getVectorOfPaths( const char *text )
+StringVector getVectorOfPaths( const char *text )
 {
-	std::vector<std::string> ret;
+	StringVector ret;
 	std::string tmp;
 
 	std::cout << text;
@@ -41,7 +43,7 @@ std::vector<std::string> getVectorOfPaths( const char *text )
 
 void hide()
 {
-	std::vector<std::string> filesToHide, filesOnPartition;
+	StringVector filesToHide, filesOnPartition;
 	std::string partitionPath, partitionDevicePath;
 	FileHidder fileHidder;
 
@@ -65,7 +67,7 @@ void hide()
 
 void restore()
 {
-	std::vector<std::string> filesOnPartition;
+	StringVector filesOnPartition;
 	std::string partitionPath, partitionDevicePath, pathToStore;
 	FileHidder fileHidder;
 

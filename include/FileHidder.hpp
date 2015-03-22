@@ -37,6 +37,8 @@ namespace fs = boost::filesystem;
 using namespace boost::nowide;
 using namespace pathOperations;
 
+typedef std::vector<std::string> StringVector;
+
 class FileHidder
 {
 public:
@@ -57,19 +59,18 @@ private:
 	Fat32Manager fatManager;
 	DistributedMemoryMapper dmm;
 
-	bool isPathsCorrect( const std::vector<std::string> &paths, const std::string &partitionPath );
+	bool isPathsCorrect( const StringVector &paths, const std::string &partitionPath );
 
-	uintmax_t getFilesSize( const std::vector<std::string> &filesPaths );
-	uintmax_t getSizeToHide( const std::vector<std::string> &filesToHide );
-	uintmax_t getFreeSpaceAfterFiles( const std::vector<std::string> &filesOnPartition );
-	uint32_t getSeed( const std::string &pathToPartition,
-					  const std::vector<std::string> &filesOnPartition );
+	uintmax_t getFilesSize( const StringVector &filesPaths );
+	uintmax_t getSizeToHide( const StringVector &filesToHide );
+	uintmax_t getFreeSpaceAfterFiles( const StringVector &filesOnPartition );
+	uint32_t getSeed( const StringVector &filesOnPartition );
 
-	std::string hashFile( const std::string &pathToPartition, const std::string &pathOnPartition );
+	std::string hashFile( const std::string &path );
 
-	bool mapFreeSpace( const std::vector<std::string> &filesOnPartition );
+	bool mapFreeSpace( const StringVector &filesOnPartition );
 
-	std::vector<std::string> preparePathsOnPartition( const std::vector<std::string> &filesOnPartition,
+	StringVector preparePathsOnPartition( const StringVector &filesOnPartition,
 													  const std::string &partitionPath ) const;
 	std::string preparePathToStore( const std::string &pathToStore,
 									const FileHidder::HiddenFileMetadata &fileMetadata,
@@ -94,12 +95,12 @@ private:
 					  std::map<std::string, size_t> &restoredFiles );
 
 	bool prepareFatManager( const std::string &partitionPath );
-	bool checkPaths( const std::vector<std::string> &paths );
-	bool checkPaths( const std::vector<std::string> &filesOnPartition,
+	bool checkPaths( const StringVector &paths );
+	bool checkPaths( const StringVector &filesOnPartition,
 					 const std::string &partitionPath,
-					 const std::vector<std::string> &filesToHide,
+					 const StringVector &filesToHide,
 					 const std::string &partitionDevPath );
-	bool checkPaths( const std::vector<std::string> &filesOnPartition,
+	bool checkPaths( const StringVector &filesOnPartition,
 					 const std::string &partitionPath,
 					 const std::string &partitionDevPath,
 					 const std::string &pathToStore );
@@ -108,12 +109,12 @@ public:
 	FileHidder() {}
 	~FileHidder() {}
 
-	bool hideFiles( std::vector<std::string> &filesOnPartition,
+	bool hideFiles( StringVector &filesOnPartition,
 					const std::string &partitionPath,
-					const std::vector<std::string> &filesToHide,
+					const StringVector &filesToHide,
 					const std::string &partitionDevPath );
 
-	bool restoreMyFiles( std::vector<std::string> &filesOnPartition,
+	bool restoreMyFiles( StringVector &filesOnPartition,
 						 const std::string &partitionPath,
 						 const std::string &partitionDevPath,
 						 const std::string &pathToStore );

@@ -256,9 +256,9 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstC
 
 	return dirEntries;
 }
-std::vector<std::string> Fat32Manager::getPathFoldersNames( const std::string &path ) const
+StringVector Fat32Manager::getPathFoldersNames( const std::string &path ) const
 {
-	std::vector<std::string> folders;
+	StringVector folders;
 	size_t posBegin = 0, posEnd, numberToCopy;
 
 	while( ( posEnd = path.find( '/', posBegin ) ) != std::string::npos )
@@ -348,7 +348,7 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( std::string searchedDirEntryN
 }
 DirectoryEntry Fat32Manager::findFile( const std::string &path )
 {
-	std::vector<std::string> foldersNames;
+	StringVector foldersNames;
 	std::string fileName;
 	DirectoryEntry currentFolder, foundFile;
 
@@ -381,17 +381,17 @@ void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
 	mappedFileMngr.setFilePath( partitionPath );
 }
 
-bool Fat32Manager::isValidFat32( )
+bool Fat32Manager::isValidFat32()
 {
 	if( !initOk )
 		return false;
 
-	return getFatType( ) == FAT32;
+	return getFatType() == FAT32;
 }
 
-void Fat32Manager::close( )
+void Fat32Manager::close()
 {
-	mappedFileMngr.close( );
+	mappedFileMngr.close();
 }
 
 bool Fat32Manager::isPathCorrect( const std::string &path )
@@ -401,7 +401,7 @@ bool Fat32Manager::isPathCorrect( const std::string &path )
 	return isCorrect;
 }
 
-EFatType Fat32Manager::getFatType( )
+EFatType Fat32Manager::getFatType()
 {
 	if( fatInfo.total_clusters < 4085 )
 		return FAT12;
@@ -441,7 +441,7 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const std::string &path )
 	return file.getFileSize() % clusterSize();
 }
 
-std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const std::vector<std::string> &files )
+std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const StringVector &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
 
@@ -456,7 +456,7 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
 	return chunks;
 }
 
-char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::string> &files )
+char* Fat32Manager::mapSpaceAfterFiles( const StringVector &files )
 {
 	std::vector<ClusterWithFreeSpace> clusters;
 	uintmax_t preparedOffset, preparedSize;
@@ -468,8 +468,8 @@ char* Fat32Manager::mapSpaceAfterFiles( const std::vector<std::string> &files )
 			getFileFreeSpaceOffset( file ) ) );
 	}
 
-	firstCluster = *std::min_element( clusters.begin( ), clusters.end( ) );
-	lastCluster = *std::max_element( clusters.begin( ), clusters.end( ) );
+	firstCluster = *std::min_element( clusters.begin(), clusters.end() );
+	lastCluster = *std::max_element( clusters.begin(), clusters.end() );
 
 	preparedOffset = getClusterStartOffset( firstCluster.clusterNo ) + firstCluster.freeSpaceOffset;
 	preparedSize = getClusterStartOffset( lastCluster.clusterNo + 1 ) - preparedOffset;

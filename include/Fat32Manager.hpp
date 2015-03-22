@@ -13,6 +13,7 @@
 #include <DirectoryEntry.hpp>
 
 namespace fs = boost::filesystem;
+typedef std::vector<std::string> StringVector;
 
 class Fat32Manager
 {
@@ -45,7 +46,6 @@ private:
 
 	bool _init();
 
-
 	void loadFat32ExtBS();
 	bool loadBootSector();
 	void loadFatInfo();
@@ -57,35 +57,11 @@ private:
 	inline uintmax_t getClusterStartOffset( size_t clusterNo ) const;
 
 	std::vector<FatRawLongFileName> extractLongFileNames( char *&ptrInCluster ) const;
-	void extractCluster( const size_t clusterNo, char *dest, const size_t dataSize )
-	{
-		char *mappedClusterPtr;
-
-		mappedClusterPtr = loadCluster( clusterNo );
-
-		std::copy( mappedClusterPtr,
-				   mappedClusterPtr + dataSize,
-				   dest );
-	}
-	void extractCluster( const size_t clusterNo, std::ostream &dest, const size_t dataSize )
-	{
-		std::vector<char> cluster( dataSize );
-
-		extractCluster( clusterNo, cluster.data(), dataSize );
-
-		dest.write( cluster.data(), dataSize );
-	}
-
-	template <class T>
-	void extractCluster( const size_t clusterNo, T &dest )
-	{
-		extractCluster( clusterNo, dest, clusterSize() );
-	}
 
 	std::vector<size_t> getClusterChain( size_t firstCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster );
-	std::vector<std::string> getPathFoldersNames( const std::string &path ) const;
+	StringVector getPathFoldersNames( const std::string &path ) const;
 	std::string getPathFileName( const std::string &path ) const;
 	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const;
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const;
@@ -127,41 +103,9 @@ public:
 	size_t getFreeSpaceAfterFile( const std::string &path );
 	size_t getFileLastClusterNo( const std::string &path );
 	size_t getFileFreeSpaceOffset( const std::string &path );
-	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const std::vector<std::string> &files );
+	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const StringVector &files );
 
-	std::shared_ptr<char> extractFileToMem( const std::string &path )
-	{
-		auto file = findFile( path );
-		auto clusterChain = getClusterChain( file.getCluster() );
-		std::shared_ptr<char> fileInMem( new char[file.getFileSize()] );
-		char *destToCopy;
-
-		destToCopy = fileInMem.get();
-
-		for( size_t i = 0; i < clusterChain.size() - 1; ++i, destToCopy += clusterSize() )
-			extractCluster( clusterChain[i], destToCopy );
-
-		extractCluster( clusterChain.back(), destToCopy, file.getFileSize() % clusterSize() );
-
-		return fileInMem;
-	}
-	std::string extractFileToDisc( const std::string &path )
-	{
-		auto file = findFile( path );
-		auto clusterChain = getClusterChain( file.getCluster( ) );
-		std::string pathToExtract = "files/tmp/extracted";
-		std::ofstream fileInDisc( pathToExtract, std::ios::binary );
-
-		for( size_t i = 0; i < clusterChain.size() - 1; ++i )
-			extractCluster( clusterChain[i], fileInDisc );
-
-
-		extractCluster( clusterChain.back(), fileInDisc, file.getFileSize() % clusterSize() );
-
-		return pathToExtract;
-	}
-
-	char* mapSpaceAfterFiles( const std::vector<std::string> &files );
+	char* mapSpaceAfterFiles( const StringVector &files );
 
 	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
 };
