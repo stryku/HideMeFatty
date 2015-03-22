@@ -5,9 +5,9 @@
 <a href="#download">Downloads</a>
 <a href="#before-hide-and-seek">Before hide-and-seek</a>
 <a href="#usage">Usage</a>
-	<a href="#usage-general">General info</a>
-	<a href="#usage-hidding">Hidding example</a>
-	<a href="#usage-restoring">Restoring example</a>
+	<a href="#general-info">General info</a>
+	<a href="#hidding-example">Hidding example</a>
+	<a href="#restoring-example">Restoring example</a>
 </pre>
 
 ## About
