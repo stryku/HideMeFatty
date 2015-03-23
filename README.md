@@ -15,8 +15,7 @@
 Hide Me Fatty is simple program that is able to hide files on the partition with (for now only) FAT32 filesystem.
 
 ## Latest version
-Latest version is v0.3. <br />
-Like in linux kernel odd minor (v0.>>3<<) represent beta release. Even represent stable version.<br />
+Latest version is v0.3. <br /> That version is still in tests. If you have any problems with program I will be grateful for some details.
 
 ## In case you have too much free time
 So now you know that current release is beta. If you want help me with finding bugs you are free to <a href="#downloads">download</a> and play with version with log generation (that in "release-logs" folder). That version generate lots of logs (located in files/logs/global.log) which may help me with bugs. Then when program crashes you can send me this log via email (stryku2393( at )gmail.com). I will be grateful for your help.<br />
