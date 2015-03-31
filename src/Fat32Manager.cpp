@@ -31,7 +31,7 @@ bool Fat32Manager::ClusterWithFreeSpace::operator>( const ClusterWithFreeSpace &
 	return clusterNo > c.clusterNo;
 }
 
-Fat32Manager::FreeSpaceChunk::FreeSpaceChunk( uintmax_t offset, size_t size ) :
+Fat32Manager::FreeSpaceChunk::FreeSpaceChunk( uint64_t offset, size_t size ) :
 	offset( offset ),
 	size( size )
 {}
@@ -165,7 +165,7 @@ inline size_t Fat32Manager::getClusterFirstSectorNo( size_t clusterNo ) const
 {
 	return ( clusterNo - 2 ) * bootSector.sectors_per_cluster + fatInfo.first_data_sector;
 }
-inline uintmax_t Fat32Manager::getClusterStartOffset( size_t clusterNo ) const
+inline uint64_t Fat32Manager::getClusterStartOffset( size_t clusterNo ) const
 {
 	return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 }
@@ -457,7 +457,7 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
 char* Fat32Manager::mapSpaceAfterFiles( const StringVector &files )
 {
 	std::vector<ClusterWithFreeSpace> clusters;
-	uintmax_t preparedOffset, preparedSize;
+	uint64_t preparedOffset, preparedSize;
 	ClusterWithFreeSpace firstCluster, lastCluster;
 
 	for( const auto &file : files )

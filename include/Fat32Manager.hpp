@@ -54,7 +54,7 @@ private:
 
 	inline size_t clusterSize() const;
 	inline size_t getClusterFirstSectorNo( size_t clusterNo ) const;
-	inline uintmax_t getClusterStartOffset( size_t clusterNo ) const;
+	inline uint64_t getClusterStartOffset( size_t clusterNo ) const;
 
 	std::vector<FatRawLongFileName> extractLongFileNames( char *&ptrInCluster ) const;
 
@@ -74,11 +74,11 @@ private:
 public:
 	struct FreeSpaceChunk
 	{
-		uintmax_t offset;
+		uint64_t offset;
 		size_t size;
 
 		FreeSpaceChunk( ) {}
-		FreeSpaceChunk( uintmax_t offset, size_t size );
+		FreeSpaceChunk( uint64_t offset, size_t size );
 
 		bool operator< ( const FreeSpaceChunk &c ) const;
 		friend std::ostream& operator<< ( std::ostream&, FreeSpaceChunk const& );

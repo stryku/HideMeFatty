@@ -53,7 +53,7 @@ public:
 
 		HiddenFileMetadata();
 		HiddenFileMetadata( const std::string &fileName,
-							const uintmax_t fileSize );
+							const uint64_t fileSize );
 	};
 
 private:
@@ -63,9 +63,9 @@ private:
 
 	bool isPathsCorrect( const StringVector &paths, const std::string &partitionPath );
 
-	uintmax_t getFilesSize( const StringVector &filesPaths );
-	uintmax_t getSizeToHide( const StringVector &filesToHide );
-	uintmax_t getFreeSpaceAfterFiles( const StringVector &filesOnPartition );
+	uint64_t getFilesSize( const StringVector &filesPaths );
+	uint64_t getSizeToHide( const StringVector &filesToHide );
+	uint64_t getFreeSpaceAfterFiles( const StringVector &filesOnPartition );
 	uint32_t getSeed( const StringVector &filesOnPartition );
 
 	std::string hashFile( const std::string &path );
@@ -78,22 +78,22 @@ private:
 									const FileHider::HiddenFileMetadata &fileMetadata,
 									std::map<std::string, size_t> &restoredFiles ) const;
 
-	void hideFileSize( const uintmax_t &fileSize );
+	void hideFileSize( const uint64_t &fileSize );
 	void hideFileName( const char *fileName );
-	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	bool hideFileContents( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
-	bool hideFile( const std::string &filePath, boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
+	bool hideFileContents( const std::string &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
+	bool hideFile( const std::string &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
 
-	uintmax_t restoreFileSize();
+	uint64_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
-	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uintmax_t freeSpaceSize );
+	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
 	void restoreFile( std::ofstream &fileStream,
 					  boost::random::mt19937 &rng,
-					  const uintmax_t freeSpaceSize,
+					  const uint64_t freeSpaceSize,
 					  const HiddenFileMetadata &metadata );
 	bool restoreMyFile( std::string pathToStore,
 						boost::random::mt19937 &rng,
-						const uintmax_t freeSpaceSize,
+						const uint64_t freeSpaceSize,
 					  std::map<std::string, size_t> &restoredFiles );
 
 	bool prepareFatManager( const std::string &partitionPath );

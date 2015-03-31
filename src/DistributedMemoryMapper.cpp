@@ -18,7 +18,7 @@ void DistributedMemoryMapper::addMemoryChunk( char *ptr, size_t size )
 	totalSize += size;
 }
 
-char& DistributedMemoryMapper::operator[]( uintmax_t no )
+char& DistributedMemoryMapper::operator[]( uint64_t no )
 {
 	for( const auto &chunk : chunks )
 	{
@@ -40,9 +40,9 @@ void DistributedMemoryMapper::createShuffledArray( boost::random::mt19937 &rng )
 
 	shuffledArray.resize( totalSize );
 
-	for( uintmax_t i = 0; i < totalSize; ++i )
+	for( uint64_t i = 0; i < totalSize; ++i )
 	{
-		uintmax_t ind;
+		uint64_t ind;
 
 		ind = rng() % totalSize;
 

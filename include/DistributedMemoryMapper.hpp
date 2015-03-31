@@ -20,9 +20,9 @@ private:
 	};
 
 	std::vector<ChunkMetadata> chunks;
-	uintmax_t totalSize;
-	std::vector<uintmax_t> shuffledArray;
-	std::vector<uintmax_t>::iterator shuffledIterator;
+	uint64_t totalSize;
+	std::vector<uint64_t> shuffledArray;
+	std::vector<uint64_t>::iterator shuffledIterator;
 	
 
 public:
@@ -33,7 +33,7 @@ public:
 
 	void addMemoryChunk( char *ptr, size_t size );
 
-	char& operator[]( uintmax_t no );
+	char& operator[]( uint64_t no );
 
 	char& shuffled();
 
