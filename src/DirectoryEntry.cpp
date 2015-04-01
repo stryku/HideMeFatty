@@ -11,9 +11,9 @@ DirectoryEntry::DirectoryEntry( const std::vector<FatRawLongFileName> &longFileN
 	assign( longFileNames, rawDirEntry );
 }
 
-inline std::string DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
+inline std::u16string DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
 {
-	std::string namePart;
+	std::u16string namePart;
 
 	for( size_t i = 0; i < 5; ++i )
 	{
@@ -42,9 +42,9 @@ inline std::string DirectoryEntry::getPartOfName( const FatRawLongFileName &long
 	return namePart;
 }
 
-inline std::string DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::u16string DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempExtension;
+	std::u16string tempExtension;
 
 	for( size_t i = 8; i < 11; ++i )
 	{
@@ -57,9 +57,9 @@ inline std::string DirectoryEntry::extractExtension( const FatRawDirectoryEntry 
 	return tempExtension;
 }
 
-inline std::string DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::u16string DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempName, tempExtension;
+	std::u16string tempName, tempExtension;
 
 	for( size_t i = 0; i < 8; ++i )
 	{
@@ -83,7 +83,7 @@ inline std::string DirectoryEntry::extractShortName( const FatRawDirectoryEntry 
 inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
 												 const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempName;
+	std::u16string tempName;
 
 	if( longFileNames.size( ) == 0 )
 		tempName = extractShortName( rawDirEntry );
@@ -93,7 +93,9 @@ inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFile
 			tempName += getPartOfName( i );
 	}
 
-	return tempName;
+	return boost::locale::conv::utf_to_utf<char, char16_t>( static_cast<const char16_t*>( tempName.c_str() ), 
+															static_cast<const char16_t*>( tempName.c_str() + tempName.capacity() ) );
+		
 }
 
 inline Date DirectoryEntry::extractDate( const unsigned short int time, const unsigned short int date ) const

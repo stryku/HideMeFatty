@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
  
+#include <boost/locale.hpp>
+
 #include <FatStructs.h>
 #include <Structs.h>
 
@@ -22,10 +24,10 @@ private:
 	bool deleted;
 
 private:
-	inline std::string getPartOfName( const FatRawLongFileName &longFileName ) const;
+	inline std::u16string getPartOfName( const FatRawLongFileName &longFileName ) const;
 
-	inline std::string extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const;
-	inline std::string extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline std::u16string extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const;
+	inline std::u16string extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const;
 	inline std::string extractName( const std::vector<FatRawLongFileName> &longFileNames,
 									 const FatRawDirectoryEntry &rawDirEntry ) const;
 	inline Date extractDate( const unsigned short int time, const unsigned short int date ) const;
