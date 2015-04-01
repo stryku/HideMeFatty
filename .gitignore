@@ -8,6 +8,8 @@ hmf/*
 czasomierz/
 czasomierz/*
 cbp2make*
+gui/build*
+!gui/HideMeFatty
 
 
 ## Ignore Visual Studio temporary files, build results, and
