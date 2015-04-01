@@ -152,7 +152,6 @@ bool FileHider::hideFileContents( const std::string &filePath,
 								   const uint64_t freeSpaceSize )
 {
 	uint64_t fileSize;
-	char ch;
 	std::ifstream file( filePath, std::ios::binary );
 
 	if( !file.is_open() )
@@ -161,10 +160,7 @@ bool FileHider::hideFileContents( const std::string &filePath,
 	fileSize = fs::file_size( filePath );
 
 	for( size_t i = 0; i < fileSize; ++i )
-	{
-		ch = file.get( );
-		dmm.shuffled( ) = ch;
-	}
+		dmm.shuffled() = file.get();
 
 	return true;
 }

@@ -5,8 +5,8 @@ DirectoryEntry::DirectoryEntry( ) :
 {}
 
 DirectoryEntry::DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames,
-				const FatRawDirectoryEntry &rawDirEntry ) :
-				attributes( BAD_DIR_ENTRY )
+								const FatRawDirectoryEntry &rawDirEntry ) :
+								attributes( BAD_DIR_ENTRY )
 {
 	assign( longFileNames, rawDirEntry );
 }
