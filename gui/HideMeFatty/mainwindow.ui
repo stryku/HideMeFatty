@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="iconSize">
        <size>
@@ -46,9 +46,17 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
-          <widget class="QWidget" name="step1">
+          <widget class="QWidget" name="hidingStep1">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>558</width>
+             <height>277</height>
+            </rect>
+           </property>
            <attribute name="label">
             <string>Step 1: Select partition (status: waiting for selecting partition)</string>
            </attribute>
@@ -77,15 +85,8 @@
              </item>
             </widget>
            </widget>
-           <zorder>label_3</zorder>
-           <zorder>comboBox</zorder>
-           <zorder>label_4</zorder>
-           <zorder>label_3</zorder>
-           <zorder>comboBox</zorder>
-           <zorder>partitionsComboBox</zorder>
-           <zorder>label_4</zorder>
           </widget>
-          <widget class="QWidget" name="step2">
+          <widget class="QWidget" name="hidingStep2">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -124,7 +125,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="step3">
+          <widget class="QWidget" name="hidingStep3">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -163,7 +164,15 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="step4">
+          <widget class="QWidget" name="hidingStep4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>558</width>
+             <height>277</height>
+            </rect>
+           </property>
            <attribute name="label">
             <string>Step 4: Hide files (status: waiting for step 3)</string>
            </attribute>
@@ -199,9 +208,9 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBox_2">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
-          <widget class="QWidget" name="step1">
+          <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -214,7 +223,7 @@
             <string>Step 1: Select partition</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="step2">
+          <widget class="QWidget" name="restoringStep2">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -227,12 +236,28 @@
             <string>Step 2: Select files on partition</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="step3">
+          <widget class="QWidget" name="restoringStep3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>558</width>
+             <height>277</height>
+            </rect>
+           </property>
            <attribute name="label">
             <string>Step 3: Select path to store</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="step4">
+          <widget class="QWidget" name="restoringStep4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>558</width>
+             <height>277</height>
+            </rect>
+           </property>
            <attribute name="label">
             <string>Step 4: Restore files</string>
            </attribute>
