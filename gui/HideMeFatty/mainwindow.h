@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <vector>
+#include <string>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +19,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    void initPartitionsComboBox();
+    std::vector<std::string> getFat32Partitions();
 };
 
 #endif // MAINWINDOW_H
