@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTableView>
+
 #include <vector>
 #include <string>
 
@@ -26,6 +28,7 @@ private:
     void initPartitionsComboBox();
     void initTableViews();
     std::vector<std::string> getFat32Partitions();
+    void initTableView( QTableView *tableView );
 
 };
 

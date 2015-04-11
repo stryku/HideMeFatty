@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtGui>
 #include <QFileDialog>
+#include <QtGui>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,15 +27,19 @@ void MainWindow::initPartitionsComboBox()
         ui->partitionsComboBox->addItem(QString::fromStdString(i));
 }
 
-void MainWindow::initTableViews()
+void MainWindow::initTableView( QTableView *tableView )
 {
-    QStandardItemModel *model = new QStandardItemModel(2, 2, this);
+    QStandardItemModel *model = new QStandardItemModel(0, 0, this);
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Size")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("File Path")));
 
+    tableView->setModel( model );
+}
 
-    ui->tableViewHidFileOnPartition->setModel( new QStandardItemModel(*model) );
-    ui->tableViewHideFilesToHide->setModel(model);
+void MainWindow::initTableViews()
+{
+    initTableView( ui->tableViewHideFilesToHide );
+    initTableView( ui->tableViewHidFileOnPartition );
 }
 
 std::vector<std::string> MainWindow::getFat32Partitions()
