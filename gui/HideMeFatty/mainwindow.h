@@ -17,11 +17,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_addFilesOnPartitionButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     void initPartitionsComboBox();
+    void initTableViews();
     std::vector<std::string> getFat32Partitions();
+
 };
 
 #endif // MAINWINDOW_H

@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -46,7 +46,7 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>3</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="hidingStep1">
            <property name="geometry">
@@ -99,27 +99,31 @@
             <string>Step 2: Select files on partition (status: waiting for step 1)</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
-            <item row="2" column="1">
-             <widget class="QPushButton" name="pushButton">
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>Add files on partition</string>
+               <string>Selected files on partition</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QColumnView" name="filesToHideCollumnView"/>
-            </item>
-            <item row="2" column="0">
+            <item row="4" column="0">
              <widget class="QLabel" name="label">
               <property name="text">
                <string>Total free space:</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_2">
+            <item row="4" column="1">
+             <widget class="QPushButton" name="addFilesOnPartitionButton">
               <property name="text">
-               <string>Selected files on partition</string>
+               <string>Add files on partition</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QTableView" name="tableViewHidFileOnPartition">
+              <property name="showGrid">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -137,7 +141,7 @@
            <attribute name="label">
             <string>Step 3: Select files to hide (status: waiting for step 2)</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_4">
+           <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
@@ -146,7 +150,11 @@
              </widget>
             </item>
             <item row="1" column="0" colspan="2">
-             <widget class="QColumnView" name="filesToHideCollumnView_2"/>
+             <widget class="QTableView" name="tableViewHideFilesToHide">
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_5">
@@ -215,8 +223,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">

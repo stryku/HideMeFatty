@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QtGui>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -7,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     initPartitionsComboBox();
+    initTableViews();
 }
 
 MainWindow::~MainWindow()
@@ -24,6 +27,17 @@ void MainWindow::initPartitionsComboBox()
         ui->partitionsComboBox->addItem(QString::fromStdString(i));
 }
 
+void MainWindow::initTableViews()
+{
+    QStandardItemModel *model = new QStandardItemModel(2, 2, this);
+    model->setHorizontalHeaderItem(0, new QStandardItem(QString("Size")));
+    model->setHorizontalHeaderItem(1, new QStandardItem(QString("File Path")));
+
+
+    ui->tableViewHidFileOnPartition->setModel( new QStandardItemModel(*model) );
+    ui->tableViewHideFilesToHide->setModel(model);
+}
+
 std::vector<std::string> MainWindow::getFat32Partitions()
 {
     std::vector<std::string> ret;
@@ -32,3 +46,9 @@ std::vector<std::string> MainWindow::getFat32Partitions()
 
     return ret;
 }
+
+void MainWindow::on_addFilesOnPartitionButton_clicked()
+{
+    auto fileNames = QFileDialog::getOpenFileNames();
+}
+
