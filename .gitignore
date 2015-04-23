@@ -10,6 +10,7 @@ czasomierz/*
 cbp2make*
 gui/build*
 !gui/HideMeFatty
+*.autosave
 
 
 ## Ignore Visual Studio temporary files, build results, and

@@ -3,6 +3,8 @@
 #include <QFileDialog>
 #include <QtGui>
 
+#include <boost/filesystem.hpp>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -51,8 +53,19 @@ std::vector<std::string> MainWindow::getFat32Partitions()
     return ret;
 }
 
+void addPathToTableView( const QString &path, QTableView *tableView )
+{
+
+}
+
 void MainWindow::on_addFilesOnPartitionButton_clicked()
 {
-    auto fileNames = QFileDialog::getOpenFileNames();
+    auto filePaths = QFileDialog::getOpenFileNames();
+
+    for( const auto &filePath : filePaths )
+    {
+        auto fileSize = boost::filesystem::file_size(filePath);
+    }
+
 }
 
