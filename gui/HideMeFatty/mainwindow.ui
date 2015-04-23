@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
       </property>
@@ -35,7 +38,7 @@
       <property name="tabsClosable">
        <bool>false</bool>
       </property>
-      <property name="tabBarAutoHide">
+      <property name="tabBarAutoHide" stdset="0">
        <bool>false</bool>
       </property>
       <widget class="QWidget" name="tab_3">
@@ -46,15 +49,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="hidingStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -91,8 +94,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -134,8 +137,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -177,8 +180,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -216,15 +219,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBox_2">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -236,8 +239,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -249,8 +252,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -262,8 +265,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>277</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -284,7 +287,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

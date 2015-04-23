@@ -64,7 +64,7 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
 
     for( const auto &filePath : filePaths )
     {
-        auto fileSize = boost::filesystem::file_size(filePath);
+        auto fileSize = boost::filesystem::file_size(filePath.toStdString());
     }
 
 }
