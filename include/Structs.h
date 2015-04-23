@@ -1,6 +1,10 @@
 #ifndef _INCLUDE_STRUCTS_
 #define _INCLUDE_STRUCTS_
 
+#include <string>
+#include <sstream>
+#include <pathOperations.hpp>
+
 struct Date
 {
 	size_t second,
@@ -44,6 +48,29 @@ struct ClusterInfo
 	size_t clusterNo,
 	freeBytes,
 	freeBytesOffset;
+};
+
+struct PartitionInfo
+{
+    std::string devicePath,
+                mediaPath,
+                name,
+                filesystem,
+                attributes;
+
+    PartitionInfo() {}
+
+    PartitionInfo( std::stringstream &in )
+    {
+        in  >> devicePath \
+            >> mediaPath \
+            >> filesystem \
+            >> attributes;
+
+        name = pathOperations::getPathFileName( mediaPath );
+    }
+
+    ~PartitionInfo() {}
 };
 
 #endif

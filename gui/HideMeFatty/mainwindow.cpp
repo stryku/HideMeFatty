@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QtGui>
 
+
 #include <boost/filesystem.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -21,12 +22,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::initPartitionsComboBox()
 {
-    std::vector<std::string> partitions;
-
-    partitions = getFat32Partitions();
+    auto partitions = getFat32Partitions();
 
     for( const auto &i : partitions)
-        ui->partitionsComboBox->addItem(QString::fromStdString(i));
+        ui->partitionsComboBox->addItem(QString::fromStdString(i.name));
 }
 
 void MainWindow::initTableView( QTableView *tableView )
@@ -44,11 +43,17 @@ void MainWindow::initTableViews()
     initTableView( ui->tableViewHidFileOnPartition );
 }
 
-std::vector<std::string> MainWindow::getFat32Partitions()
+std::vector<PartitionInfo> MainWindow::getFat32Partitions()
 {
-    std::vector<std::string> ret;
+    std::vector<PartitionInfo> ret;
 
-    ret.push_back("siema");
+    auto partitions = PartitionFinder().getMountedPartitions();
+
+    for( const auto &i : partitions )
+    {
+        if( i.filesystem == "vfat" )
+            ret.push_back( i );
+    }
 
     return ret;
 }

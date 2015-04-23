@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include <PartitionFinder.hpp>
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,7 +29,7 @@ private:
 
     void initPartitionsComboBox();
     void initTableViews();
-    std::vector<std::string> getFat32Partitions();
+    std::vector<PartitionInfo> getFat32Partitions();
     void initTableView( QTableView *tableView );
 
 };
