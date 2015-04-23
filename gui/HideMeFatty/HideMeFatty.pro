@@ -38,7 +38,8 @@ HEADERS  += mainwindow.h \
     ../../include/FileHider.hpp \
     ../../include/MappedFileManager.hpp \
     ../../include/pathOperations.hpp \
-    ../../include/Structs.h
+    ../../include/Structs.h \
+    ../../include/FileTable.hpp
 
 
 FORMS    += mainwindow.ui
