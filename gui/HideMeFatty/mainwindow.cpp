@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initPartitionsComboBox();
     initFileTables();
+    initHideInfo();
 }
 
 MainWindow::~MainWindow()
@@ -30,6 +31,12 @@ void MainWindow::initFileTables()
 
     fileTables[FILETABLE_FILES_ON_PARTITION].init( this, ui->tableViewHidFileOnPartition );
     fileTables[FILETABLE_FILES_TO_HIDE].init( this, ui->tableViewHideFilesToHide );
+}
+
+void MainWindow::initHideInfo()
+{
+    ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
+    ui->labSizeToHide->setText( "Total free space: " + QString::number( hideInfo.sizeToHide ) );
 }
 
 std::vector<PartitionInfo> MainWindow::getFat32Partitions()
@@ -60,3 +67,8 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
     addFilesToTable( FILETABLE_FILES_ON_PARTITION );
 }
 
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    addFilesToTable( FILETABLE_FILES_TO_HIDE );
+}

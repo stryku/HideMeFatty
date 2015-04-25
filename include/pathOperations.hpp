@@ -53,6 +53,16 @@ std::vector<T> getPathFoldersNames( const T &path )
 	return folders;
 }
 
+template <class T>
+T getPathToFile( const T &path )
+{
+    size_t pos = path.find_last_of( '/' );
+
+    pos = ( pos == T::npos ) ? 0 : pos;
+
+    return path.substr( 0, pos-1 );
+}
+
 } // namespace pathOperations
 
 #endif

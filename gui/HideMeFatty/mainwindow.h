@@ -26,6 +26,8 @@ public:
 private slots:
     void on_addFilesOnPartitionButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     enum EnumFileTable
     {
@@ -35,11 +37,20 @@ private:
         ENUM_FILETABLE_COUNT
     };
 
+    struct HideInfo
+    {
+        size_t sizeToHide, freeSpace;
+
+        HideInfo() : sizeToHide( 0 ), freeSpace( 0 ) {}
+    }hideInfo;
+
     Ui::MainWindow *ui;
     QVector<FileTable> fileTables;
 
     void initPartitionsComboBox();
     void initFileTables();
+    void initHideInfo();
+
     void addFilesToTable( EnumFileTable tableId );
     std::vector<PartitionInfo> getFat32Partitions();
 
