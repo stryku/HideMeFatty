@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 
 #include <PartitionFinder.hpp>
 #include <FileTable.hpp>
@@ -51,7 +52,7 @@ private:
     void initFileTables();
     void initHideInfo();
 
-    void addFilesToTable( EnumFileTable tableId );
+    void addFilesToTable( EnumFileTable tableId, std::function<void( const QString& )> functionOnFile  );
     std::vector<PartitionInfo> getFat32Partitions();
 
 };

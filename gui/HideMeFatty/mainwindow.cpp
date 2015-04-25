@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -36,7 +37,7 @@ void MainWindow::initFileTables()
 void MainWindow::initHideInfo()
 {
     ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
-    ui->labSizeToHide->setText( "Total free space: " + QString::number( hideInfo.sizeToHide ) );
+    ui->labSizeToHide->setText( "Total size to hide: " + QString::number( hideInfo.sizeToHide ) );
 }
 
 std::vector<PartitionInfo> MainWindow::getFat32Partitions()
@@ -54,12 +55,15 @@ std::vector<PartitionInfo> MainWindow::getFat32Partitions()
     return ret;
 }
 
-void MainWindow::addFilesToTable( EnumFileTable tableId )
+void MainWindow::addFilesToTable( EnumFileTable tableId, std::function<void( const QString& )> functionOnFile )
 {
     auto filePaths = QFileDialog::getOpenFileNames();
 
     for( const auto &filePath : filePaths )
+    {
         fileTables[tableId].addFile( filePath );
+        functionOnFile( filePath );
+    }
 }
 
 void MainWindow::on_addFilesOnPartitionButton_clicked()
