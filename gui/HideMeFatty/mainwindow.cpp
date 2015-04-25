@@ -55,24 +55,41 @@ std::vector<PartitionInfo> MainWindow::getFat32Partitions()
     return ret;
 }
 
-void MainWindow::addFilesToTable( EnumFileTable tableId, std::function<void( const QString& )> functionOnFile )
+void MainWindow::addFilesToTable( EnumFileTable tableId,
+                                  std::function<void( const QFile& )> functionOnFile )
 {
     auto filePaths = QFileDialog::getOpenFileNames();
 
     for( const auto &filePath : filePaths )
     {
-        fileTables[tableId].addFile( filePath );
-        functionOnFile( filePath );
+        QFile file( filePath );
+        if( file.open( QIODevice::ReadOnly ) )
+        {
+            fileTables[tableId].addFile( filePath );
+            functionOnFile( file );
+            file.close();
+        }
     }
+}
+
+void MainWindow::newFileOnPartition( const QFile &file )
+{
+    hideInfo.freeSpace += file.size();
+    ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
 }
 
 void MainWindow::on_addFilesOnPartitionButton_clicked()
 {
-    addFilesToTable( FILETABLE_FILES_ON_PARTITION );
+    auto functionToCallOnFile = std::bind( &MainWindow::newFileOnPartition,
+                                           this,
+                                           std::placeholders::_1);
+
+    addFilesToTable( FILETABLE_FILES_ON_PARTITION, functionToCallOnFile );
 }
 
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    addFilesToTable( FILETABLE_FILES_TO_HIDE );
+    auto a = std::bind(&MainWindow::newFileOnPartition, this, std::placeholders::_1);
+    addFilesToTable( FILETABLE_FILES_TO_HIDE, a );
 }
