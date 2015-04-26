@@ -14,6 +14,7 @@
 #include <Fat32Manager.hpp>
 #include <FileTable.hpp>
 #include <FilesOnPartitionTable.hpp>
+#include <FilesToHideTable.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -64,6 +65,7 @@ private:
     std::vector<PartitionInfo> getFat32Partitions();
 
     void newFileOnPartition( const QFile &file );
+    void newFileToHide( const QFile &file );
 
 };
 

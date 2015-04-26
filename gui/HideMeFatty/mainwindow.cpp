@@ -34,10 +34,9 @@ void MainWindow::initFileTables()
     fileTables.resize( ENUM_FILETABLE_COUNT );
 
     fileTables[FILETABLE_FILES_ON_PARTITION] = std::make_shared<FilesOnPartitionTable>();
-    fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesOnPartitionTable>();
+    fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesToHideTable>();
 
     fileTables[FILETABLE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
-
     fileTables[FILETABLE_FILES_TO_HIDE]->init( this, ui->tableViewHideFilesToHide );
 }
 
@@ -88,6 +87,12 @@ void MainWindow::newFileOnPartition( const QFile &file )
     ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
 }
 
+void MainWindow::newFileToHide( const QFile &file )
+{
+    hideInfo.sizeToHide += file.size();
+    ui->labSizeToHide->setText( "Total size to hide: " + QString::number( hideInfo.sizeToHide ) );
+}
+
 void MainWindow::on_addFilesOnPartitionButton_clicked()
 {
     auto functionToCallOnFile = std::bind( &MainWindow::newFileOnPartition,
@@ -100,8 +105,11 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    auto a = std::bind(&MainWindow::newFileOnPartition, this, std::placeholders::_1);
-    addFilesToTable( FILETABLE_FILES_TO_HIDE, a );
+    auto functionToCallOnFile = std::bind( &MainWindow::newFileToHide,
+                                           this,
+                                           std::placeholders::_1);
+
+    addFilesToTable( FILETABLE_FILES_TO_HIDE, functionToCallOnFile );
 }
 
 void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
