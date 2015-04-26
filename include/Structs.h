@@ -58,6 +58,8 @@ struct PartitionInfo
                 filesystem,
                 attributes;
 
+    size_t clusterSize;
+
     PartitionInfo() {}
 
     PartitionInfo( std::stringstream &in )

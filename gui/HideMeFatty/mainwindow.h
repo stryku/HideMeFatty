@@ -10,6 +10,7 @@
 #include <functional>
 
 #include <PartitionFinder.hpp>
+#include <Fat32Manager.hpp>
 #include <FileTable.hpp>
 
 namespace Ui {
@@ -41,12 +42,14 @@ private:
     struct HideInfo
     {
         size_t sizeToHide, freeSpace;
+        PartitionInfo partitionInfo;
 
         HideInfo() : sizeToHide( 0 ), freeSpace( 0 ) {}
     }hideInfo;
 
     Ui::MainWindow *ui;
     QVector<FileTable> fileTables;
+    Fat32Manager fatManager;
 
     void initPartitionsComboBox();
     void initFileTables();

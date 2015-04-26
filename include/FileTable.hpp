@@ -69,6 +69,7 @@ public:
     void init( QMainWindow *mainWindow, QTableView *tableView )
     {
         view = tableView;
+        view->setEditTriggers( QAbstractItemView::NoEditTriggers );
         createModel( mainWindow );
     }
 
