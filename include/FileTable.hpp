@@ -18,6 +18,9 @@ using namespace pathOperations;
 class FileTable
 {
 protected:
+    static const size_t firstColumn = 0;
+    static const size_t fileNameColumn = 1;
+    static const size_t fullPathColumn = 2;
 
     QTableView *view;
     QStandardItemModel *model;
@@ -74,11 +77,11 @@ public:
         model->appendRow(new QStandardItem());
 
         model->setItem( rowCount,
-                        1,
+                        fileNameColumn,
                         new QStandardItem( fileName ) );
 
         model->setItem( rowCount,
-                        2,
+                        fullPathColumn,
                         new QStandardItem( path ) );
 
         fillFirstColumn( path, rowCount );

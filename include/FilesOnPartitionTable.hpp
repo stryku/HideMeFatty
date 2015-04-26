@@ -23,7 +23,7 @@ public:
         auto freeSpace = info.freeSpaceAfterFile;
 
         model->setItem( row,
-                        0,
+                        firstColumn,
                         new QStandardItem( QString::number( freeSpace ) ) );
     }
 

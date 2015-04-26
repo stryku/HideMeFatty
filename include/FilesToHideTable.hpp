@@ -18,7 +18,7 @@ public:
         auto fileSize = QFile( path ).size();
 
         model->setItem( row,
-                        0,
+                        firstColumn,
                         new QStandardItem( QString::number( fileSize ) ) );
     }
 };
