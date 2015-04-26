@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <PartitionInfo.hpp>
+#include <QDataStream>
 
 class PartitionFinder
 {
@@ -23,6 +24,9 @@ public:
         while( getline(mtab, line) )
         {
             std::stringstream lineStream( line );
+            //QDataStream lineStream;
+
+            //lineStream << line;
 
             ret.push_back( PartitionInfo( lineStream ) );
         }

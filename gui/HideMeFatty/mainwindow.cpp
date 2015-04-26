@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <FileHider.hpp>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,7 +26,7 @@ void MainWindow::initPartitionsComboBox()
 
     for( const auto &i : partitions)
     {
-        ui->partitionsComboBox->addItem( QString::fromStdString( i.name ) );
+        ui->partitionsComboBox->addItem( i.name );
         validParitions.push_back( i );
     }
 }
@@ -106,7 +108,7 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
     addFilesToTable( FILETABLE_FILES_ON_PARTITION,
                      functionToCallOnFile,
                      "Select files on partition",
-                     QString::fromStdString( hideInfo.partitionInfo.mediaPath ) );
+                     hideInfo.partitionInfo.mediaPath );
 }
 
 
@@ -131,5 +133,29 @@ void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
         hideInfo.partitionInfo.initClusterSize();
         dynamic_cast< FilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
         ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
+    }
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    auto filesOnPartition = fileTables[FILETABLE_FILES_ON_PARTITION]->getFullPaths(),
+            filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
+
+    auto partitionDevPath = hideInfo.partitionInfo.devicePath,
+            partitionMediaPath = hideInfo.partitionInfo.mediaPath;
+
+    FileHider fileHider;
+
+    if( fileHider.hideFiles(filesOnPartition,
+                            partitionMediaPath,
+                            filesToHide,
+                            partitionDevPath ) )
+    {
+        QMessageBox::information(this, "ok", "ok");
+    }
+    else
+    {
+        QMessageBox::information(this, "chuja", "chuja");
+
     }
 }

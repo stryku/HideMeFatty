@@ -12,8 +12,10 @@
 #include <MappedFileManager.hpp>
 #include <DirectoryEntry.hpp>
 
+#include <QStringList>
+
 namespace fs = boost::filesystem;
-typedef std::vector<std::string> StringVector;
+//typedef std::vector<std::string> QStringList;
 
 class Fat32Manager
 {
@@ -60,15 +62,16 @@ private:
 	std::vector<size_t> getClusterChain( size_t firstCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster );
-	StringVector getPathFoldersNames( const std::string &path ) const;
-	std::string getPathFileName( const std::string &path ) const;
+    QStringList getPathFoldersNames( const QString &path ) const;
+    QString getPathFileName( const QString &path ) const;
 	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const;
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const;
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
+    size_t getFileFreeSpaceOffset( const DirectoryEntry &file );
 
 	DirectoryEntry findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry = DirectoryEntry() );
-	DirectoryEntry findDirEntryInFolder( std::string searchedDirEntryName, const size_t folderCluster );
-	DirectoryEntry findFile( const std::string &path );
+    DirectoryEntry findDirEntryInFolder( QString searchedDirEntryName, const size_t folderCluster );
+    DirectoryEntry findFile( const QString &path );
 	
 public:
 	struct FreeSpaceChunk
@@ -84,10 +87,10 @@ public:
 	};
 
 	Fat32Manager();
-	Fat32Manager( const std::string &partitionPath );
+    Fat32Manager( const QString &partitionPath );
 	~Fat32Manager() {}
 
-	void setPartitionPath( const fs::path &partitionPath );
+    void setPartitionPath( const QString &partitionPath );
 
 	bool isValidFat32();
 
@@ -96,16 +99,16 @@ public:
 	bool good();
 	void clear();
 
-	bool isPathCorrect( const std::string &path );
+    bool isPathCorrect( const QString &path );
 
     inline size_t clusterSize() const;
 	EFatType getFatType();
-	size_t getFreeSpaceAfterFile( const std::string &path );
-	size_t getFileLastClusterNo( const std::string &path );
-	size_t getFileFreeSpaceOffset( const std::string &path );
-	std::vector<FreeSpaceChunk> getSpacesAfterFiles( const StringVector &files );
+    size_t getFreeSpaceAfterFile( const QString &path );
+    size_t getFileLastClusterNo( const QString &path );
+    size_t getFileFreeSpaceOffset( const QString &path );
+    std::vector<FreeSpaceChunk> getSpacesAfterFiles( const QStringList &files );
 
-	char* mapSpaceAfterFiles( const StringVector &files );
+    char* mapSpaceAfterFiles( const QStringList &files );
 
 	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
 };

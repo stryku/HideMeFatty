@@ -80,7 +80,7 @@ inline std::u16string DirectoryEntry::extractShortName( const FatRawDirectoryEnt
 	return tempName;
 }
 
-inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
+inline QString DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
 												 const FatRawDirectoryEntry &rawDirEntry ) const
 {
 	std::u16string tempName;
@@ -93,8 +93,7 @@ inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFile
 			tempName += getPartOfName( i );
 	}
 
-	return boost::locale::conv::utf_to_utf<char, char16_t>( static_cast<const char16_t*>( tempName.c_str() ), 
-															static_cast<const char16_t*>( tempName.c_str() + tempName.capacity() ) );
+    return QString::fromUtf16( reinterpret_cast<const ushort*>( tempName.c_str() ) );
 		
 }
 
@@ -122,7 +121,11 @@ inline bool DirectoryEntry::extractIfDeleted( const FatRawDirectoryEntry &rawDir
 
 inline size_t DirectoryEntry::extractCluster( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	return ( static_cast<uint32_t>( rawDirEntry.highCluster ) << 31 ) + rawDirEntry.lowCluster;
+    size_t high = rawDirEntry.highCluster;
+    high = high << 16;
+    high += rawDirEntry.lowCluster;
+    return high;
+    //return ( static_cast<uint32_t>( rawDirEntry.highCluster ) << 31 ) + rawDirEntry.lowCluster;
 }
 
 void DirectoryEntry::assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry )
@@ -141,7 +144,7 @@ EDirEntryType DirectoryEntry::type( ) const
 	return static_cast<EDirEntryType>( attributes );
 }
 
-std::string DirectoryEntry::getName( ) const
+QString DirectoryEntry::getName( ) const
 {
 	return name;
 }
@@ -174,7 +177,7 @@ bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
 std::ostream& operator<< ( std::ostream &out, const DirectoryEntry &de )
 {
 	out << std::dec;
-	out << "\nname = " << de.name.c_str() <</*TODO*/ \
+    out << "\nname = " << de.name.toStdString().c_str() <</*TODO*/ \
 		"\nfile size = " << de.fileSize << \
 		"\nattributes = 0x" << std::hex << static_cast<size_t>( de.attributes ) << \
 		"\ncluster = " << std::dec << de.cluster << \

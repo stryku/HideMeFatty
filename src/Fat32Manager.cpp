@@ -1,4 +1,5 @@
 #include <Fat32Manager.hpp>
+#include <QDir>
 
 Fat32Manager::Fat32Manager( ) :
 	fatInfoLoaded( false ),
@@ -7,12 +8,12 @@ Fat32Manager::Fat32Manager( ) :
 	initOk( false )
 {}
 
-Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
+Fat32Manager::Fat32Manager( const QString &partitionPath ) :
 	fatInfoLoaded( false ),
 	bootSectorLoaded( false ),
 	fatTableLoaded( false )
 {
-	mappedFileMngr.setFilePath( partitionPath );
+    mappedFileMngr.setFilePath( partitionPath.toStdString() );
 	initOk = _init();
 }
 
@@ -214,6 +215,7 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromDirCluster( size_t di
 	FatRawDirectoryEntry tempRawDirEntry;
 	std::vector<FatRawLongFileName> tempRawLongFileNames;
 	char *mappedClusterPtr, *endOfCluster;
+    void *ptr;
 
 	mappedClusterPtr = loadCluster( dirCluster );
 
@@ -234,6 +236,7 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromDirCluster( size_t di
 		dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
 
 		mappedClusterPtr += sizeof( FatRawDirectoryEntry );
+        ptr = mappedClusterPtr;
 	}
 
 	return dirEntries;
@@ -254,27 +257,29 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstC
 
 	return dirEntries;
 }
-StringVector Fat32Manager::getPathFoldersNames( const std::string &path ) const
+QStringList Fat32Manager::getPathFoldersNames( const QString &path ) const
 {
-	StringVector folders;
+    QStringList folders;
 	size_t posBegin = 0, posEnd, numberToCopy;
+    QFileInfo fileInfo( path );
+    auto pathh = fileInfo.dir();
 
-	while( ( posEnd = path.find( '/', posBegin ) ) != std::string::npos )
+    /*while( ( posEnd = path.find( '/', posBegin ) ) != QString::npos )
 	{
 		numberToCopy = posEnd - posBegin;
 		folders.push_back( path.substr( posBegin, numberToCopy ) );
 		posBegin = posEnd + 1;
-	}
+    }*/
 
-	return folders;
+    return pathh.absolutePath().split( "/" );
 }
-std::string Fat32Manager::getPathFileName( const std::string &path ) const
+QString Fat32Manager::getPathFileName( const QString &path ) const
 {
-	size_t pos = path.find_last_of( '/' );
+    //size_t pos = path.find_last_of( '/' );
 
-	pos = ( pos == std::string::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
+    //pos = ( pos == QString::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
 
-	return path.substr( pos );
+    return QString();
 }
 size_t Fat32Manager::getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const
 {
@@ -323,17 +328,19 @@ DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const Direc
 
 	return DirectoryEntry( );
 }
-DirectoryEntry Fat32Manager::findDirEntryInFolder( std::string searchedDirEntryName, const size_t folderCluster )
+DirectoryEntry Fat32Manager::findDirEntryInFolder( QString searchedDirEntryName, const size_t folderCluster )
 {
 	DirectoryEntry currentDirEntry;
-	std::string dirEntryName;
+    QString dirEntryName;
 
-	boost::to_upper( searchedDirEntryName );
+    //boost::to_upper( searchedDirEntryName );
+    searchedDirEntryName = searchedDirEntryName.toUpper();
 
 	do
 	{
 		dirEntryName = currentDirEntry.getName( );
-		boost::to_upper( dirEntryName );
+        //boost::to_upper( dirEntryName );
+        dirEntryName = dirEntryName.toUpper();
 
 		if( dirEntryName == searchedDirEntryName )
 			return currentDirEntry;
@@ -344,19 +351,22 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( std::string searchedDirEntryN
 
 	return DirectoryEntry();
 }
-DirectoryEntry Fat32Manager::findFile( const std::string &path )
+DirectoryEntry Fat32Manager::findFile( const QString &path )
 {
-	StringVector foldersNames;
-	std::string fileName;
+    QStringList foldersNames;
+    QString fileName;
 	DirectoryEntry currentFolder, foundFile;
 
 	foldersNames = getPathFoldersNames( path );
-	fileName = getPathFileName( path );
+    fileName = path.split( "/" ).back();
 
 	currentFolder.setCluster( fat32ExtBS.root_cluster );
 
 	for( const auto &folderName : foldersNames )
 	{
+        if(folderName.length() == 0)
+            break;
+
 		currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
 
 		if( currentFolder.type() == BAD_DIR_ENTRY )
@@ -374,9 +384,9 @@ DirectoryEntry Fat32Manager::findFile( const std::string &path )
 	return foundFile;
 }
 
-void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
+void Fat32Manager::setPartitionPath( const QString &partitionPath )
 {
-	mappedFileMngr.setFilePath( partitionPath );
+    mappedFileMngr.setFilePath( partitionPath.toStdString() );
 }
 
 bool Fat32Manager::isValidFat32()
@@ -392,7 +402,7 @@ void Fat32Manager::close()
 	mappedFileMngr.close();
 }
 
-bool Fat32Manager::isPathCorrect( const std::string &path )
+bool Fat32Manager::isPathCorrect( const QString &path )
 {
 	bool isCorrect = findFile( path ).type() != BAD_DIR_ENTRY;
 
@@ -412,16 +422,18 @@ EFatType Fat32Manager::getFatType()
 	}
 }
 
-size_t Fat32Manager::getFreeSpaceAfterFile( const std::string &path )
+size_t Fat32Manager::getFreeSpaceAfterFile( const QString &path )
 {
-	DirectoryEntry file;
+    /*DirectoryEntry file;
 
-	file = findFile( path );
+    file = findFile( path );*/
 
-	return getFreeSpaceAfterFile( file );
+    return AdvancedFileInfo( path, clusterSize() ).freeSpaceAfterFile;
+
+    //return getFreeSpaceAfterFile( file );
 }
 
-size_t Fat32Manager::getFileLastClusterNo( const std::string &path )
+size_t Fat32Manager::getFileLastClusterNo( const QString &path )
 {
 	DirectoryEntry file;
 
@@ -430,31 +442,43 @@ size_t Fat32Manager::getFileLastClusterNo( const std::string &path )
 	return getFileLastClusterNo( file );
 }
 
-size_t Fat32Manager::getFileFreeSpaceOffset( const std::string &path )
+size_t Fat32Manager::getFileFreeSpaceOffset( const QString &path )
 {
 	DirectoryEntry file;
 
-	file = findFile( path );
+    //file = findFile( path );
 
-	return file.getFileSize() % clusterSize();
+
+
+    return QFileInfo( path ).size() % clusterSize();
 }
 
-std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const StringVector &files )
+size_t Fat32Manager::getFileFreeSpaceOffset( const DirectoryEntry &file )
+{
+
+
+
+
+    return file.getFileSize() % clusterSize();
+}
+
+std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const QStringList &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
 
 	for( const auto &file : files )
-	{
-		size_t clusterNo = getFileLastClusterNo( file );
+    {
+        auto fileDirEntry = findFile( file );
+        size_t clusterNo = getFileLastClusterNo( fileDirEntry );
 
-		chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( clusterNo ) + getFileFreeSpaceOffset( file ) ,
-											getFreeSpaceAfterFile( file ) ) );
+        chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( fileDirEntry.getCluster() ) + getFileFreeSpaceOffset( fileDirEntry ) ,
+                                            getFreeSpaceAfterFile( fileDirEntry ) ) );
 	}
 
 	return chunks;
 }
 
-char* Fat32Manager::mapSpaceAfterFiles( const StringVector &files )
+char* Fat32Manager::mapSpaceAfterFiles( const QStringList &files )
 {
 	std::vector<ClusterWithFreeSpace> clusters;
 	uint64_t preparedOffset, preparedSize;

@@ -2,14 +2,15 @@
 #define _INCLUDE_PARTITIONINFO_HPP_
 
 #include <Fat32Manager.hpp>
+#include <QDataStream>
 
 struct PartitionInfo
 {
-    std::string devicePath,
-                mediaPath,
-                name,
-                filesystem,
-                attributes;
+    QString devicePath,
+            mediaPath,
+            name,
+            filesystem,
+            attributes;
 
     size_t clusterSize;
 
@@ -17,19 +18,25 @@ struct PartitionInfo
 
     PartitionInfo( std::stringstream &in )
     {
-        in  >> devicePath \
-            >> mediaPath \
-            >> filesystem \
-            >> attributes;
+        std::string tmp;
 
-        name = pathOperations::getPathFileName( mediaPath );
+        in >> tmp;
+        devicePath = QString::fromStdString( tmp );
+        in >> tmp;
+        mediaPath = QString::fromStdString( tmp );
+        in >> tmp;
+        filesystem = QString::fromStdString( tmp );
+        in >> tmp;
+        attributes = QString::fromStdString( tmp );
+
+        name = QFileInfo( QFile( mediaPath ) ).fileName();
     }
 
     ~PartitionInfo() {}
 
     void initClusterSize()
     {
-        if( devicePath.empty() )
+        if( devicePath.length() == 0 )
             clusterSize = 0;
         else
         {

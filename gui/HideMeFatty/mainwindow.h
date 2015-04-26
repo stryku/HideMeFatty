@@ -35,6 +35,8 @@ private slots:
 
     void on_partitionsComboBox_currentIndexChanged(int index);
 
+    void on_pushButton_3_clicked();
+
 private:
     enum EnumFileTable
     {

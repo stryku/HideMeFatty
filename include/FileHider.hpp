@@ -23,6 +23,9 @@
 
 #include <easylogging++.h>
 
+#include <QString>
+#include <QStringList>
+
 #include <vector>
 #include <numeric>
 #include <algorithm>
@@ -39,7 +42,7 @@ namespace fs = boost::filesystem;
 using namespace boost::nowide;
 using namespace pathOperations;
 
-typedef std::vector<std::string> StringVector;
+//typedef std::vector<std::string> QStringList;
 
 class FileHider
 {
@@ -52,7 +55,7 @@ public:
 		char fileName[maxFileName];
 
 		HiddenFileMetadata();
-		HiddenFileMetadata( const std::string &fileName,
+        HiddenFileMetadata( const QString &fileName,
 							const uint64_t fileSize );
 	};
 
@@ -61,28 +64,31 @@ private:
 	Fat32Manager fatManager;
 	DistributedMemoryMapper dmm;
 
-	bool isPathsCorrect( const StringVector &paths, const std::string &partitionPath );
+    bool isPathsCorrect( const QStringList &paths, const QString &partitionPath );
 
-	uint64_t getFilesSize( const StringVector &filesPaths );
-	uint64_t getSizeToHide( const StringVector &filesToHide );
-	uint64_t getFreeSpaceAfterFiles( const StringVector &filesOnPartition );
-	uint32_t getSeed( const StringVector &filesOnPartition );
+    uint64_t getFilesSize( const QStringList &filesPaths );
+    uint64_t getSizeToHide( const QStringList &filesToHide );
+    uint64_t getFreeSpaceAfterFiles( const QStringList &filesOnPartition );
+    uint32_t getSeed( const QStringList &filesOnPartition );
 
-	std::string hashFile( const std::string &path );
+    std::string hashFile( const std::string &path );
 
-	bool mapFreeSpace( const StringVector &filesOnPartition );
+    bool mapFreeSpace( const QStringList &filesOnPartition );
 
-	StringVector preparePathsOnPartition( const StringVector &filesOnPartition,
-													  const std::string &partitionPath ) const;
-	std::string preparePathToStore( const std::string &pathToStore,
+    QStringList preparePathsOnPartition( const QStringList &filesOnPartition,
+                                                      const QString &partitionPath ) const;
+    QString preparePathOnPartition( const QString &path,
+                                    const QString &partitionPath ) const;
+
+    QString preparePathToStore( const QString &pathToStore,
 									const FileHider::HiddenFileMetadata &fileMetadata,
-									std::map<std::string, size_t> &restoredFiles ) const;
+                                    std::map<QString, size_t> &restoredFiles ) const;
 
 	void hideFileSize( const uint64_t &fileSize );
 	void hideFileName( const char *fileName );
 	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
-	bool hideFileContents( const std::string &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
-	bool hideFile( const std::string &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
+    bool hideFileContents( const QString &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
+    bool hideFile( const QString &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
 
 	uint64_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
@@ -91,35 +97,35 @@ private:
 					  boost::random::mt19937 &rng,
 					  const uint64_t freeSpaceSize,
 					  const HiddenFileMetadata &metadata );
-	bool restoreMyFile( std::string pathToStore,
+    bool restoreMyFile( QString pathToStore,
 						boost::random::mt19937 &rng,
 						const uint64_t freeSpaceSize,
-					  std::map<std::string, size_t> &restoredFiles );
+                      std::map<QString, size_t> &restoredFiles );
 
-	bool prepareFatManager( const std::string &partitionPath );
-	bool checkPaths( const StringVector &paths );
-	bool checkPaths( const StringVector &filesOnPartition,
-					 const std::string &partitionPath,
-					 const StringVector &filesToHide,
-					 const std::string &partitionDevPath );
-	bool checkPaths( const StringVector &filesOnPartition,
-					 const std::string &partitionPath,
-					 const std::string &partitionDevPath,
-					 const std::string &pathToStore );
+    bool prepareFatManager( const QString &partitionPath );
+    bool checkPaths( const QStringList &paths );
+    bool checkPaths( const QStringList &filesOnPartition,
+                     const QString &partitionPath,
+                     const QStringList &filesToHide,
+                     const QString &partitionDevPath );
+    bool checkPaths( const QStringList &filesOnPartition,
+                     const QString &partitionPath,
+                     const QString &partitionDevPath,
+                     const QString &pathToStore );
 
 public:
 	FileHider() {}
 	~FileHider() {}
 
-	bool hideFiles( StringVector &filesOnPartition,
-					const std::string &partitionPath,
-					const StringVector &filesToHide,
-					const std::string &partitionDevPath );
+    bool hideFiles( QStringList &filesOnPartition,
+                    const QString &partitionPath,
+                    const QStringList &filesToHide,
+                    const QString &partitionDevPath );
 
-	bool restoreMyFiles( StringVector &filesOnPartition,
-						 const std::string &partitionPath,
-						 const std::string &partitionDevPath,
-						 const std::string &pathToStore );
+    bool restoreMyFiles( QStringList &filesOnPartition,
+                         const QString &partitionPath,
+                         const QString &partitionDevPath,
+                         const QString &pathToStore );
 };
 
 #endif
