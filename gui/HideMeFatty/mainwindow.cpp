@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initPartitionsComboBox();
-    initFileTables();
     initHideInfo();
+    initFileTables();
 }
 
 MainWindow::~MainWindow()
@@ -33,8 +33,12 @@ void MainWindow::initFileTables()
 {
     fileTables.resize( ENUM_FILETABLE_COUNT );
 
-    fileTables[FILETABLE_FILES_ON_PARTITION].init( this, ui->tableViewHidFileOnPartition );
-    fileTables[FILETABLE_FILES_TO_HIDE].init( this, ui->tableViewHideFilesToHide );
+    fileTables[FILETABLE_FILES_ON_PARTITION] = std::make_shared<FilesOnPartitionTable>();
+    fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesOnPartitionTable>();
+
+    fileTables[FILETABLE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
+
+    fileTables[FILETABLE_FILES_TO_HIDE]->init( this, ui->tableViewHideFilesToHide );
 }
 
 void MainWindow::initHideInfo()
@@ -68,7 +72,7 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
         QFile file( filePath );
         if( file.open( QIODevice::ReadOnly ) )
         {
-            fileTables[tableId].addFile( filePath );
+            fileTables[tableId]->addFile( filePath );
             functionOnFile( file );
             file.close();
         }
@@ -101,4 +105,5 @@ void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
 {
     hideInfo.partitionInfo = validParitions[index - 1];
     hideInfo.partitionInfo.initClusterSize();
+    dynamic_cast< FilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
 }

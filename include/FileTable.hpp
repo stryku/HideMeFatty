@@ -37,13 +37,15 @@ private:
 
 public:
     FileTable() {}
-    FileTable( QTableView *view, QMainWindow *mainWindow ) : view( view )
+    FileTable( QTableView *view,
+               QMainWindow *mainWindow ) :
+        view( view )
     {
          createModel( mainWindow );
     }
-    ~FileTable() {}
+    virtual ~FileTable() {}
 
-    virtual void fillFirstColumn( const QString &path ) = 0;
+    virtual void fillFirstColumn( const QString &path, const size_t row ) = 0;
 
     void addFile( const QString &path )
     {
@@ -61,7 +63,7 @@ public:
                         2,
                         new QStandardItem( path ) );
 
-        fillFirstColumn( path );
+        fillFirstColumn( path, rowCount );
 
         view->resizeColumnsToContents();
     }

@@ -10,17 +10,17 @@ private:
     size_t _fsClusterSize;
 public:
     FilesOnPartitionTable() {}
-    FilesOnPartitionTable( QTableView *view, QMainWindow *mainWindow ) :
+    FilesOnPartitionTable( QTableView *view,
+                           QMainWindow *mainWindow ) :
         FileTable( view, mainWindow )
     {}
     ~FilesOnPartitionTable() {}
 
-    void fillFirstColumn( const QString &path )
+    void fillFirstColumn( const QString &path, const size_t row )
     {
-        auto rowCount = model->rowCount();
         auto freeSpace = AdvancedFileInfo( path, _fsClusterSize ).freeSpaceAfterFile;
 
-        model->setItem( rowCount,
+        model->setItem( row,
                         0,
                         new QStandardItem( QString::number( freeSpace ) ) );
     }

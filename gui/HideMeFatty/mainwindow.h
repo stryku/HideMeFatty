@@ -8,10 +8,12 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <memory>
 
 #include <PartitionFinder.hpp>
 #include <Fat32Manager.hpp>
 #include <FileTable.hpp>
+#include <FilesOnPartitionTable.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -50,7 +52,7 @@ private:
     }hideInfo;
 
     Ui::MainWindow *ui;
-    QVector<FileTable> fileTables;
+    QVector<std::shared_ptr<FileTable>> fileTables;
     QVector<PartitionInfo> validParitions;
     Fat32Manager fatManager;
 
