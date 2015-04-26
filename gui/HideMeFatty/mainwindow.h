@@ -30,6 +30,8 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_partitionsComboBox_currentIndexChanged(int index);
+
 private:
     enum EnumFileTable
     {
@@ -49,6 +51,7 @@ private:
 
     Ui::MainWindow *ui;
     QVector<FileTable> fileTables;
+    QVector<PartitionInfo> validParitions;
     Fat32Manager fatManager;
 
     void initPartitionsComboBox();

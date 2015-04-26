@@ -23,7 +23,10 @@ void MainWindow::initPartitionsComboBox()
     auto partitions = getFat32Partitions();
 
     for( const auto &i : partitions)
+    {
         ui->partitionsComboBox->addItem( QString::fromStdString( i.name ) );
+        validParitions.push_back( i );
+    }
 }
 
 void MainWindow::initFileTables()
@@ -92,4 +95,10 @@ void MainWindow::on_pushButton_2_clicked()
 {
     auto a = std::bind(&MainWindow::newFileOnPartition, this, std::placeholders::_1);
     addFilesToTable( FILETABLE_FILES_TO_HIDE, a );
+}
+
+void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
+{
+    hideInfo.partitionInfo = validParitions[index - 1];
+    hideInfo.partitionInfo.initClusterSize();
 }

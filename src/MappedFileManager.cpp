@@ -58,7 +58,7 @@ void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bo
 		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, allocationGranularity );
 	}
 	else
-	{
+    {
 		preparedOffset = getOffsetForGranularity( startOffset, allocationGranularity );
 		preparedOffset = getOffsetForGranularity( preparedOffset, mappingGranularity );
 		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, mappingGranularity );
