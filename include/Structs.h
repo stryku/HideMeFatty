@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <pathOperations.hpp>
+#include <QFileInfo>
 
 struct Date
 {
@@ -51,5 +52,17 @@ struct ClusterInfo
 };
 
 
+struct AdvancedFileInfo
+{
+    size_t freeSpaceAfterFile;
+    QFileInfo basicInfo;
+
+    AdvancedFileInfo() {}
+    ADvancedFileInfo( const QString &path, const size_t fsClusterSize )
+    {
+        basicInfo = QFileInfo( QFile( path ) );
+        freeSpaceAfterFile = fsClusterSize - ( basicInfo.size() % fsClusterSize );
+    }
+};
 
 #endif
