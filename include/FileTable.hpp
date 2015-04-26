@@ -17,10 +17,11 @@ using namespace pathOperations;
 
 class FileTable
 {
-private:
+protected:
     QTableView *view;
     QStandardItemModel *model;
 
+private:
     void createModel( QMainWindow *mainWindow )
     {
         QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel;
@@ -42,18 +43,15 @@ public:
     }
     ~FileTable() {}
 
+    virtual void fillFirstColumn( const QString &path ) = 0;
+
     void addFile( const QString &path )
     {
         auto rowCount = model->rowCount();
         QFileInfo fileInfo( path );
-        auto fileSize = fileInfo.size();
         auto fileName = fileInfo.fileName();
 
         model->appendRow(new QStandardItem());
-
-        model->setItem( rowCount,
-                        0,
-                        new QStandardItem( QString::number( fileSize ) ) );
 
         model->setItem( rowCount,
                         1,
@@ -62,6 +60,8 @@ public:
         model->setItem( rowCount,
                         2,
                         new QStandardItem( path ) );
+
+        fillFirstColumn( path );
 
         view->resizeColumnsToContents();
     }

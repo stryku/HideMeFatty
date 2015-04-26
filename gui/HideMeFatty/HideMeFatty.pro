@@ -40,7 +40,8 @@ HEADERS  += mainwindow.h \
     ../../include/pathOperations.hpp \
     ../../include/Structs.h \
     ../../include/FileTable.hpp \
-    ../../include/PartitionInfo.hpp
+    ../../include/PartitionInfo.hpp \
+    ../../include/FilesOnPartitionTable.hpp
 
 
 FORMS    += mainwindow.ui

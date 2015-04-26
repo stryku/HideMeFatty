@@ -58,7 +58,7 @@ struct AdvancedFileInfo
     QFileInfo basicInfo;
 
     AdvancedFileInfo() {}
-    ADvancedFileInfo( const QString &path, const size_t fsClusterSize )
+    AdvancedFileInfo( const QString &path, const size_t fsClusterSize )
     {
         basicInfo = QFileInfo( QFile( path ) );
         freeSpaceAfterFile = fsClusterSize - ( basicInfo.size() % fsClusterSize );
