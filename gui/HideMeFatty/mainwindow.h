@@ -61,7 +61,10 @@ private:
     void initFileTables();
     void initHideInfo();
 
-    void addFilesToTable( EnumFileTable tableId, std::function<void( const QFile& )> functionOnFile  );
+    void addFilesToTable( EnumFileTable tableId,
+                          std::function<void( const QFile& )> functionOnFile,
+                          const QString &caption = QString(),
+                          const QString &dir = QString() );
     std::vector<PartitionInfo> getFat32Partitions();
 
     void newFileOnPartition( const QFile &file );

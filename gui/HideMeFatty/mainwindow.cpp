@@ -62,9 +62,13 @@ std::vector<PartitionInfo> MainWindow::getFat32Partitions()
 }
 
 void MainWindow::addFilesToTable( EnumFileTable tableId,
-                                  std::function<void( const QFile& )> functionOnFile )
+                                  std::function<void( const QFile& )> functionOnFile,
+                                  const QString &caption,
+                                  const QString &dir )
 {
-    auto filePaths = QFileDialog::getOpenFileNames();
+    auto filePaths = QFileDialog::getOpenFileNames( this,
+                                                    caption,
+                                                    dir );
 
     for( const auto &filePath : filePaths )
     {
@@ -99,7 +103,10 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
                                            this,
                                            std::placeholders::_1);
 
-    addFilesToTable( FILETABLE_FILES_ON_PARTITION, functionToCallOnFile );
+    addFilesToTable( FILETABLE_FILES_ON_PARTITION,
+                     functionToCallOnFile,
+                     "Select files on partition",
+                     QString::fromStdString( hideInfo.partitionInfo.mediaPath ) );
 }
 
 
@@ -109,7 +116,9 @@ void MainWindow::on_pushButton_2_clicked()
                                            this,
                                            std::placeholders::_1);
 
-    addFilesToTable( FILETABLE_FILES_TO_HIDE, functionToCallOnFile );
+    addFilesToTable( FILETABLE_FILES_TO_HIDE,
+                     functionToCallOnFile,
+                     "Select files to hide" );
 }
 
 void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
