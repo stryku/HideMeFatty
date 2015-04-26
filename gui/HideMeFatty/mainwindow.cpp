@@ -123,7 +123,13 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
 {
-    hideInfo.partitionInfo = validParitions[index - 1];
-    hideInfo.partitionInfo.initClusterSize();
-    dynamic_cast< FilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+    if( index == 0 )
+        ui->toolBoxHide->setItemText( 0, "Step 1: Select partition (status: waiting for selecting partition)" );
+    else
+    {
+        hideInfo.partitionInfo = validParitions[index - 1];
+        hideInfo.partitionInfo.initClusterSize();
+        dynamic_cast< FilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+        ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
+    }
 }
