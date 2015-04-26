@@ -50,29 +50,6 @@ struct ClusterInfo
 	freeBytesOffset;
 };
 
-struct PartitionInfo
-{
-    std::string devicePath,
-                mediaPath,
-                name,
-                filesystem,
-                attributes;
 
-    size_t clusterSize;
-
-    PartitionInfo() {}
-
-    PartitionInfo( std::stringstream &in )
-    {
-        in  >> devicePath \
-            >> mediaPath \
-            >> filesystem \
-            >> attributes;
-
-        name = pathOperations::getPathFileName( mediaPath );
-    }
-
-    ~PartitionInfo() {}
-};
 
 #endif

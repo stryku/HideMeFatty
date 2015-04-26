@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <Structs.h>
+#include <PartitionInfo.hpp>
 
 class PartitionFinder
 {

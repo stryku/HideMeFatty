@@ -52,7 +52,6 @@ private:
 	bool loadFatTable();
 	char* loadCluster( size_t clusterNo );
 
-	inline size_t clusterSize() const;
 	inline size_t getClusterFirstSectorNo( size_t clusterNo ) const;
 	inline uint64_t getClusterStartOffset( size_t clusterNo ) const;
 
@@ -99,6 +98,7 @@ public:
 
 	bool isPathCorrect( const std::string &path );
 
+    inline size_t clusterSize() const;
 	EFatType getFatType();
 	size_t getFreeSpaceAfterFile( const std::string &path );
 	size_t getFileLastClusterNo( const std::string &path );

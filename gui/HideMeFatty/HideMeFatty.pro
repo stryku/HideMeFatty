@@ -39,7 +39,8 @@ HEADERS  += mainwindow.h \
     ../../include/MappedFileManager.hpp \
     ../../include/pathOperations.hpp \
     ../../include/Structs.h \
-    ../../include/FileTable.hpp
+    ../../include/FileTable.hpp \
+    ../../include/PartitionInfo.hpp
 
 
 FORMS    += mainwindow.ui
