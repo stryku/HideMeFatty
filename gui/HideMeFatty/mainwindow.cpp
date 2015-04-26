@@ -114,7 +114,7 @@ void MainWindow::on_pushButton_2_clicked()
 {
     auto functionToCallOnFile = std::bind( &MainWindow::newFileToHide,
                                            this,
-                                           std::placeholders::_1);
+                                           std::placeholders::_1 );
 
     addFilesToTable( FILETABLE_FILES_TO_HIDE,
                      functionToCallOnFile,
