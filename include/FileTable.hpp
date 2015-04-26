@@ -5,6 +5,7 @@
 #include <QTableView>
 #include <QtGui>
 #include <QFileInfo>
+#include <QStringList>
 
 #include <boost/filesystem.hpp>
 
@@ -52,7 +53,7 @@ public:
 
     virtual void fillFirstColumn( const QString &path, const size_t row ) = 0;
 
-    bool canAdd( const QString &path )
+    bool canAdd( const QString &path ) const
     {
         auto rowCount = model->rowCount();
 
@@ -99,6 +100,17 @@ public:
     void sortByCollumn( size_t collumn, Qt::SortOrder sortOrder )
     {
         view->sortByColumn( collumn, sortOrder );
+    }
+
+    QStringList getFullPaths() const
+    {
+        QStringList ret;
+        auto rowCount = model->rowCount();
+
+        for(size_t i = 0; i < rowCount; ++i )
+            ret << model->item( i, fullPathColumn )->text();
+
+        return ret;
     }
 };
 
