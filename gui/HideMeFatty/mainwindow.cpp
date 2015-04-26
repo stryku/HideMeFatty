@@ -81,7 +81,10 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
 
 void MainWindow::newFileOnPartition( const QFile &file )
 {
-    hideInfo.freeSpace += file.size();
+    AdvancedFileInfo info( file,
+                           hideInfo.partitionInfo.clusterSize );
+
+    hideInfo.freeSpace += info.freeSpaceAfterFile;
     ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
 }
 

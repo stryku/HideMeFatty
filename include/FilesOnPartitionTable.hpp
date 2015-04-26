@@ -18,7 +18,9 @@ public:
 
     void fillFirstColumn( const QString &path, const size_t row )
     {
-        auto freeSpace = AdvancedFileInfo( path, _fsClusterSize ).freeSpaceAfterFile;
+        AdvancedFileInfo info( path, _fsClusterSize );
+
+        auto freeSpace = info.freeSpaceAfterFile;
 
         model->setItem( row,
                         0,
