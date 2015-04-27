@@ -94,8 +94,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>361</width>
+             <height>152</height>
             </rect>
            </property>
            <attribute name="label">
@@ -137,8 +137,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>296</width>
+             <height>152</height>
             </rect>
            </property>
            <attribute name="label">
@@ -180,8 +180,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>148</width>
+             <height>160</height>
             </rect>
            </property>
            <attribute name="label">
@@ -219,15 +219,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxRest">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -296,21 +296,44 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
-            <string>Step 3: Select path to store</string>
+            <string>Step 3: Select folder to store files</string>
            </attribute>
+           <widget class="QSplitter" name="splitter_3">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>0</y>
+              <width>531</width>
+              <height>51</height>
+             </rect>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QPushButton" name="pushButtonSelectFolderToStore">
+             <property name="text">
+              <string>Select folder</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelSelectedFolderToStore">
+             <property name="text">
+              <string>Folder not selected</string>
+             </property>
+            </widget>
+           </widget>
           </widget>
           <widget class="QWidget" name="restoringStep4">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">

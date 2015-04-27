@@ -118,7 +118,7 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
     ui->labFreeSpace->setText( "Total free space: " + QString::number( freeSpace ) );
 }
 
-
+//TODO ALMOST SMART LABEL
 void MainWindow::on_pushButton_2_clicked()
 {
     size_t sizeToHide;
@@ -190,4 +190,11 @@ void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
         dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
         ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
     }
+}
+
+void MainWindow::on_pushButtonSelectFolderToStore_clicked()
+{
+    auto selectedFolder = QFileDialog::getExistingDirectory();
+
+    ui->labelSelectedFolderToStore->setText( selectedFolder );
 }

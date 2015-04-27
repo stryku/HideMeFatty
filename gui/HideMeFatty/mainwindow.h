@@ -44,6 +44,8 @@ private slots:
 
     void on_comboBoxRestPartitions_currentIndexChanged(int index);
 
+    void on_pushButtonSelectFolderToStore_clicked();
+
 private:
     enum EnumFileTable
     {
