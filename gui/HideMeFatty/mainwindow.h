@@ -33,11 +33,13 @@ private slots:
 
     void on_pushButton_2_clicked();
 
-    void on_partitionsComboBox_currentIndexChanged(int index);
+    void on_comboBoxHidePartitions_currentIndexChanged(int index);
 
     void on_pushButton_3_clicked();
 
     void on_pushButtonRestAddFilesOnPartition_clicked();
+
+    void on_comboBoxRestPartitions_currentIndexChanged(int index);
 
 private:
     enum EnumFileTable
@@ -61,7 +63,7 @@ private:
     QVector<PartitionInfo> validParitions;
     Fat32Manager fatManager;
 
-    void initPartitionsComboBox();
+    void initPartitionsComboBoxes();
     void initFileTables();
     void initHideInfo();
 

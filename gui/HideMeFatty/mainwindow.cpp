@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    initPartitionsComboBox();
+    initPartitionsComboBoxes();
     initHideInfo();
     initFileTables();
 }
@@ -20,13 +20,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initPartitionsComboBox()
+void MainWindow::initPartitionsComboBoxes()
 {
     auto partitions = getFat32Partitions();
 
     for( const auto &i : partitions)
     {
-        ui->partitionsComboBox->addItem( i.name );
+        ui->comboBoxHidePartitions->addItem( i.name );
+        ui->comboBoxRestPartitions->addItem( i.name );
         validParitions.push_back( i );
     }
 }
@@ -123,7 +124,7 @@ void MainWindow::on_pushButton_2_clicked()
                      "Select files to hide" );
 }
 
-void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
+void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
 {
     if( index == 0 )
         ui->toolBoxHide->setItemText( 0, "Step 1: Select partition (status: waiting for selecting partition)" );
@@ -163,4 +164,17 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
 {
 
+}
+
+void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
+{
+    if( index == 0 )
+        ui->toolBoxHide->setItemText( 0, "Step 1: Select partition (status: waiting for selecting partition)" );
+    else
+    {
+        hideInfo.partitionInfo = validParitions[index - 1];
+        hideInfo.partitionInfo.initClusterSize();
+        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+        ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
+    }
 }
