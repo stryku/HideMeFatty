@@ -35,7 +35,7 @@ void MainWindow::initFileTables()
 {
     fileTables.resize( ENUM_FILETABLE_COUNT );
 
-    fileTables[FILETABLE_FILES_ON_PARTITION] = std::make_shared<FilesOnPartitionTable>();
+    fileTables[FILETABLE_FILES_ON_PARTITION] = std::make_shared<HideFilesOnPartitionTable>();
     fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesToHideTable>();
 
     fileTables[FILETABLE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
@@ -131,7 +131,7 @@ void MainWindow::on_partitionsComboBox_currentIndexChanged(int index)
     {
         hideInfo.partitionInfo = validParitions[index - 1];
         hideInfo.partitionInfo.initClusterSize();
-        dynamic_cast< FilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
         ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
     }
 }
@@ -146,10 +146,10 @@ void MainWindow::on_pushButton_3_clicked()
 
     FileHider fileHider;
 
-    if( fileHider.hideFiles(filesOnPartition,
-                            partitionMediaPath,
-                            filesToHide,
-                            partitionDevPath ) )
+    if( fileHider.hideFiles( filesOnPartition,
+                             partitionMediaPath,
+                             filesToHide,
+                             partitionDevPath ) )
     {
         QMessageBox::information(this, "ok", "ok");
     }
@@ -158,4 +158,9 @@ void MainWindow::on_pushButton_3_clicked()
         QMessageBox::information(this, "chuja", "chuja");
 
     }
+}
+
+void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
+{
+
 }

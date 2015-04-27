@@ -13,7 +13,7 @@
 #include <PartitionFinder.hpp>
 #include <Fat32Manager.hpp>
 #include <FileTable.hpp>
-#include <FilesOnPartitionTable.hpp>
+#include <HideFilesOnPartitionTable.hpp>
 #include <FilesToHideTable.hpp>
 
 namespace Ui {
@@ -36,6 +36,10 @@ private slots:
     void on_partitionsComboBox_currentIndexChanged(int index);
 
     void on_pushButton_3_clicked();
+
+    void on_pushButton_clicked();
+
+    void on_pushButtonRestAddFilesOnPartition_clicked();
 
 private:
     enum EnumFileTable

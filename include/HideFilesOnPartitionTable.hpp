@@ -4,17 +4,17 @@
 #include <FileTable.hpp>
 #include <Structs.h>
 
-class FilesOnPartitionTable : public FileTable
+class HideFilesOnPartitionTable : public FileTable
 {
 private:
     size_t _fsClusterSize;
 public:
-    FilesOnPartitionTable() {}
-    FilesOnPartitionTable( QTableView *view,
+    HideFilesOnPartitionTable() {}
+    HideFilesOnPartitionTable( QTableView *view,
                            QMainWindow *mainWindow ) :
         FileTable( view, mainWindow )
     {}
-    ~FilesOnPartitionTable() {}
+    ~HideFilesOnPartitionTable() {}
 
     void fillFirstColumn( const QString &path, const size_t row )
     {
