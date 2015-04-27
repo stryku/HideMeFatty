@@ -49,7 +49,7 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxHide">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="hidingStep1">
            <property name="geometry">
@@ -180,8 +180,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>148</width>
-             <height>160</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -219,7 +219,7 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxRest">
           <property name="currentIndex">
-           <number>2</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
@@ -339,6 +339,25 @@
            <attribute name="label">
             <string>Step 4: Restore files</string>
            </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="2" column="0">
+             <widget class="QProgressBar" name="progressBarRestoring">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QTreeView" name="treeView"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pushButtonRestoreFiles">
+              <property name="text">
+               <string>Start restoring files</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>

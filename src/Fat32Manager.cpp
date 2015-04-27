@@ -456,7 +456,8 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const QString &path )
 size_t Fat32Manager::getFileFreeSpaceOffset( const DirectoryEntry &file )
 {
 
-
+    auto size = file.getFileSize();
+    auto clusterSizea = clusterSize();
 
 
     return file.getFileSize() % clusterSize();
@@ -470,6 +471,9 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
     {
         auto fileDirEntry = findFile( file );
         size_t clusterNo = getFileLastClusterNo( fileDirEntry );
+        auto startOffset = getClusterStartOffset( fileDirEntry.getCluster() ),
+                freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
+                freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
 
         chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( fileDirEntry.getCluster() ) + getFileFreeSpaceOffset( fileDirEntry ) ,
                                             getFreeSpaceAfterFile( fileDirEntry ) ) );
@@ -486,8 +490,9 @@ char* Fat32Manager::mapSpaceAfterFiles( const QStringList &files )
 
 	for( const auto &file : files )
 	{
-		clusters.push_back( ClusterWithFreeSpace( getFileLastClusterNo( file ),
-			getFileFreeSpaceOffset( file ) ) );
+        auto findedFile = findFile( file );
+        clusters.push_back( ClusterWithFreeSpace( getFileLastClusterNo( findedFile ),
+            getFileFreeSpaceOffset( findedFile ) ) );
 	}
 
 	firstCluster = *std::min_element( clusters.begin(), clusters.end() );

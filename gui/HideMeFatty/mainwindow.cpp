@@ -198,3 +198,27 @@ void MainWindow::on_pushButtonSelectFolderToStore_clicked()
 
     ui->labelSelectedFolderToStore->setText( selectedFolder );
 }
+
+void MainWindow::on_pushButtonRestoreFiles_clicked()
+{
+    auto filesOnPartition = fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->getFullPaths();
+
+    auto partitionDevPath = hideInfo.partitionInfo.devicePath,
+            partitionMediaPath = hideInfo.partitionInfo.mediaPath;
+    auto pathToStore = ui->labelSelectedFolderToStore->text();
+
+    FileHider fileHider;
+
+    if( fileHider.restoreMyFiles( filesOnPartition,
+                                  partitionMediaPath,
+                                  partitionDevPath,
+                                  pathToStore ) )
+    {
+        QMessageBox::information(this, "ok", "ok");
+    }
+    else
+    {
+        QMessageBox::information(this, "chuja", "chuja");
+
+    }
+}

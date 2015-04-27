@@ -46,6 +46,8 @@ private slots:
 
     void on_pushButtonSelectFolderToStore_clicked();
 
+    void on_pushButtonRestoreFiles_clicked();
+
 private:
     enum EnumFileTable
     {
