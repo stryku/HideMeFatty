@@ -15,10 +15,13 @@
 #include <FileTable.hpp>
 #include <HideFilesOnPartitionTable.hpp>
 #include <FilesToHideTable.hpp>
+#include <RestoreFilesOnPartitionTable.hpp>
 
 namespace Ui {
 class MainWindow;
 }
+
+typedef std::function<void( const QFile& )> FunctionOnFile;
 
 class MainWindow : public QMainWindow
 {
@@ -44,8 +47,9 @@ private slots:
 private:
     enum EnumFileTable
     {
-        FILETABLE_FILES_ON_PARTITION,
+        FILETABLE_HIDE_FILES_ON_PARTITION,
         FILETABLE_FILES_TO_HIDE,
+        FILETABLE_RESTORE_FILES_ON_PARTITION,
 
         ENUM_FILETABLE_COUNT
     };
@@ -68,7 +72,6 @@ private:
     void initHideInfo();
 
     void addFilesToTable( EnumFileTable tableId,
-                          std::function<void( const QFile& )> functionOnFile,
                           const QString &caption = QString(),
                           const QString &dir = QString() );
     std::vector<PartitionInfo> getFat32Partitions();

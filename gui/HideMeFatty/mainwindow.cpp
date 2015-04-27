@@ -36,11 +36,13 @@ void MainWindow::initFileTables()
 {
     fileTables.resize( ENUM_FILETABLE_COUNT );
 
-    fileTables[FILETABLE_FILES_ON_PARTITION] = std::make_shared<HideFilesOnPartitionTable>();
+    fileTables[FILETABLE_HIDE_FILES_ON_PARTITION] = std::make_shared<HideFilesOnPartitionTable>();
     fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesToHideTable>();
+    fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION] = std::make_shared<RestoreFilesOnPartitionTable>();
 
-    fileTables[FILETABLE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
+    fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
     fileTables[FILETABLE_FILES_TO_HIDE]->init( this, ui->tableViewHideFilesToHide );
+    fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->init( this, ui->tableViewRestoreFilesOnPartition );
 }
 
 void MainWindow::initHideInfo()
@@ -65,7 +67,6 @@ std::vector<PartitionInfo> MainWindow::getFat32Partitions()
 }
 
 void MainWindow::addFilesToTable( EnumFileTable tableId,
-                                  std::function<void( const QFile& )> functionOnFile,
                                   const QString &caption,
                                   const QString &dir )
 {
@@ -79,7 +80,6 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
         if( file.open( QIODevice::ReadOnly ) )
         {
             fileTables[tableId]->addFile( filePath );
-            functionOnFile( file );
             file.close();
         }
     }
@@ -102,26 +102,37 @@ void MainWindow::newFileToHide( const QFile &file )
 
 void MainWindow::on_addFilesOnPartitionButton_clicked()
 {
-    auto functionToCallOnFile = std::bind( &MainWindow::newFileOnPartition,
-                                           this,
-                                           std::placeholders::_1);
+    size_t freeSpace;
+    HideSectionFileTable *table;
 
-    addFilesToTable( FILETABLE_FILES_ON_PARTITION,
-                     functionToCallOnFile,
+    addFilesToTable( FILETABLE_HIDE_FILES_ON_PARTITION,
                      "Select files on partition",
                      hideInfo.partitionInfo.mediaPath );
+
+    table = dynamic_cast<HideSectionFileTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() );
+
+    freeSpace = table->getAcumulatedFirstColumn();
+
+    ui->labFreeSpace->setText( QString::number( freeSpace ) );
+
+    ui->labFreeSpace->setText( "Total free space: " + QString::number( freeSpace ) );
 }
 
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    auto functionToCallOnFile = std::bind( &MainWindow::newFileToHide,
-                                           this,
-                                           std::placeholders::_1 );
+    size_t sizeToHide;
+    HideSectionFileTable *table;
 
     addFilesToTable( FILETABLE_FILES_TO_HIDE,
-                     functionToCallOnFile,
-                     "Select files to hide" );
+                     "Select files to hide",
+                     "." );
+
+    table = dynamic_cast<HideSectionFileTable*>( fileTables[FILETABLE_FILES_TO_HIDE].get() );
+
+    sizeToHide = table->getAcumulatedFirstColumn();
+
+    ui->labSizeToHide->setText( "Total size to hide: " + QString::number( sizeToHide ) );
 }
 
 void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
@@ -132,14 +143,14 @@ void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
     {
         hideInfo.partitionInfo = validParitions[index - 1];
         hideInfo.partitionInfo.initClusterSize();
-        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
         ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
     }
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    auto filesOnPartition = fileTables[FILETABLE_FILES_ON_PARTITION]->getFullPaths(),
+    auto filesOnPartition = fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->getFullPaths(),
             filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
 
     auto partitionDevPath = hideInfo.partitionInfo.devicePath,
@@ -163,7 +174,9 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
 {
-
+    addFilesToTable( FILETABLE_RESTORE_FILES_ON_PARTITION,
+                     "Select files",
+                     hideInfo.partitionInfo.mediaPath );
 }
 
 void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
@@ -174,7 +187,7 @@ void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
     {
         hideInfo.partitionInfo = validParitions[index - 1];
         hideInfo.partitionInfo.initClusterSize();
-        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
+        dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() )->setFsClusterSize( hideInfo.partitionInfo.clusterSize );
         ui->toolBoxHide->setItemText(0, "Step 1: Select partition (status: ready)");
     }
 }

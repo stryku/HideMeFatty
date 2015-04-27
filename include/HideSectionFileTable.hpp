@@ -16,6 +16,13 @@ protected:
         fullPathColumnIndex = 2;
     }
 
+    void fillColumns( const QString &path )
+    {
+        FileTable::fillColumns( path );
+
+        fillFirstColumn( path );
+    }
+
 public:
     HideSectionFileTable() {}
     HideSectionFileTable( QTableView *view,
@@ -24,11 +31,15 @@ public:
     {}
     virtual ~HideSectionFileTable() {}
 
-    virtual void fillColumns( const QString &path )
+    size_t getAcumulatedFirstColumn()
     {
-        FileTable::fillColumns( path );
+        size_t ret = 0;
+        auto rowCount = model->rowCount();
 
-        fillFirstColumn( path );
+        for(size_t i = 0; i < rowCount; ++i )
+            ret += model->item( i, firstColumnIndex )->data( Qt::DisplayRole ).toUInt();
+
+        return ret;
     }
 };
 
