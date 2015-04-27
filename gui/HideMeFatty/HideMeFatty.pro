@@ -42,7 +42,9 @@ HEADERS  += mainwindow.h \
     ../../include/FileTable.hpp \
     ../../include/PartitionInfo.hpp \
     ../../include/FilesToHideTable.hpp \
-    ../../include/HideFilesOnPartitionTable.hpp
+    ../../include/HideFilesOnPartitionTable.hpp \
+    ../../include/RestoreFilesOnPartitionTable.hpp \
+    ../../include/HideSectionFileTable.hpp
 
 
 FORMS    += mainwindow.ui

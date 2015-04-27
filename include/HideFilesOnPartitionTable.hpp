@@ -1,32 +1,39 @@
 #ifndef _INCLUDE_FILESONPARTITIONTABLE_HPP_
 #define _INCLUDE_FILESONPARTITIONTABLE_HPP_
 
-#include <FileTable.hpp>
+#include <HideSectionFileTable.hpp>
 #include <Structs.h>
 
-class HideFilesOnPartitionTable : public FileTable
+class HideFilesOnPartitionTable : public HideSectionFileTable
 {
 private:
     size_t _fsClusterSize;
 public:
     HideFilesOnPartitionTable() {}
     HideFilesOnPartitionTable( QTableView *view,
-                           QMainWindow *mainWindow ) :
-        FileTable( view, mainWindow )
+                               QMainWindow *mainWindow ) :
+        HideSectionFileTable( view, mainWindow )
     {}
     ~HideFilesOnPartitionTable() {}
 
-    void fillFirstColumn( const QString &path, const size_t row )
+protected:
+    void fillFirstColumn( const QString &path )
     {
         AdvancedFileInfo info( path, _fsClusterSize );
 
         auto freeSpace = info.freeSpaceAfterFile;
 
-        model->setItem( row,
-                        firstColumn,
+        model->setItem( model->rowCount() - 1,
+                        firstColumnIndex,
                         new QStandardItem( QString::number( freeSpace ) ) );
     }
+    void createModel( QMainWindow *mainWindow )
+    {
+        FileTable::createModel( mainWindow );
+        model->setHorizontalHeaderItem( firstColumnIndex, new QStandardItem( QString( "Free space" ) ) );
+    }
 
+public:
     void setFsClusterSize( const size_t fsClusterSize )
     {
         _fsClusterSize = fsClusterSize;

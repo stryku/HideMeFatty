@@ -1,0 +1,11 @@
+#ifndef _INCLUDE_RESTOREFILESONPARTITIONTABLE_HPP_
+#define _INCLUDE_RESTOREFILESONPARTITIONTABLE_HPP_
+
+#include <FileTable.hpp>
+
+class RestoreFilesOnPartitionTable : public FileTable
+{
+
+};
+
+#endif // _INCLUDE_RESTOREFILESONPARTITIONTABLE_HPP_

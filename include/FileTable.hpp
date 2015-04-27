@@ -19,22 +19,19 @@ using namespace pathOperations;
 class FileTable
 {
 protected:
-    static const size_t firstColumn = 0;
-    static const size_t fileNameColumn = 1;
-    static const size_t fullPathColumn = 2;
+    size_t fileNameColumnIndex;
+    size_t fullPathColumnIndex;
 
     QTableView *view;
     QStandardItemModel *model;
 
-private:
-
-    void createModel( QMainWindow *mainWindow )
+    virtual void initColumnsIndexes() = 0;
+    virtual void createModel( QMainWindow *mainWindow )
     {
         QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel;
         QStandardItemModel *newModel = new QStandardItemModel( 0, 0, mainWindow );
-        newModel->setHorizontalHeaderItem( 0, new QStandardItem( QString( "Size" )));
-        newModel->setHorizontalHeaderItem( 1, new QStandardItem( QString( "File Name" ) ) );
-        newModel->setHorizontalHeaderItem( 2, new QStandardItem( QString( "Full Path" ) ) );
+        newModel->setHorizontalHeaderItem( fileNameColumnIndex, new QStandardItem( QString( "File Name" ) ) );
+        newModel->setHorizontalHeaderItem( fullPathColumnIndex, new QStandardItem( QString( "Full Path" ) ) );
 
         proxyModel->setSourceModel( newModel );
         view->setModel( proxyModel );
@@ -51,19 +48,34 @@ public:
     }
     virtual ~FileTable() {}
 
-    virtual void fillFirstColumn( const QString &path, const size_t row ) = 0;
-
     bool canAdd( const QString &path ) const
     {
         auto rowCount = model->rowCount();
 
-        for(size_t i = 0; i < rowCount; ++i )
+        for( size_t i = 0; i < rowCount; ++i )
         {
-            if( model->item( i, 2 )->text() == path )
+            if( model->item( i, fullPathColumnIndex )->text() == path )
                 return false;
         }
 
         return true;
+    }
+
+    virtual void fillColumns( const QString &path )
+    {
+        auto rowCount = model->rowCount();
+        QFileInfo fileInfo( path );
+        auto fileName = fileInfo.fileName();
+
+        model->appendRow( new QStandardItem() );
+
+        model->setItem( rowCount,
+                        fileNameColumnIndex,
+                        new QStandardItem( fileName ) );
+
+        model->setItem( rowCount,
+                        fullPathColumnIndex,
+                        new QStandardItem( path ) );
     }
 
     void addFile( const QString &path )
@@ -71,21 +83,7 @@ public:
         if( !canAdd( path ) )
             return;
 
-        auto rowCount = model->rowCount();
-        QFileInfo fileInfo( path );
-        auto fileName = fileInfo.fileName();
-
-        model->appendRow(new QStandardItem());
-
-        model->setItem( rowCount,
-                        fileNameColumn,
-                        new QStandardItem( fileName ) );
-
-        model->setItem( rowCount,
-                        fullPathColumn,
-                        new QStandardItem( path ) );
-
-        fillFirstColumn( path, rowCount );
+        fillColumns( path );
 
         view->resizeColumnsToContents();
     }
@@ -94,6 +92,7 @@ public:
     {
         view = tableView;
         view->setEditTriggers( QAbstractItemView::NoEditTriggers );
+        initColumnsIndexes();
         createModel( mainWindow );
     }
 
@@ -108,7 +107,7 @@ public:
         auto rowCount = model->rowCount();
 
         for(size_t i = 0; i < rowCount; ++i )
-            ret << model->item( i, fullPathColumn )->text();
+            ret << model->item( i, fullPathColumnIndex )->text();
 
         return ret;
     }
