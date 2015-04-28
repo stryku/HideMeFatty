@@ -26,7 +26,7 @@ Last release: https://github.com/stryku/HideMeFatty/releases/tag/v0.3.1
 ## Before hide-and-seek
 There are things you must to know before using this program.<br />
 First of all you need run it with root permissions.<br />
-After hiding some files you can view/copy etc. files on partition (more about that below) but you can't modify/remove them because you will lose hidded files.<br />
+After hiding some files you can view/copy etc. files on partition (more about that below) but you can't modify/remove them because you will lose hidden files.<br />
 
 ## Usage
 ### General info
