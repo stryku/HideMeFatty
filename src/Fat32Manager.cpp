@@ -205,7 +205,7 @@ std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster )
 	{
 		chain.push_back( cluster );
 		cluster = fatTable[cluster];
-	} while( cluster <= lastClusterMagic );
+    } while( cluster < lastClusterMagic );
 
 	return chain;
 }
@@ -257,12 +257,14 @@ std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstC
 
 	return dirEntries;
 }
-QStringList Fat32Manager::getPathFoldersNames( const QString &path ) const
+QStringList Fat32Manager::getPathFoldersNames( QString path ) const
 {
     QStringList folders;
 	size_t posBegin = 0, posEnd, numberToCopy;
     QFileInfo fileInfo( path );
     auto pathh = fileInfo.dir();
+    auto absolute = fileInfo.canonicalPath();
+    path.truncate( path.lastIndexOf( "/" ) );
 
     /*while( ( posEnd = path.find( '/', posBegin ) ) != QString::npos )
 	{
@@ -271,7 +273,7 @@ QStringList Fat32Manager::getPathFoldersNames( const QString &path ) const
 		posBegin = posEnd + 1;
     }*/
 
-    return pathh.absolutePath().split( "/" );
+    return path.split( "/" );
 }
 QString Fat32Manager::getPathFileName( const QString &path ) const
 {

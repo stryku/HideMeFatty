@@ -62,7 +62,7 @@ private:
 	std::vector<size_t> getClusterChain( size_t firstCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster );
-    QStringList getPathFoldersNames( const QString &path ) const;
+    QStringList getPathFoldersNames( QString path ) const;
     QString getPathFileName( const QString &path ) const;
 	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const;
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const;

@@ -10,8 +10,8 @@
 #include <functional>
 #include <memory>
 
-#include <PartitionFinder.hpp>
 #include <Fat32Manager.hpp>
+#include <PartitionFinder.hpp>
 #include <FileTable.hpp>
 #include <HideFilesOnPartitionTable.hpp>
 #include <FilesToHideTable.hpp>
