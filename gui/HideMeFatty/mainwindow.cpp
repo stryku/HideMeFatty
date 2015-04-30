@@ -77,7 +77,7 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
     for( const auto &filePath : filePaths )
     {
         QFile file( filePath );
-        if( file.open( QIODevice::ReadOnly ) )
+        if( file.open( QIODevice::ReadOnly ) && file.size() > 0 )
         {
             fileTables[tableId]->addFile( filePath );
             file.close();

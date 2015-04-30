@@ -264,6 +264,12 @@ QStringList Fat32Manager::getPathFoldersNames( QString path ) const
     QFileInfo fileInfo( path );
     auto pathh = fileInfo.dir();
     auto absolute = fileInfo.canonicalPath();
+
+    auto pos = path.lastIndexOf( "/" );
+
+    if( pos == -1 )
+        return QStringList();
+
     path.truncate( path.lastIndexOf( "/" ) );
 
     /*while( ( posEnd = path.find( '/', posBegin ) ) != QString::npos )
