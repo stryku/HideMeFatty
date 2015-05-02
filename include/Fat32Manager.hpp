@@ -93,7 +93,7 @@ public:
     void setPartitionPath( const QString &partitionPath );
 
 	bool isValidFat32();
-
+char *  mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks);
 	void init();
 	void close();
 	bool good();
@@ -101,7 +101,7 @@ public:
 
     bool isPathCorrect( const QString &path );
 
-    inline size_t clusterSize() const;
+    size_t clusterSize() const;
 	EFatType getFatType();
     size_t getFreeSpaceAfterFile( const QString &path );
     size_t getFileLastClusterNo( const QString &path );
@@ -111,6 +111,7 @@ public:
     char* mapSpaceAfterFiles( const QStringList &files );
 
 	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
+
 };
 
 #endif

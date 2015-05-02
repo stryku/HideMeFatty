@@ -18,12 +18,18 @@ void DistributedMemoryMapper::addMemoryChunk( char *ptr, size_t size )
 	totalSize += size;
 }
 
+//TODO
+#include <easylogging++.h>
 char& DistributedMemoryMapper::operator[]( uint64_t no )
 {
 	for( const auto &chunk : chunks )
 	{
 		if( no < chunk.size )
+        {
+            //LOG( INFO ) <<reinterpret_cast<u_int64_t>(chunk.ptr + no);
+            vvv.push_back(chunk.ptr + no);
 			return chunk.ptr[no];
+        }
 
 		no -= chunk.size;
 	}
@@ -31,7 +37,18 @@ char& DistributedMemoryMapper::operator[]( uint64_t no )
 
 char& DistributedMemoryMapper::shuffled()
 {
+    yo++;
 	return ( *this )[*shuffledIterator++];
+}
+
+//todo
+#include <fstream>
+void DistributedMemoryMapper::save()
+{
+    std::ofstream o("ssave");
+    for(auto i : shuffledArray)
+        o<<i<<"\n";
+
 }
 
 void DistributedMemoryMapper::createShuffledArray( boost::random::mt19937 &rng )

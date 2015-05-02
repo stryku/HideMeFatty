@@ -56,6 +56,12 @@ public:
 	void close();
 
 	friend std::ostream& operator<<( std::ostream &, const MappedChunk & );
+
+    //todo
+    u_int64_t size()
+    {
+        return mappedFile.size();
+    }
 };
 
 #endif

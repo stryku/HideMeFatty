@@ -91,6 +91,23 @@ std::string FileHider::hashFile( const std::string &path )
 	return result;
 }
 
+/*char *  FileHider::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
+{
+    uint64_t preparedOffset, preparedSize;
+    Fat32Manager::FreeSpaceChunk firstCluster, lastCluster;
+
+    firstCluster = *std::min_element( chunks.begin(), chunks.end() );
+    lastCluster = *std::max_element( chunks.begin(), chunks.end() );
+
+    //TODO
+    uint64_t FOFF = firstCluster.offset;
+    uint64_t sss = lastCluster.offset + lastCluster.size-FOFF;
+    sss -= preparedOffset;
+    preparedOffset = FOFF;
+    preparedSize =sss;
+    return mappedFileMngr.map( preparedOffset, preparedSize, false ); //todo false na true
+}*/
+
 bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 {
 	std::vector<Fat32Manager::FreeSpaceChunk> chunks;
@@ -101,15 +118,23 @@ bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 
 	dmm.clear();
 
-	mappedPtr = fatManager.mapSpaceAfterFiles( filesOnPartition );
+    mappedPtr = fatManager.mapChunks(chunks);
 
 	if( mappedPtr == nullptr )
 		return false;
 
-	startOffset = std::min_element( chunks.begin( ), chunks.end( ) )->offset;
+    startOffset = std::min_element( chunks.begin( ), chunks.end( ) )->offset;
+
 
 	for( const auto &chunk : chunks )
+    {
+        //todo
+        void *m = mappedPtr;
+        void *mm = m;
+        uint64_t sss = chunk.offset - startOffset;
+        m += sss;
 		dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
+    }
 
 	return true;
 }
@@ -317,6 +342,7 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
+    dmm.save();
 
 	for( const auto &file : filesToHide )
 	{
@@ -354,7 +380,7 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 		return false;
 	}
 
-	freeSpaceSize = getFreeSpaceAfterFiles( preparedPaths );
+    freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
 
 	seed = getSeed( filesOnPartition );
 
@@ -366,6 +392,7 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 
 	rng.seed( seed );
 	dmm.createShuffledArray( rng );
+    dmm.save();
 
 	while( restoreMyFile( pathToStore, rng, freeSpaceSize, restoredFiles ) ) 
 	{}

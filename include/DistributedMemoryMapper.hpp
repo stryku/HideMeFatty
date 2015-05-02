@@ -5,7 +5,10 @@
 
 #include <vector>
 #include <stdint.h> 
+#include <fstream>
 
+//todo
+#include <algorithm>
 class DistributedMemoryMapper
 {
 private:
@@ -19,17 +22,33 @@ private:
 		~ChunkMetadata() {}
 	};
 
+    std::vector<char*> vvv;
 	std::vector<ChunkMetadata> chunks;
 	uint64_t totalSize;
 	std::vector<uint64_t> shuffledArray;
 	std::vector<uint64_t>::iterator shuffledIterator;
 	
+    size_t yo;
 
 public:
 	DistributedMemoryMapper() :
 		totalSize( 0 )
-	{}
-	~DistributedMemoryMapper() {}
+    {
+        yo = 0;
+    }
+
+    //TODO
+    void save();
+    //todo
+    ~DistributedMemoryMapper()
+    {
+        //TODO
+        std::sort(vvv.begin(), vvv.end());
+        std::ofstream log;
+        log.open("siemalog.txt");
+        for(auto i : vvv)
+            log << reinterpret_cast<u_int64_t>(i)<<"\n";
+    }
 
 	void addMemoryChunk( char *ptr, size_t size );
 

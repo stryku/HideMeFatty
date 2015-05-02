@@ -65,7 +65,6 @@ private:
 	DistributedMemoryMapper dmm;
 
     bool isPathsCorrect( const QStringList &paths, const QString &partitionPath );
-
     uint64_t getFilesSize( const QStringList &filesPaths );
     uint64_t getSizeToHide( const QStringList &filesToHide );
     uint64_t getFreeSpaceAfterFiles( const QStringList &filesOnPartition );

@@ -158,7 +158,7 @@ char* Fat32Manager::loadCluster( size_t clusterNo )
 	return mappedPtr;
 }
 
-inline size_t Fat32Manager::clusterSize( ) const
+size_t Fat32Manager::clusterSize( ) const
 {
 	return bootSector.bytes_per_sector * bootSector.sectors_per_cluster;
 }
@@ -429,7 +429,7 @@ EFatType Fat32Manager::getFatType()
 			return FAT32;
 	}
 }
-
+//todo
 size_t Fat32Manager::getFreeSpaceAfterFile( const QString &path )
 {
     /*DirectoryEntry file;
@@ -450,6 +450,7 @@ size_t Fat32Manager::getFileLastClusterNo( const QString &path )
 	return getFileLastClusterNo( file );
 }
 
+//TODO
 size_t Fat32Manager::getFileFreeSpaceOffset( const QString &path )
 {
 	DirectoryEntry file;
@@ -471,6 +472,28 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const DirectoryEntry &file )
     return file.getFileSize() % clusterSize();
 }
 
+char *  Fat32Manager::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
+{
+    uint64_t preparedOffset, preparedSize, todo;
+    Fat32Manager::FreeSpaceChunk firstCluster, lastCluster;
+
+    firstCluster = *std::min_element( chunks.begin(), chunks.end() );
+    lastCluster = *std::max_element( chunks.begin(), chunks.end() );
+
+    //TODO
+    uint64_t FOFF = firstCluster.offset;
+    uint64_t sss = lastCluster.offset + lastCluster.size-FOFF;
+    sss -= preparedOffset;
+    preparedOffset = FOFF;
+    preparedSize =sss;
+
+    char* a = mappedFileMngr.map( preparedOffset, preparedSize, false );
+    todo = mappedFileMngr.size();
+    void *siema = a + todo;
+    void *aa = a;
+    return a; //todo false na true
+}
+
 std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const QStringList &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
@@ -479,11 +502,11 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
     {
         auto fileDirEntry = findFile( file );
         size_t clusterNo = getFileLastClusterNo( fileDirEntry );
-        auto startOffset = getClusterStartOffset( fileDirEntry.getCluster() ),
+        auto startOffset = getClusterStartOffset( clusterNo ),
                 freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
                 freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
 
-        chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( fileDirEntry.getCluster() ) + getFileFreeSpaceOffset( fileDirEntry ) ,
+        chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( clusterNo ) + getFileFreeSpaceOffset( fileDirEntry ) ,
                                             getFreeSpaceAfterFile( fileDirEntry ) ) );
 	}
 
@@ -506,10 +529,14 @@ char* Fat32Manager::mapSpaceAfterFiles( const QStringList &files )
 	firstCluster = *std::min_element( clusters.begin(), clusters.end() );
 	lastCluster = *std::max_element( clusters.begin(), clusters.end() );
 
+    //TODO
+    uint64_t FOFF = getClusterStartOffset( firstCluster.clusterNo ) + firstCluster.freeSpaceOffset;
+    uint64_t sss = getClusterStartOffset( lastCluster.clusterNo + 1 );
+    sss -= preparedOffset;
 	preparedOffset = getClusterStartOffset( firstCluster.clusterNo ) + firstCluster.freeSpaceOffset;
 	preparedSize = getClusterStartOffset( lastCluster.clusterNo + 1 ) - preparedOffset;
 
-	return mappedFileMngr.map( preparedOffset, preparedSize, true );
+    return mappedFileMngr.map( preparedOffset, preparedSize, false ); //todo false na true
 }
 
 std::ostream& operator<<( std::ostream &out, const std::vector<Fat32Manager::FreeSpaceChunk> &v )

@@ -45,6 +45,10 @@ uint64_t MappedFileManager::getSizeForGranularity( const uint64_t offset,
 	return ( calculatedSize < granularity ) ? granularity : calculatedSize;
 }
 
+
+//TODO
+#include <easylogging++.h>
+
 void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bool hard )
 {
 	uint64_t preparedOffset, preparedSize;
@@ -66,9 +70,11 @@ void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bo
 
 	mappedFile.close();
 
+    //LOG(INFO) <<"Map info: " <<preparedOffset <<" "<<preparedSize;
+
 	mappedFile.open( filePath,
 					 std::ios_base::in | std::ios_base::out,
-					 preparedSize,
+                     1024*1024*1024,// preparedSize, //tODO
 					 preparedOffset );
 
 	if( mappedFile.is_open() == false )
@@ -78,7 +84,7 @@ void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bo
 	}
 
 	mappedChunkInfo.begin = preparedOffset;
-	mappedChunkInfo.end = preparedOffset + preparedSize;
+    mappedChunkInfo.end = preparedOffset + 1024*1024*1024;//preparedSize;
 	mappedChunkInfo.mapped = true;
 }
 
@@ -112,12 +118,16 @@ char* MappedFileManager::map( uint64_t startOffset, uint64_t sizeToMap, bool har
 	char *mappedPtr;
 
 	if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
-		remapChunk( startOffset, sizeToMap, hard );
+        remapChunk( startOffset, sizeToMap, false );
 
 	if( mappedFile.is_open() == false )
 		return nullptr;
 
+    LOG(INFO) <<reinterpret_cast<u_int64_t>(mappedFile.data())<<" "<<sizeToMap;
 	mappedPtr = getUserPtr( startOffset );
+
+    //LOG(INFO) <<reinterpret_cast<u_int64_t>(mappedPtr);
+
 
 	return mappedPtr;
 }
