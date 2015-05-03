@@ -7,8 +7,6 @@
 #include <stdint.h> 
 #include <fstream>
 
-//todo
-#include <algorithm>
 class DistributedMemoryMapper
 {
 private:
@@ -33,22 +31,8 @@ private:
 public:
 	DistributedMemoryMapper() :
 		totalSize( 0 )
-    {
-        yo = 0;
-    }
-
-    //TODO
-    void save();
-    //todo
-    ~DistributedMemoryMapper()
-    {
-        //TODO
-        std::sort(vvv.begin(), vvv.end());
-        std::ofstream log;
-        log.open("siemalog.txt");
-        for(auto i : vvv)
-            log << reinterpret_cast<u_int64_t>(i)<<"\n";
-    }
+    {}
+    ~DistributedMemoryMapper() {}
 
 	void addMemoryChunk( char *ptr, size_t size );
 

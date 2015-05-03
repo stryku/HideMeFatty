@@ -474,7 +474,7 @@ size_t Fat32Manager::getFileFreeSpaceOffset( const DirectoryEntry &file )
 
 char *  Fat32Manager::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
 {
-    uint64_t preparedOffset, preparedSize, todo;
+    uint64_t preparedOffset, preparedSize;
     Fat32Manager::FreeSpaceChunk firstCluster, lastCluster;
 
     firstCluster = *std::min_element( chunks.begin(), chunks.end() );
@@ -484,14 +484,10 @@ char *  Fat32Manager::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunk
     uint64_t FOFF = firstCluster.offset;
     uint64_t sss = lastCluster.offset + lastCluster.size-FOFF;
     sss -= preparedOffset;
-    preparedOffset = FOFF;
-    preparedSize =sss;
+    preparedOffset = firstCluster.offset;
+    preparedSize = lastCluster.offset + lastCluster.size - preparedOffset;
 
-    char* a = mappedFileMngr.map( preparedOffset, preparedSize, false );
-    todo = mappedFileMngr.size();
-    void *siema = a + todo;
-    void *aa = a;
-    return a; //todo false na true
+    return mappedFileMngr.map( preparedOffset, preparedSize, true ); //todo false na true
 }
 
 std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const QStringList &files )
