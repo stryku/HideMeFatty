@@ -32,7 +32,6 @@ char& DistributedMemoryMapper::operator[]( uint64_t no )
 
 char& DistributedMemoryMapper::shuffled()
 {
-    yo++;
 	return ( *this )[*shuffledIterator++];
 }
 
