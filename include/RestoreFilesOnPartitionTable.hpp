@@ -14,9 +14,8 @@ protected:
 
 public:
     RestoreFilesOnPartitionTable() {}
-    RestoreFilesOnPartitionTable( QTableView *view,
-                          QMainWindow *mainWindow ) :
-        FileTable( view, mainWindow )
+    RestoreFilesOnPartitionTable( QTableView *view ) :
+        FileTable( view )
     {}
     virtual ~RestoreFilesOnPartitionTable() {}
 };

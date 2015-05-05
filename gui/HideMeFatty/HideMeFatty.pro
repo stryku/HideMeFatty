@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     ../../src/Fat32Manager.cpp \
     ../../src/FatStructs.cpp \
     ../../src/FileHider.cpp \
-    ../../src/MappedFileManager.cpp
+    ../../src/MappedFileManager.cpp \
+    ../../src/FileTable.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 

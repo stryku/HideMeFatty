@@ -27,9 +27,8 @@ protected:
 
 public:
     HideSectionFileTable() {}
-    HideSectionFileTable( QTableView *view,
-                          QMainWindow *mainWindow ) :
-        FileTable( view, mainWindow )
+    HideSectionFileTable( QTableView *view ) :
+        FileTable( view )
     {}
     virtual ~HideSectionFileTable() {}
 

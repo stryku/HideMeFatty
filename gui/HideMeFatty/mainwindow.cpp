@@ -40,9 +40,9 @@ void MainWindow::initFileTables()
     fileTables[FILETABLE_FILES_TO_HIDE] = std::make_shared<FilesToHideTable>();
     fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION] = std::make_shared<RestoreFilesOnPartitionTable>();
 
-    fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->init( this, ui->tableViewHidFileOnPartition );
-    fileTables[FILETABLE_FILES_TO_HIDE]->init( this, ui->tableViewHideFilesToHide );
-    fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->init( this, ui->tableViewRestoreFilesOnPartition );
+    fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->init( ui->tableViewHidFileOnPartition );
+    fileTables[FILETABLE_FILES_TO_HIDE]->init( ui->tableViewHideFilesToHide );
+    fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->init( ui->tableViewRestoreFilesOnPartition );
 }
 
 void MainWindow::initHideInfo()

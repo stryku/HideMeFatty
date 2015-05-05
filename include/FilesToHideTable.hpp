@@ -8,9 +8,8 @@ class FilesToHideTable : public HideSectionFileTable
 {
 public:
     FilesToHideTable() {}
-    FilesToHideTable( QTableView *view,
-                           QMainWindow *mainWindow ) :
-        HideSectionFileTable( view, mainWindow )
+    FilesToHideTable( QTableView *view ) :
+        HideSectionFileTable( view )
     {}
     ~FilesToHideTable() {}
 
@@ -24,9 +23,9 @@ protected:
                         new QStandardItem( QString::number( fileSize ) ) );
     }
 
-    void createModel( QMainWindow *mainWindow )
+    void createModel()
     {
-        FileTable::createModel( mainWindow );
+        FileTable::createModel();
         model->setHorizontalHeaderItem( firstColumnIndex, new QStandardItem( QString( "File size" ) ) );
     }
 };

@@ -11,9 +11,8 @@ private:
     size_t _fsClusterSize;
 public:
     HideFilesOnPartitionTable() {}
-    HideFilesOnPartitionTable( QTableView *view,
-                               QMainWindow *mainWindow ) :
-        HideSectionFileTable( view, mainWindow )
+    HideFilesOnPartitionTable( QTableView *view ) :
+        HideSectionFileTable( view )
     {}
     ~HideFilesOnPartitionTable() {}
 
@@ -28,9 +27,9 @@ protected:
                         firstColumnIndex,
                         new QStandardItem( QString::number( freeSpace ) ) );
     }
-    void createModel( QMainWindow *mainWindow )
+    void createModel()
     {
-        FileTable::createModel( mainWindow );
+        FileTable::createModel();
         model->setHorizontalHeaderItem( firstColumnIndex, new QStandardItem( QString( "Free space" ) ) );
     }
 
