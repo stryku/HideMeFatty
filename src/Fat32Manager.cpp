@@ -237,35 +237,16 @@ QStringList Fat32Manager::getPathFoldersNames( QString path ) const
     return path.split( "/" );
 }
 
-//todo cleanup
-QString Fat32Manager::getPathFileName( const QString &path ) const
-{
-    //size_t pos = path.find_last_of( '/' );
-
-    //pos = ( pos == QString::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
-
-    return QString();
-}
-
 size_t Fat32Manager::getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const
 {
 	return clusterSize( ) - ( fileDirEntry.getFileSize( ) % clusterSize( ) );
 }
 
-//todo clusterChain()
 size_t Fat32Manager::getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const
 {
-	size_t currentClusterNo;
+    auto clustersChain = getClusterChain( fileDirEntry.getCluster() );
 
-	currentClusterNo = fileDirEntry.getCluster( );
-
-	while( true )
-	{
-		if( fatTable[currentClusterNo] >= lastClusterMagic )
-			return currentClusterNo;
-
-		currentClusterNo = fatTable[currentClusterNo];
-	}
+    return clustersChain.back();
 }
 
 ClusterInfo Fat32Manager::getFileLastClusterInfo( const DirectoryEntry &fileDirEntry )
