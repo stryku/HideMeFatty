@@ -1,1 +1,2 @@
 -disable buttons etc in for example step 2 when step 1 isn't ready
+-almost smart label
