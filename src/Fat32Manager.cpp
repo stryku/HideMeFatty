@@ -301,33 +301,45 @@ DirectoryEntry Fat32Manager::findDirEntryInFolder( QString searchedDirEntryName,
 	return DirectoryEntry();
 }
 
-//todo split
-DirectoryEntry Fat32Manager::findFile( const QString &path )
+DirectoryEntry Fat32Manager::getFileParentFolder( const QString &path )
 {
+    DirectoryEntry currentFolder;
     QStringList foldersNames;
-    QString fileName;
-	DirectoryEntry currentFolder, foundFile;
 
-	foldersNames = getPathFoldersNames( path );
-    fileName = path.split( "/" ).back();
+    foldersNames = getPathFoldersNames( path );
 
-	currentFolder.setCluster( fat32ExtBS.root_cluster );
+    currentFolder.setCluster( fat32ExtBS.root_cluster );
 
-	for( const auto &folderName : foldersNames )
-	{
+    for( const auto &folderName : foldersNames )
+    {
         if(folderName.length() == 0)
             break;
 
-		currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+        currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
 
-		if( currentFolder.type() == BAD_DIR_ENTRY )
-			return DirectoryEntry();
-	}
+        if( currentFolder.type() == BAD_DIR_ENTRY )
+            return DirectoryEntry();
+    }
+
+    return currentFolder;
+}
+
+DirectoryEntry Fat32Manager::findFile( const QString &path )
+{
+    QString fileName;
+    DirectoryEntry parentFolder, foundFile;
+
+    fileName = path.split( "/" ).back();
 
 	if( fileName.length() == 0 )
 		return DirectoryEntry();
 
-	foundFile = findDirEntryInFolder( fileName, currentFolder.getCluster( ) );
+    parentFolder = getFileParentFolder( path );
+
+    if( parentFolder.type() == BAD_DIR_ENTRY )
+        return DirectoryEntry();
+
+    foundFile = findDirEntryInFolder( fileName, parentFolder.getCluster( ) );
 
 	if( foundFile.type() == BAD_DIR_ENTRY )
 		return DirectoryEntry();

@@ -68,6 +68,7 @@ private:
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
     size_t getFileFreeSpaceOffset( const DirectoryEntry &file );
     std::vector<char> getRawFolder( const std::vector<size_t> &folderClusterChain );
+    DirectoryEntry getFileParentFolder( const QString &path );
 
     std::vector<DirectoryEntry> getDirEntriesFromRawFolder( std::vector<char> &rawFolder );
 
