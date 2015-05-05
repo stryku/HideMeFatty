@@ -9,12 +9,9 @@
 
 #include <boost/filesystem.hpp>
 
-#include <pathOperations.hpp>
-
 class QMainWindow;
 
 namespace fs = boost::filesystem;
-using namespace pathOperations;
 
 class FileTable
 {

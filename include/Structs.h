@@ -3,7 +3,6 @@
 
 #include <string>
 #include <sstream>
-#include <pathOperations.hpp>
 #include <QFileInfo>
 
 struct Date

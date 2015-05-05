@@ -177,7 +177,7 @@ bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
 std::ostream& operator<< ( std::ostream &out, const DirectoryEntry &de )
 {
 	out << std::dec;
-    out << "\nname = " << de.name.toStdString().c_str() <</*TODO*/ \
+    out << "\nname = " << de.name.toStdString() << \
 		"\nfile size = " << de.fileSize << \
 		"\nattributes = 0x" << std::hex << static_cast<size_t>( de.attributes ) << \
 		"\ncluster = " << std::dec << de.cluster << \

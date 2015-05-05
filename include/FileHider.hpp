@@ -34,15 +34,9 @@
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryMapper.hpp>
-#include <pathOperations.hpp>
-
-#include <iostream>
 
 namespace fs = boost::filesystem;
 using namespace boost::nowide;
-using namespace pathOperations;
-
-//typedef std::vector<std::string> QStringList;
 
 class FileHider
 {
