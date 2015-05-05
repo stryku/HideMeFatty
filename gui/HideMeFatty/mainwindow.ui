@@ -56,12 +56,12 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
-            <string>Step 1: Select partition (status: waiting for selecting partition)</string>
+            <string>Step 1: Select partition</string>
            </attribute>
            <widget class="QSplitter" name="splitter">
             <property name="geometry">
@@ -99,7 +99,7 @@
             </rect>
            </property>
            <attribute name="label">
-            <string>Step 2: Select files on partition (status: waiting for step 1)</string>
+            <string>Step 2: Select files on partition</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="2" column="0">
@@ -142,7 +142,7 @@
             </rect>
            </property>
            <attribute name="label">
-            <string>Step 3: Select files to hide (status: waiting for step 2)</string>
+            <string>Step 3: Select files to hide</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
@@ -185,7 +185,7 @@
             </rect>
            </property>
            <attribute name="label">
-            <string>Step 4: Hide files (status: waiting for step 3)</string>
+            <string>Step 4: Hide files</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
@@ -219,15 +219,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxRest">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">
@@ -264,8 +264,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>301</width>
+             <height>152</height>
             </rect>
            </property>
            <attribute name="label">
@@ -296,8 +296,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">

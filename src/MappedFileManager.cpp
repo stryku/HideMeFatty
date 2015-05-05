@@ -27,11 +27,9 @@ bool MappedFileManager::MappedChunk::inside( const uint64_t offset, const uint64
 	return offset >= begin && offset + size <= end;
 }
 
-
 uint64_t MappedFileManager::getOffsetForGranularity( uint64_t offset, const size_t granularity ) const
 {
-	offset = offset / granularity * granularity;
-	return offset;
+    return offset / granularity * granularity;;
 }
 
 uint64_t MappedFileManager::getSizeForGranularity( const uint64_t offset,
@@ -78,7 +76,7 @@ void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bo
 	}
 
 	mappedChunkInfo.begin = preparedOffset;
-    mappedChunkInfo.end = preparedOffset + preparedSize;//preparedSize;
+    mappedChunkInfo.end = preparedOffset + preparedSize;
 	mappedChunkInfo.mapped = true;
 }
 

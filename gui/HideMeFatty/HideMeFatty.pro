@@ -21,30 +21,38 @@ LIBS += -lboost_system \
 SOURCES += main.cpp \
         mainwindow.cpp \
     ../../src/DirectoryEntry.cpp \
-    ../../src/DistributedMemoryMapper.cpp \
     ../../src/Fat32Manager.cpp \
     ../../src/FatStructs.cpp \
     ../../src/FileHider.cpp \
-    ../../src/MappedFileManager.cpp
+    ../../src/MappedFileManager.cpp \
+    ../../src/FileTable.cpp \
+    ../../src/FilesToHideTable.cpp \
+    ../../src/HideFilesOnPartitionTable.cpp \
+    ../../src/HideSectionFileTable.cpp \
+    ../../src/PartitionFinder.cpp \
+    ../../src/PartitionInfo.cpp \
+    ../../src/DistributedMemoryManager.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS  += mainwindow.h \
     ../../include/PartitionFinder.hpp \
     ../../include/DirectoryEntry.hpp \
-    ../../include/DistributedMemoryMapper.hpp \
     ../../include/Fat32Manager.hpp \
     ../../include/FatStructs.h \
     ../../include/FileHider.hpp \
     ../../include/MappedFileManager.hpp \
-    ../../include/pathOperations.hpp \
     ../../include/Structs.h \
     ../../include/FileTable.hpp \
     ../../include/PartitionInfo.hpp \
     ../../include/FilesToHideTable.hpp \
     ../../include/HideFilesOnPartitionTable.hpp \
     ../../include/RestoreFilesOnPartitionTable.hpp \
-    ../../include/HideSectionFileTable.hpp
+    ../../include/HideSectionFileTable.hpp \
+    ../../include/DistributedMemoryManager.hpp
 
 
 FORMS    += mainwindow.ui
+
+OTHER_FILES += \
+    ../../TODO.txt

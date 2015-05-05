@@ -58,18 +58,12 @@ private:
         ENUM_FILETABLE_COUNT
     };
 
-    struct HideInfo
-    {
-        size_t sizeToHide, freeSpace;
-        PartitionInfo partitionInfo;
-
-        HideInfo() : sizeToHide( 0 ), freeSpace( 0 ) {}
-    }hideInfo;
-
     Ui::MainWindow *ui;
     QVector<std::shared_ptr<FileTable>> fileTables;
     QVector<PartitionInfo> validParitions;
     Fat32Manager fatManager;
+    PartitionInfo hideSelectedPartition,
+                  restoreSelectedPartition;
 
     void initPartitionsComboBoxes();
     void initFileTables();
@@ -79,10 +73,6 @@ private:
                           const QString &caption = QString(),
                           const QString &dir = QString() );
     std::vector<PartitionInfo> getFat32Partitions();
-
-    void newFileOnPartition( const QFile &file );
-    void newFileToHide( const QFile &file );
-
 };
 
 #endif // MAINWINDOW_H

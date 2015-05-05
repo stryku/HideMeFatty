@@ -15,7 +15,6 @@
 #include <QStringList>
 
 namespace fs = boost::filesystem;
-//typedef std::vector<std::string> QStringList;
 
 class Fat32Manager
 {
@@ -59,7 +58,7 @@ private:
 
 	std::vector<FatRawLongFileName> extractLongFileNames( char *&ptrInCluster ) const;
 
-	std::vector<size_t> getClusterChain( size_t firstCluster );
+    std::vector<size_t> getClusterChain( size_t firstCluster ) const;
 	std::vector<DirectoryEntry> getDirEntriesFromDirCluster( size_t dirCluster );
 	std::vector<DirectoryEntry> getDirEntriesFromFolder( size_t firstCluster );
     QStringList getPathFoldersNames( QString path ) const;
@@ -69,6 +68,7 @@ private:
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
     size_t getFileFreeSpaceOffset( const DirectoryEntry &file );
     std::vector<char> getRawFolder( const std::vector<size_t> &folderClusterChain );
+    DirectoryEntry getFileParentFolder( const QString &path );
 
     std::vector<DirectoryEntry> getDirEntriesFromRawFolder( std::vector<char> &rawFolder );
 
@@ -95,14 +95,11 @@ public:
 
     void setPartitionPath( const QString &partitionPath );
 
-	bool isValidFat32();
-char *  mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks);
+    bool isValidFat32();
 	void init();
 	void close();
 	bool good();
-	void clear();
-
-    bool isPathCorrect( const QString &path );
+    void clear();
 
     size_t clusterSize() const;
 	EFatType getFatType();
@@ -111,7 +108,7 @@ char *  mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks);
     size_t getFileFreeSpaceOffset( const QString &path );
     std::vector<FreeSpaceChunk> getSpacesAfterFiles( const QStringList &files );
 
-    char* mapSpaceAfterFiles( const QStringList &files );
+    char *  mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks);
 
 	friend std::ostream& operator<< ( std::ostream&, Fat32Manager const& );
 

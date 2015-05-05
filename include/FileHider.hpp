@@ -33,16 +33,10 @@
 #include <map>
 
 #include <Fat32Manager.hpp>
-#include <DistributedMemoryMapper.hpp>
-#include <pathOperations.hpp>
-
-#include <iostream>
+#include <DistributedMemoryManager.hpp>
 
 namespace fs = boost::filesystem;
 using namespace boost::nowide;
-using namespace pathOperations;
-
-//typedef std::vector<std::string> QStringList;
 
 class FileHider
 {
@@ -62,7 +56,7 @@ public:
 private:
 
 	Fat32Manager fatManager;
-	DistributedMemoryMapper dmm;
+    DistributedMemoryManager dmm;
 
     bool isPathsCorrect( const QStringList &paths, const QString &partitionPath );
     uint64_t getFilesSize( const QStringList &filesPaths );
