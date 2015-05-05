@@ -16,6 +16,8 @@ class QMainWindow;
 namespace fs = boost::filesystem;
 using namespace pathOperations;
 
+
+//todo split to cpp file
 class FileTable
 {
 protected:

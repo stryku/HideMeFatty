@@ -15,7 +15,6 @@
 #include <QStringList>
 
 namespace fs = boost::filesystem;
-//typedef std::vector<std::string> QStringList;
 
 class Fat32Manager
 {

@@ -1,6 +1,7 @@
 #ifndef _INCLUDE_PATHOPERATIONS_HPP_
 #define _INCLUDE_PATHOPERATIONS_HPP_
 
+//todo do we need this?
 namespace pathOperations
 {
 

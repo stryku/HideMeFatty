@@ -1,6 +1,8 @@
 #ifndef _INCLUDE_PARTITIONINFO_HPP_
 #define _INCLUDE_PARTITIONINFO_HPP_
 
+//todo split to cpp file
+
 #include <Fat32Manager.hpp>
 #include <QDataStream>
 

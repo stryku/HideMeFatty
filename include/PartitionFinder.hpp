@@ -7,6 +7,8 @@
 #include <PartitionInfo.hpp>
 #include <QDataStream>
 
+//todo change name
+// split to cpp file
 class PartitionFinder
 {
 private:

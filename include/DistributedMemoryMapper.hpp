@@ -20,13 +20,13 @@ private:
 		~ChunkMetadata() {}
 	};
 
-    std::vector<char*> vvv;
+    std::vector<char*> vvv; //todo
 	std::vector<ChunkMetadata> chunks;
 	uint64_t totalSize;
 	std::vector<uint64_t> shuffledArray;
 	std::vector<uint64_t>::iterator shuffledIterator;
 	
-    size_t yo;
+    size_t yo; //todo
 
 public:
 	DistributedMemoryMapper() :

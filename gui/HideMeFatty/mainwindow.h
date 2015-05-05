@@ -58,6 +58,7 @@ private:
         ENUM_FILETABLE_COUNT
     };
 
+    //todo
     struct HideInfo
     {
         size_t sizeToHide, freeSpace;

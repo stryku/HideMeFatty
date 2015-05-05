@@ -18,6 +18,7 @@ void DistributedMemoryMapper::addMemoryChunk( char *ptr, size_t size )
 	totalSize += size;
 }
 
+//todo change operator to method
 char& DistributedMemoryMapper::operator[]( uint64_t no )
 {
 	for( const auto &chunk : chunks )

@@ -45,6 +45,7 @@ void MainWindow::initFileTables()
     fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->init( this, ui->tableViewRestoreFilesOnPartition );
 }
 
+//todo 0
 void MainWindow::initHideInfo()
 {
     ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
@@ -85,6 +86,7 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
     }
 }
 
+//todo delete
 void MainWindow::newFileOnPartition( const QFile &file )
 {
     AdvancedFileInfo info( file,
@@ -94,6 +96,7 @@ void MainWindow::newFileOnPartition( const QFile &file )
     ui->labFreeSpace->setText( "Total free space: " + QString::number( hideInfo.freeSpace ) );
 }
 
+//todo delete
 void MainWindow::newFileToHide( const QFile &file )
 {
     hideInfo.sizeToHide += file.size();
@@ -179,6 +182,7 @@ void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
                      hideInfo.partitionInfo.mediaPath );
 }
 
+//todo remove steps status
 void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
 {
     if( index == 0 )

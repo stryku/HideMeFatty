@@ -3,6 +3,8 @@
 
 #include <FileTable.hpp>
 
+
+//todo split to cpp file
 class HideSectionFileTable : public FileTable
 {
 protected:

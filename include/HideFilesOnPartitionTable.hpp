@@ -4,6 +4,7 @@
 #include <HideSectionFileTable.hpp>
 #include <Structs.h>
 
+//todo split to cpp file
 class HideFilesOnPartitionTable : public HideSectionFileTable
 {
 private:

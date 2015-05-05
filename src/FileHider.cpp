@@ -11,11 +11,11 @@ FileHider::HiddenFileMetadata::HiddenFileMetadata( const QString &fileName,
 {
 	std::memset( this->fileName, '\0', maxFileName );
     size_t size = fileName.toUtf8().size();
-    //std::copy( fileName.toStdString().c_str(), fileName.toStdString().c_str() + fileName.capacity(), this->fileName );
     std::memcpy( this->fileName, fileName.toUtf8(), size);
 
 }
 
+//todo delete
 bool FileHider::isPathsCorrect( const QStringList &paths, const QString &partitionPath )
 {
 	for( const auto &path : paths )
@@ -43,7 +43,7 @@ uint64_t FileHider::getSizeToHide( const QStringList &filesToHide )
 
 	size = getFilesSize( filesToHide );
 	size += filesToHide.size( ) * sizeof( HiddenFileMetadata );
-	size += sizeof( uint64_t ); // for last 0 
+    size += sizeof( uint64_t ); // for last filesize 0
 
 	return size;
 }
