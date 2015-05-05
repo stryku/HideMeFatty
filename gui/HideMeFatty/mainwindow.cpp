@@ -170,14 +170,7 @@ void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
 {
     if( index > 0 )
     {
-        HideFilesOnPartitionTable *tablePtr;
-
-        tablePtr = dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION].get() );
-
         restoreSelectedPartition = validParitions[index - 1];
-        restoreSelectedPartition.initClusterSize();
-
-        tablePtr->setFsClusterSize( restoreSelectedPartition.clusterSize );
     }
 }
 

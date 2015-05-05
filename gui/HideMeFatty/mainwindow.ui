@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="iconSize">
        <size>
@@ -56,8 +56,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -94,8 +94,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>361</width>
+             <height>152</height>
             </rect>
            </property>
            <attribute name="label">
@@ -137,8 +137,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>296</width>
+             <height>152</height>
             </rect>
            </property>
            <attribute name="label">
@@ -219,15 +219,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxRest">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="restoringStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>560</width>
+             <height>247</height>
             </rect>
            </property>
            <attribute name="label">

@@ -27,11 +27,9 @@ bool MappedFileManager::MappedChunk::inside( const uint64_t offset, const uint64
 	return offset >= begin && offset + size <= end;
 }
 
-//todo
 uint64_t MappedFileManager::getOffsetForGranularity( uint64_t offset, const size_t granularity ) const
 {
-	offset = offset / granularity * granularity;
-	return offset;
+    return offset / granularity * granularity;;
 }
 
 uint64_t MappedFileManager::getSizeForGranularity( const uint64_t offset,
@@ -102,7 +100,6 @@ char* MappedFileManager::getUserPtr( uint64_t startOffset )
 	return preparedPtr;
 }
 
-//todo fs::path --> QString
 void MappedFileManager::setFilePath( const fs::path &pathToFile )
 {
 	filePath = pathToFile;
