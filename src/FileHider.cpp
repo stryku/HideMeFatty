@@ -15,18 +15,6 @@ FileHider::HiddenFileMetadata::HiddenFileMetadata( const QString &fileName,
 
 }
 
-//todo delete
-bool FileHider::isPathsCorrect( const QStringList &paths, const QString &partitionPath )
-{
-	for( const auto &path : paths )
-	{
-		if( !fatManager.isPathCorrect( path ) )
-			return false;
-	}
-
-	return true;
-}
-
 uint64_t FileHider::getFilesSize( const QStringList &filesPaths )
 {
 	uint64_t totalSize = 0;
@@ -90,23 +78,6 @@ std::string FileHider::hashFile( const std::string &path )
 
 	return result;
 }
-
-/*char *  FileHider::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
-{
-    uint64_t preparedOffset, preparedSize;
-    Fat32Manager::FreeSpaceChunk firstCluster, lastCluster;
-
-    firstCluster = *std::min_element( chunks.begin(), chunks.end() );
-    lastCluster = *std::max_element( chunks.begin(), chunks.end() );
-
-    //TODO
-    uint64_t FOFF = firstCluster.offset;
-    uint64_t sss = lastCluster.offset + lastCluster.size-FOFF;
-    sss -= preparedOffset;
-    preparedOffset = FOFF;
-    preparedSize =sss;
-    return mappedFileMngr.map( preparedOffset, preparedSize, false ); //todo false na true
-}*/
 
 bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 {
@@ -411,9 +382,9 @@ bool FileHider::prepareFatManager( const QString &partitionPath )
 }
 
 bool FileHider::checkPaths( const QStringList &filesOnPartition,
-                             const QString &partitionPath,
-                             const QStringList &filesToHide,
-                             const QString &partitionDevPath )
+                            const QString &partitionPath,
+                            const QStringList &filesToHide,
+                            const QString &partitionDevPath )
 {
 	if( !checkPaths( filesOnPartition ) )
 	{
