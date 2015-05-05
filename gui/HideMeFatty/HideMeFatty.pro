@@ -43,7 +43,6 @@ HEADERS  += mainwindow.h \
     ../../include/FatStructs.h \
     ../../include/FileHider.hpp \
     ../../include/MappedFileManager.hpp \
-    ../../include/pathOperations.hpp \
     ../../include/Structs.h \
     ../../include/FileTable.hpp \
     ../../include/PartitionInfo.hpp \
