@@ -6,7 +6,17 @@ FileTable::FileTable( QTableView *view) :
      createModel();
 }
 
+void FileTable::createModel()
+{
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel;
+    QStandardItemModel *newModel = new QStandardItemModel( 0, 0 );
+    newModel->setHorizontalHeaderItem( fileNameColumnIndex, new QStandardItem( QString( "File Name" ) ) );
+    newModel->setHorizontalHeaderItem( fullPathColumnIndex, new QStandardItem( QString( "Full Path" ) ) );
 
+    proxyModel->setSourceModel( newModel );
+    view->setModel( proxyModel );
+    model = newModel;
+}
 
 bool FileTable::canAdd( const QString &path ) const
 {
