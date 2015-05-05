@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     ../../src/FileHider.cpp \
     ../../src/MappedFileManager.cpp \
     ../../src/FileTable.cpp \
-    ../../src/FilesToHideTable.cpp
+    ../../src/FilesToHideTable.cpp \
+    ../../src/HideFilesOnPartitionTable.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
