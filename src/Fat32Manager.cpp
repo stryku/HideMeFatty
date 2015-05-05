@@ -214,40 +214,6 @@ std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster )
 	return chain;
 }
 
-// todo remove
-std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromDirCluster( size_t dirCluster )
-{
-	std::vector<DirectoryEntry> dirEntries;
-	FatRawDirectoryEntry tempRawDirEntry;
-	std::vector<FatRawLongFileName> tempRawLongFileNames;
-	char *mappedClusterPtr, *endOfCluster;
-    void *ptr;
-
-	mappedClusterPtr = loadCluster( dirCluster );
-
-	if( mappedClusterPtr == nullptr )
-		return dirEntries;
-
-	endOfCluster = mappedClusterPtr + clusterSize( );
-
-	while( true )
-	{
-		tempRawLongFileNames = extractLongFileNames( mappedClusterPtr );
-
-		if( mappedClusterPtr >= endOfCluster || *( static_cast<char*>( mappedClusterPtr ) ) == 0 )
-			break;
-
-		tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( mappedClusterPtr ) );
-
-		dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
-
-		mappedClusterPtr += sizeof( FatRawDirectoryEntry );
-        ptr = mappedClusterPtr;
-	}
-
-	return dirEntries;
-}
-
 //todo cleanup
 std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstCluster )
 {
