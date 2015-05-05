@@ -16,8 +16,6 @@ class QMainWindow;
 namespace fs = boost::filesystem;
 using namespace pathOperations;
 
-
-//todo split to cpp file
 class FileTable
 {
 protected:
@@ -36,13 +34,9 @@ public:
     virtual ~FileTable() {}
 
     bool canAdd( const QString &path ) const;
-
     virtual void fillColumns( const QString &path );
-
     void addFile( const QString &path );
-
     void init( QTableView *tableView );
-
     QStringList getFullPaths() const;
 };
 
