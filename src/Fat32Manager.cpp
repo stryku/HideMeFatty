@@ -419,9 +419,9 @@ std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( con
     {
         auto fileDirEntry = findFile( file );
         size_t clusterNo = getFileLastClusterNo( fileDirEntry );
-        auto startOffset = getClusterStartOffset( clusterNo ),
-             freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
-             freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
+        uint64_t startOffset = getClusterStartOffset( clusterNo ),
+                 freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
+                 freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
 
         chunks.push_back( FreeSpaceChunk( startOffset + freeSpaceOffset,
                                           freeSpace ) );
