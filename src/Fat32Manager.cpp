@@ -214,50 +214,25 @@ std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster )
 	return chain;
 }
 
-//todo cleanup
 std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstCluster )
 {
     std::vector<size_t> clusterChain;
-    std::vector<DirectoryEntry> tmpDirEntries, dirEntries;
     std::vector<char> rawFolder;
 
     clusterChain = getClusterChain( firstCluster );
     rawFolder = getRawFolder( clusterChain );
 
     return getDirEntriesFromRawFolder( rawFolder );
-
-    for( const auto &cluster : clusterChain )
-    {
-        tmpDirEntries = getDirEntriesFromDirCluster( cluster );
-        dirEntries.reserve( dirEntries.size( ) + tmpDirEntries.size( ) );
-        dirEntries.insert( dirEntries.end( ), tmpDirEntries.begin( ), tmpDirEntries.end( ) );
-    }
-
-    return dirEntries;
 }
 
-//todo cleanup
 QStringList Fat32Manager::getPathFoldersNames( QString path ) const
 {
-    QStringList folders;
-	size_t posBegin = 0, posEnd, numberToCopy;
-    QFileInfo fileInfo( path );
-    auto pathh = fileInfo.dir();
-    auto absolute = fileInfo.canonicalPath();
-
     auto pos = path.lastIndexOf( "/" );
 
     if( pos == -1 )
         return QStringList();
 
     path.truncate( path.lastIndexOf( "/" ) );
-
-    /*while( ( posEnd = path.find( '/', posBegin ) ) != QString::npos )
-	{
-		numberToCopy = posEnd - posBegin;
-		folders.push_back( path.substr( posBegin, numberToCopy ) );
-		posBegin = posEnd + 1;
-    }*/
 
     return path.split( "/" );
 }
