@@ -33,7 +33,7 @@
 #include <map>
 
 #include <Fat32Manager.hpp>
-#include <DistributedMemoryMapper.hpp>
+#include <DistributedMemoryManager.hpp>
 
 namespace fs = boost::filesystem;
 using namespace boost::nowide;
@@ -56,7 +56,7 @@ public:
 private:
 
 	Fat32Manager fatManager;
-	DistributedMemoryMapper dmm;
+    DistributedMemoryManager dmm;
 
     bool isPathsCorrect( const QStringList &paths, const QString &partitionPath );
     uint64_t getFilesSize( const QStringList &filesPaths );

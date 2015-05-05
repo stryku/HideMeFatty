@@ -149,7 +149,7 @@ void FileHider::hideFileSize( const uint64_t &fileSize )
 	const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
 
 	for( size_t i = 0; i < sizeof( uint64_t ); ++i )
-		dmm.shuffled() = fileSizePtr[i];
+        dmm.nextShuffledByteRef() = fileSizePtr[i];
 }
 
 void FileHider::hideFileName( const char *fileName )
@@ -157,7 +157,7 @@ void FileHider::hideFileName( const char *fileName )
 	const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
 
 	for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
-		dmm.shuffled() = fileNamePtr[i];
+        dmm.nextShuffledByteRef() = fileNamePtr[i];
 }
 
 void FileHider::hideMetadata( const HiddenFileMetadata &metadata, 
@@ -181,7 +181,7 @@ bool FileHider::hideFileContents( const QString &filePath,
     fileSize = fs::file_size( filePath.toStdString() );
 
 	for( size_t i = 0; i < fileSize; ++i )
-		dmm.shuffled() = file.get();
+        dmm.nextShuffledByteRef() = file.get();
 
 	return true;
 }
@@ -206,7 +206,7 @@ uint64_t FileHider::restoreFileSize( )
 	char *fileSizePtr = reinterpret_cast<char*>( &fileSize );
 
 	for( size_t i = 0; i < sizeof( uint64_t ); ++i )
-		fileSizePtr[i] = dmm.shuffled( );
+        fileSizePtr[i] = dmm.nextShuffledByteRef( );
 
 	return fileSize;
 }
@@ -216,7 +216,7 @@ void FileHider::restoreFileName( HiddenFileMetadata &metadata )
 	char *fileNamePtr = reinterpret_cast<char*>( metadata.fileName );
 
 	for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
-		fileNamePtr[i] = dmm.shuffled( );
+        fileNamePtr[i] = dmm.nextShuffledByteRef( );
 }
 
 FileHider::HiddenFileMetadata FileHider::restoreMetadata( boost::random::mt19937 &rng, 
@@ -241,7 +241,7 @@ void FileHider::restoreFile( std::ofstream &fileStream,
 							  const HiddenFileMetadata &metadata )
 {
 	for( uint64_t i = 0; i < metadata.fileSize; ++i )
-		fileStream.put( dmm.shuffled( ) );
+        fileStream.put( dmm.nextShuffledByteRef( ) );
 }
 
 QString FileHider::preparePathToStore( const QString &pathToStore,

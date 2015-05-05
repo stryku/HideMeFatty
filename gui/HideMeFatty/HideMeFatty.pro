@@ -21,7 +21,6 @@ LIBS += -lboost_system \
 SOURCES += main.cpp \
         mainwindow.cpp \
     ../../src/DirectoryEntry.cpp \
-    ../../src/DistributedMemoryMapper.cpp \
     ../../src/Fat32Manager.cpp \
     ../../src/FatStructs.cpp \
     ../../src/FileHider.cpp \
@@ -31,14 +30,14 @@ SOURCES += main.cpp \
     ../../src/HideFilesOnPartitionTable.cpp \
     ../../src/HideSectionFileTable.cpp \
     ../../src/PartitionFinder.cpp \
-    ../../src/PartitionInfo.cpp
+    ../../src/PartitionInfo.cpp \
+    ../../src/DistributedMemoryManager.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS  += mainwindow.h \
     ../../include/PartitionFinder.hpp \
     ../../include/DirectoryEntry.hpp \
-    ../../include/DistributedMemoryMapper.hpp \
     ../../include/Fat32Manager.hpp \
     ../../include/FatStructs.h \
     ../../include/FileHider.hpp \
@@ -49,7 +48,8 @@ HEADERS  += mainwindow.h \
     ../../include/FilesToHideTable.hpp \
     ../../include/HideFilesOnPartitionTable.hpp \
     ../../include/RestoreFilesOnPartitionTable.hpp \
-    ../../include/HideSectionFileTable.hpp
+    ../../include/HideSectionFileTable.hpp \
+    ../../include/DistributedMemoryManager.hpp
 
 
 FORMS    += mainwindow.ui

@@ -7,7 +7,7 @@
 #include <stdint.h> 
 #include <fstream>
 
-class DistributedMemoryMapper
+class DistributedMemoryManager
 {
 private:
 	struct ChunkMetadata
@@ -24,18 +24,17 @@ private:
 	uint64_t totalSize;
 	std::vector<uint64_t> shuffledArray;
     std::vector<uint64_t>::iterator shuffledIterator;
+    char& at( uint64_t index );
 
 public:
-	DistributedMemoryMapper() :
+    DistributedMemoryManager() :
 		totalSize( 0 )
     {}
-    ~DistributedMemoryMapper() {}
+    ~DistributedMemoryManager() {}
 
-	void addMemoryChunk( char *ptr, size_t size );
+    void addMemoryChunk( char *ptr, size_t size );
 
-	char& operator[]( uint64_t no );
-
-	char& shuffled();
+    char& nextShuffledByteRef();
 
 	void createShuffledArray( boost::random::mt19937 &rng );
 
