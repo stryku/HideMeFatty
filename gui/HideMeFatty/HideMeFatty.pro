@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     ../../src/FileTable.cpp \
     ../../src/FilesToHideTable.cpp \
     ../../src/HideFilesOnPartitionTable.cpp \
-    ../../src/HideSectionFileTable.cpp
+    ../../src/HideSectionFileTable.cpp \
+    ../../src/PartitionFinder.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
