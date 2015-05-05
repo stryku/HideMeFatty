@@ -207,17 +207,17 @@ FileHider::HiddenFileMetadata FileHider::restoreMetadata( boost::random::mt19937
 }
 
 void FileHider::restoreFile( std::ofstream &fileStream,
-							  boost::random::mt19937 &rng,
-							  const uint64_t freeSpaceSize,
-							  const HiddenFileMetadata &metadata )
+                             boost::random::mt19937 &rng,
+                             const uint64_t freeSpaceSize,
+                             const HiddenFileMetadata &metadata )
 {
 	for( uint64_t i = 0; i < metadata.fileSize; ++i )
         fileStream.put( dmm.nextShuffledByteRef( ) );
 }
 
 QString FileHider::preparePathToStore( const QString &pathToStore,
-											const FileHider::HiddenFileMetadata &fileMetadata,
-                                            std::map<QString, size_t> &restoredFiles ) const
+                                       const FileHider::HiddenFileMetadata &fileMetadata,
+                                       std::map<QString, size_t> &restoredFiles ) const
 {
     QString extension, preparedPath;
     QFileInfo fileInfo( fileMetadata.fileName );
