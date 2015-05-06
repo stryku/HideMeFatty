@@ -16,6 +16,7 @@
 #include <HideFilesOnPartitionTable.hpp>
 #include <FilesToHideTable.hpp>
 #include <RestoreFilesOnPartitionTable.hpp>
+#include <TaskTree.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -64,6 +65,7 @@ private:
     Fat32Manager fatManager;
     PartitionInfo hideSelectedPartition,
                   restoreSelectedPartition;
+    TaskTree taskTree;
 
     void initPartitionsComboBoxes();
     void initFileTables();
