@@ -16,6 +16,7 @@ INCLUDEPATH += ../../include
 LIBS += -lboost_system \
 		-lboost_filesystem \
 		-lboost_iostreams \
+		-lboost_timer \
 		-lcrypto++
 
 SOURCES += main.cpp \
@@ -31,7 +32,8 @@ SOURCES += main.cpp \
     ../../src/HideSectionFileTable.cpp \
     ../../src/PartitionFinder.cpp \
     ../../src/PartitionInfo.cpp \
-    ../../src/DistributedMemoryManager.cpp
+    ../../src/DistributedMemoryManager.cpp \
+    ../../src/Task.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -49,7 +51,9 @@ HEADERS  += mainwindow.h \
     ../../include/HideFilesOnPartitionTable.hpp \
     ../../include/RestoreFilesOnPartitionTable.hpp \
     ../../include/HideSectionFileTable.hpp \
-    ../../include/DistributedMemoryManager.hpp
+    ../../include/DistributedMemoryManager.hpp \
+    ../../include/TaskTree.hpp \
+    ../../include/Task.hpp
 
 
 FORMS    += mainwindow.ui
