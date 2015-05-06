@@ -88,11 +88,6 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
 
 void MainWindow::on_addFilesOnPartitionButton_clicked()
 {
-
-    taskTree.endOfTask();
-
-    /*
-    ////////////////////////////////////////////////
     size_t freeSpace;
     HideSectionFileTable *table;
 
@@ -106,7 +101,7 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
 
     ui->labFreeSpace->setText( QString::number( freeSpace ) );
 
-    ui->labFreeSpace->setText( "Total free space: " + QString::number( freeSpace ) );*/
+    ui->labFreeSpace->setText( "Total free space: " + QString::number( freeSpace ) );
 }
 
 //TODO ALMOST SMART LABEL
@@ -143,10 +138,6 @@ void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
 
 void MainWindow::on_pushButton_3_clicked()
 {
-
-    taskTree.newTask("siema");
-
-    /*
     auto filesOnPartition = fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->getFullPaths(),
             filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
 
@@ -166,7 +157,7 @@ void MainWindow::on_pushButton_3_clicked()
     {
         QMessageBox::information(this, "chuja", "chuja");
 
-    }*/
+    }
 }
 
 void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
