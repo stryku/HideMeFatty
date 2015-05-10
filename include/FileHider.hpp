@@ -98,6 +98,10 @@ private:
                       std::map<QString, size_t> &restoredFiles );
 
     bool prepareFatManager( const QString &partitionPath );
+    bool prepareToHide( QStringList &filesOnPartition,
+                                   const QString &partitionPath,
+                                   const QStringList &filesToHide,
+                                   const QString &partitionDevPath );
     bool checkPaths( const QStringList &paths );
     bool checkPaths( const QStringList &filesOnPartition,
                      const QString &partitionPath,

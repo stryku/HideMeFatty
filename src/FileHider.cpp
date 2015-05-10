@@ -251,39 +251,37 @@ bool FileHider::restoreMyFile( QString pathToStore,
 	return true;
 }
 
-bool FileHider::hideFiles( QStringList &filesOnPartition,
-                            const QString &partitionPath,
-                            const QStringList &filesToHide,
-                            const QString &partitionDevPath )
+bool FileHider::prepareToHide( QStringList &filesOnPartition,
+                               const QString &partitionPath,
+                               const QStringList &filesToHide,
+                               const QString &partitionDevPath )
 {
-	uint64_t freeSpaceSize, sizeToHide;
-	uint32_t seed;
-	boost::random::mt19937 rng;
+    uint64_t freeSpaceSize, sizeToHide;
+    uint32_t seed;
+    boost::random::mt19937 rng;
     QStringList preparedPaths;
 
-    taskTree.newTask( "Preparing to hide" );
-
     taskTree.newTask( "Checking if paths are correct" );
-	if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
+    if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
     {
         taskTree.taskFailed();
-		return false;
+        return false;
     }
     taskTree.taskSuccess();
 
     taskTree.newTask( "Preparing paths on parition" );
-	std::sort( filesOnPartition.begin( ),
-			   filesOnPartition.end( ) );
+    std::sort( filesOnPartition.begin( ),
+               filesOnPartition.end( ) );
 
-	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+    preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
     taskTree.taskSuccess();
 
     taskTree.newTask( "Preparing FAT manager" );
-	if( prepareFatManager( partitionDevPath ) == false )
+    if( prepareFatManager( partitionDevPath ) == false )
     {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
     taskTree.taskSuccess();
 
     taskTree.newTask( "Calculating space after files on partition" );
@@ -291,11 +289,12 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
     taskTree.taskSuccess();
 
     taskTree.newTask( "Calculating size to hide" );
-	sizeToHide = getSizeToHide( filesToHide );
+    sizeToHide = getSizeToHide( filesToHide );
     taskTree.taskSuccess();
 
-	if( sizeToHide > freeSpaceSize )
-	{
+    taskTree.newTask( "Test: size to hide > free space after files" );
+    if( sizeToHide > freeSpaceSize )
+    {
         QString reason( "Size to hide (");
 
         reason += QString::number( sizeToHide );
@@ -304,27 +303,48 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
         reason += "). Not enough space fo hide files";
 
         taskTree.taskFailed( reason );
-		return false;
-	}
+        return false;
+    }
+    taskTree.taskSuccess();
 
     taskTree.newTask( "Calculating seed to hash" );
-	seed = getSeed( filesOnPartition );
+    seed = getSeed( filesOnPartition );
     taskTree.taskSuccess();
 
     taskTree.newTask( "Mapping space after files on partition" );
-	if( !mapFreeSpace( preparedPaths ) )
-	{
-		LOG( INFO ) << "Mapping free space after files went wrong";
-		return false;
-	}
+    if( !mapFreeSpace( preparedPaths ) )
+    {
+        LOG( INFO ) << "Mapping free space after files went wrong";
+        return false;
+    }
     taskTree.taskSuccess();
 
-	rng.seed( seed );
+    rng.seed( seed );
 
     taskTree.newTask( "Creating shuffled array of bytes after files on partition" );
     dmm.createShuffledArray( rng );
     taskTree.taskSuccess();
 
+    return true;
+}
+
+bool FileHider::hideFiles( QStringList &filesOnPartition,
+                            const QString &partitionPath,
+                            const QStringList &filesToHide,
+                            const QString &partitionDevPath )
+{
+
+
+    taskTree.newTask( "Preparing to hide" );
+
+    if( !prepareToHide( filesOnPartition,
+                        partitionPath,
+                        filesToHide,
+                        partitionDevPath ) )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
     taskTree.taskSuccess(); // Preparing to hide
 
     taskTree.newTask( "Hiding files" );
