@@ -280,8 +280,8 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 
     taskTree.newTask( "Preparing FAT manager" );
 	if( prepareFatManager( partitionDevPath ) == false )
-	{
-		LOG( INFO ) << "Fail preparing fat manager";
+    {
+        taskTree.taskFailed();
 		return false;
 	}
     taskTree.taskSuccess();
@@ -391,10 +391,24 @@ bool FileHider::prepareFatManager( const QString &partitionPath )
 {
 	fatManager.clear();
 	fatManager.setPartitionPath( partitionPath );
-	fatManager.init();
 
-	if( !fatManager.good() || !fatManager.isValidFat32() )
-		return false;
+    taskTree.newTask( "FAT32 manager init");
+    fatManager.init();
+
+    if( !fatManager.good() )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Checking if on partition is valid FAT32 filesystem" );
+    if( !fatManager.isValidFat32() )
+    {
+        taskTree.taskFailed( "On partition isn't valid FAT32 filesystem" );
+        return false;
+    }
+    taskTree.taskSuccess();
 
 	return true;
 }
