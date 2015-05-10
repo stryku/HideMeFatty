@@ -32,6 +32,11 @@ public:
     {
         return taskName + " " + getTimeAsQString();
     }
+
+    QString getName() const
+    {
+        return taskName;
+    }
 };
 
 #endif //_INCLUDE_TASK_HPP_
