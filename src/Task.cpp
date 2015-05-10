@@ -1,3 +1,3 @@
 #include <Task.hpp>
 
-std::string Task::defaultFormat = "( done in %ws )";
+std::string Task::defaultFormat = " %ws";
