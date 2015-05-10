@@ -81,9 +81,9 @@ private:
 
 	void hideFileSize( const uint64_t &fileSize );
 	void hideFileName( const char *fileName );
-	void hideMetadata( const HiddenFileMetadata &metadata, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
-    bool hideFileContents( const QString &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
-    bool hideFile( const QString &filePath, boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
+    void hideMetadata( const HiddenFileMetadata &metadata );
+    void hideFileContents( const QString &filePath );
+    void hideFile( const QString &filePath );
 
 	uint64_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );

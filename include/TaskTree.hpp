@@ -62,18 +62,6 @@ public:
 
     }
 
-    void endOfTask()
-    {
-        Task topTask = tasksStack.top();
-        QStandardItem *topItem = itemsStack.top();
-
-        topItem->setText( topTask.getNameWithTime() );
-        topItem->setForeground( QBrush( Qt::darkGreen ) );
-
-        tasksStack.pop();
-        itemsStack.pop();
-    }
-
     void taskSuccess()
     {
         Task topTask = tasksStack.top();
