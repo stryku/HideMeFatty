@@ -178,8 +178,7 @@ void FileHider::restoreFileName( HiddenFileMetadata &metadata )
         fileNamePtr[i] = dmm.nextShuffledByteRef( );
 }
 
-FileHider::HiddenFileMetadata FileHider::restoreMetadata( boost::random::mt19937 &rng, 
-															const uint64_t freeSpaceSize )
+FileHider::HiddenFileMetadata FileHider::restoreMetadata()
 {
 	HiddenFileMetadata metadata;
 
@@ -195,8 +194,6 @@ FileHider::HiddenFileMetadata FileHider::restoreMetadata( boost::random::mt19937
 }
 
 void FileHider::restoreFile( std::ofstream &fileStream,
-                             boost::random::mt19937 &rng,
-                             const uint64_t freeSpaceSize,
                              const HiddenFileMetadata &metadata )
 {
 	for( uint64_t i = 0; i < metadata.fileSize; ++i )
@@ -230,14 +227,12 @@ QString FileHider::preparePathToStore( const QString &pathToStore,
 }
 
 bool FileHider::restoreMyFile( QString pathToStore,
-								boost::random::mt19937 &rng,
-								const uint64_t freeSpaceSize,
                                 std::map<QString, size_t> &restoredFiles )
 {
 	HiddenFileMetadata fileMetadata;
 	std::ofstream fileStream;
 
-	fileMetadata = restoreMetadata( rng, freeSpaceSize );
+    fileMetadata = restoreMetadata();
 
 	if( fileMetadata.fileSize == 0 )
 		return false;
@@ -246,7 +241,7 @@ bool FileHider::restoreMyFile( QString pathToStore,
 
     fileStream.open( pathToStore.toStdString(), std::ios::binary );
 
-	restoreFile( fileStream, rng, freeSpaceSize, fileMetadata );
+    restoreFile( fileStream, fileMetadata );
 
 	return true;
 }
@@ -258,7 +253,6 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
 {
     uint64_t freeSpaceSize, sizeToHide;
     uint32_t seed;
-    boost::random::mt19937 rng;
     QStringList preparedPaths;
 
     taskTree.newTask( "Checking if paths are correct" );
@@ -300,7 +294,7 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
         reason += QString::number( sizeToHide );
         reason += ") free space after files (";
         reason += QString ::number( freeSpaceSize );
-        reason += "). Not enough space fo hide files";
+        reason += "). Not enough space to hide files.";
 
         taskTree.taskFailed( reason );
         return false;
@@ -319,10 +313,8 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
     }
     taskTree.taskSuccess();
 
-    rng.seed( seed );
-
     taskTree.newTask( "Creating shuffled array of bytes after files on partition" );
-    dmm.createShuffledArray( rng );
+    dmm.createShuffledArray( seed );
     taskTree.taskSuccess();
 
     return true;
@@ -369,8 +361,7 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
                                  const QString &pathToStore )
 {
 	uint64_t freeSpaceSize;
-	uint32_t seed;
-	boost::random::mt19937 rng;
+    uint32_t seed;
     QStringList preparedPaths;
     std::map<QString, size_t> restoredFiles;
 
@@ -398,10 +389,9 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 		return false;
 	}
 
-	rng.seed( seed );
-    dmm.createShuffledArray( rng );
+    dmm.createShuffledArray( seed );
 
-	while( restoreMyFile( pathToStore, rng, freeSpaceSize, restoredFiles ) ) 
+    while( restoreMyFile( pathToStore, restoredFiles ) )
 	{}
 
 	return true;

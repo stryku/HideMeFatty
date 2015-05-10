@@ -36,7 +36,7 @@ public:
 
     char& nextShuffledByteRef();
 
-	void createShuffledArray( boost::random::mt19937 &rng );
+    void createShuffledArray( uint32_t seed );
 
 	void clear();
 };

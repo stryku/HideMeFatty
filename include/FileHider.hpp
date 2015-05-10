@@ -87,14 +87,10 @@ private:
 
 	uint64_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
-	HiddenFileMetadata restoreMetadata( boost::random::mt19937 &rng, const uint64_t freeSpaceSize );
-	void restoreFile( std::ofstream &fileStream,
-					  boost::random::mt19937 &rng,
-					  const uint64_t freeSpaceSize,
+    HiddenFileMetadata restoreMetadata();
+    void restoreFile( std::ofstream &fileStream,
 					  const HiddenFileMetadata &metadata );
     bool restoreMyFile( QString pathToStore,
-						boost::random::mt19937 &rng,
-						const uint64_t freeSpaceSize,
                       std::map<QString, size_t> &restoredFiles );
 
     bool prepareFatManager( const QString &partitionPath );

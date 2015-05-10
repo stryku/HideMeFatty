@@ -34,9 +34,12 @@ char& DistributedMemoryManager::nextShuffledByteRef()
     return at(*shuffledIterator++);
 }
 
-void DistributedMemoryManager::createShuffledArray( boost::random::mt19937 &rng )
+void DistributedMemoryManager::createShuffledArray( uint32_t seed )
 {
 	std::vector<bool> usedBytes( totalSize, false );
+    boost::random::mt19937 rng;
+
+    rng.seed( seed );
 
 	shuffledArray.resize( totalSize );
 
