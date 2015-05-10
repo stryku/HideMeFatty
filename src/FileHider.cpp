@@ -14,16 +14,6 @@ FileHider::HiddenFileMetadata::HiddenFileMetadata( const QString &fileName,
     std::memcpy( this->fileName, fileName.toUtf8(), size);
 }
 
-
-void FileHider::HiddenFileMetadata::assign( const QString &fileName,
-                                            const uint64_t fileSize )
-{
-    std::memset( this->fileName, '\0', maxFileName );
-    size_t size = fileName.toUtf8().size();
-    std::memcpy( this->fileName, fileName.toUtf8(), size);
-}
-
-
 uint64_t FileHider::getFilesSize( const QStringList &filesPaths )
 {
 	uint64_t totalSize = 0;

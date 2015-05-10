@@ -51,9 +51,7 @@ public:
 
 		HiddenFileMetadata();
         HiddenFileMetadata( const QString &fileName,
-							const uint64_t fileSize );
-
-        void assign( const QString &fileName, const uint64_t fileSize );
+                            const uint64_t fileSize );
 	};
 
 private:
