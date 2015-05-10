@@ -60,3 +60,5 @@ FORMS    += mainwindow.ui
 
 OTHER_FILES += \
     ../../TODO.txt
+
+CONFIG += static

@@ -144,18 +144,19 @@ void MainWindow::on_pushButton_3_clicked()
     auto partitionDevPath = hideSelectedPartition.devicePath,
             partitionMediaPath = hideSelectedPartition.mediaPath;
 
-    FileHider fileHider;
+    FileHider fileHider( taskTree );
 
+    taskTree.newTask( "Hiding files" );
     if( fileHider.hideFiles( filesOnPartition,
                              partitionMediaPath,
                              filesToHide,
                              partitionDevPath ) )
     {
-        QMessageBox::information(this, "ok", "ok");
+        taskTree.taskSuccess();
     }
     else
     {
-        QMessageBox::information(this, "chuja", "chuja");
+        taskTree.taskFailed();
 
     }
 }
@@ -190,7 +191,7 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
             partitionMediaPath = restoreSelectedPartition.mediaPath;
     auto pathToStore = ui->labelSelectedFolderToStore->text();
 
-    FileHider fileHider;
+    FileHider fileHider( taskTree );
 
     if( fileHider.restoreMyFiles( filesOnPartition,
                                   partitionMediaPath,

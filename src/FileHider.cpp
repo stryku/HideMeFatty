@@ -434,17 +434,17 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking partition path: " + partitionPath );
-    if( !QFileInfo( partitionPath ).exists() )
+    if( !checkPath( partitionPath )  )
 	{
-        taskTree.taskFailed( "Partition path isn't correct" );
+        taskTree.taskFailed();
 		return false;
 	}
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking partition device path: " + partitionDevPath );
-    if( !QFileInfo(  partitionDevPath ).exists() )
+    if( !checkPath( partitionDevPath ) )
 	{
-        taskTree.taskFailed( "Partition device path isn't correct" );
+        taskTree.taskFailed();
 		return false;
 	}
     taskTree.taskSuccess();
@@ -467,23 +467,27 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking path to store: " + pathToStore );
-    if( !QFileInfo(  pathToStore ).exists() )
+    if( !checkPath( pathToStore ) )
     {
         taskTree.taskFailed( "Path '");
 		return false;
 	}
 
-    if( !QFileInfo( partitionPath ).exists() )
-	{
-		LOG( INFO ) << "Partition path isn't correct";
-		return false;
-	}
+    taskTree.newTask( "Checking partition path: " + partitionPath );
+    if( !checkPath( partitionPath )  )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
+    taskTree.taskSuccess();
 
-    if( !QFileInfo( partitionDevPath ).exists() )
-	{
-		LOG( INFO ) << "Partition device path isn't correct";
-		return false;
-	}
+    taskTree.newTask( "Checking partition device path: " + partitionDevPath );
+    if( !checkPath( partitionDevPath ) )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
+    taskTree.taskSuccess();
 
 	return true;
 }
