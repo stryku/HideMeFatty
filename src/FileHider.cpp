@@ -273,22 +273,38 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 	boost::random::mt19937 rng;
     QStringList preparedPaths;
 
-	if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
-		return false;
+    taskTree.newTask( "Preparing to hide" );
 
+    taskTree.newTask( "Checking if paths are correct" );
+	if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
+    {
+        taskTree.taskFailed();
+		return false;
+    }
+    taskTree.endOfTask();
+
+    taskTree.newTask( "Preparing paths on parition" );
 	std::sort( filesOnPartition.begin( ),
 			   filesOnPartition.end( ) );
 
 	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+    taskTree.endOfTask();
 
+    taskTree.newTask( "Preparing FAT manager" );
 	if( prepareFatManager( partitionDevPath ) == false )
 	{
 		LOG( INFO ) << "Fail preparing fat manager";
 		return false;
 	}
+    taskTree.endOfTask();
 
+    taskTree.newTask( "Calculating space after files on partition" );
     freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
+    taskTree.endOfTask();
+
+    taskTree.newTask( "Calculating size to hide" );
 	sizeToHide = getSizeToHide( filesToHide );
+    taskTree.endOfTask();
 
 	if( sizeToHide > freeSpaceSize )
 	{
@@ -296,22 +312,37 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 		return false;
 	}
 
+    taskTree.newTask( "Calculating seed to hash" );
 	seed = getSeed( filesOnPartition );
+    taskTree.endOfTask();
 
+    taskTree.newTask( "Mapping space after files on partition" );
 	if( !mapFreeSpace( preparedPaths ) )
 	{
 		LOG( INFO ) << "Mapping free space after files went wrong";
 		return false;
 	}
+    taskTree.endOfTask();
 
 	rng.seed( seed );
-    dmm.createShuffledArray( rng );
 
+    taskTree.newTask( "Creating shuffled array of bytes after files on partition" );
+    dmm.createShuffledArray( rng );
+    taskTree.endOfTask();
+
+    taskTree.endOfTask(); // Preparing to hide
+
+    taskTree.newTask( "Hiding files" );
 	for( const auto &file : filesToHide )
 	{
+        taskTree.newTask( "Hiding file: " + file );
+
 		if( !hideFile( file, rng, freeSpaceSize ) )
 			return false;
+
+        taskTree.endOfTask();
 	}
+    taskTree.endOfTask();
 
 	hideFileSize( 0 );
 
@@ -386,29 +417,37 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
                             const QStringList &filesToHide,
                             const QString &partitionDevPath )
 {
+    taskTree.newTask( "Checking paths on partition" );
 	if( !checkPaths( filesOnPartition ) )
-	{
-		LOG( INFO ) << "One or more path on partition isn't correct";
+    {
+        taskTree.taskFailed();
 		return false;
 	}
+    taskTree.taskSuccess();
 
+    taskTree.newTask( "Checking paths to hide" );
 	if( !checkPaths( filesToHide ) )
 	{
-		LOG( INFO ) << "One or more path to hide isn't correct";
+        taskTree.taskFailed();
 		return false;
 	}
+    taskTree.taskSuccess();
 
+    taskTree.newTask( "Checking partition path: ( " + partitionPath + " )" );
     if( !QFileInfo( partitionPath ).exists() )
 	{
-		LOG( INFO ) << "Partition path isn't correct";
+        taskTree.taskFailed( "Partition path isn't correct" );
 		return false;
 	}
+    taskTree.taskSuccess();
 
+    taskTree.newTask( "Checking partition device path: ( " + partitionDevPath + " )" );
     if( !QFileInfo(  partitionDevPath ).exists() )
 	{
-		LOG( INFO ) << "Partition device path isn't correct";
+        taskTree.taskFailed( "Partition device path isn't correct" );
 		return false;
 	}
+    taskTree.taskSuccess();
 
 	return true;
 }
@@ -448,8 +487,17 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
 bool FileHider::checkPaths( const QStringList &paths )
 {
 	for(const auto &path : paths)
+    {
+        taskTree.newTask( "Checking path: " + path );
+
         if( !QFileInfo( path ).exists() )
+        {
+            taskTree.taskFailed( "Path '" + path + "' isn't correct" );
 			return false;
+        }
+
+        taskTree.taskSuccess();
+    }
 
 	return true;
 }

@@ -34,6 +34,7 @@
 
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryManager.hpp>
+#include <TaskTree.hpp>
 
 namespace fs = boost::filesystem;
 using namespace boost::nowide;
@@ -57,6 +58,7 @@ private:
 
 	Fat32Manager fatManager;
     DistributedMemoryManager dmm;
+    TaskTree &taskTree;
 
     bool isPathsCorrect( const QStringList &paths, const QString &partitionPath );
     uint64_t getFilesSize( const QStringList &filesPaths );
@@ -107,7 +109,9 @@ private:
                      const QString &pathToStore );
 
 public:
-	FileHider() {}
+    FileHider( TaskTree &taskTree ) :
+        taskTree( taskTree )
+    {}
 	~FileHider() {}
 
     bool hideFiles( QStringList &filesOnPartition,
