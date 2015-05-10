@@ -296,7 +296,14 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 
 	if( sizeToHide > freeSpaceSize )
 	{
-		LOG( INFO ) << "Size to hide(" << sizeToHide << ") > free space after files(" << freeSpaceSize << "). Not enough space fo hide files";
+        QString reason( "Size to hide (");
+
+        reason += QString::number( sizeToHide );
+        reason += ") free space after files (";
+        reason += QString ::number( freeSpaceSize );
+        reason += "). Not enough space fo hide files";
+
+        taskTree.taskFailed( reason );
 		return false;
 	}
 
