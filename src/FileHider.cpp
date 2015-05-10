@@ -433,7 +433,7 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
 	}
     taskTree.taskSuccess();
 
-    taskTree.newTask( "Checking partition path: ( " + partitionPath + " )" );
+    taskTree.newTask( "Checking partition path: " + partitionPath );
     if( !QFileInfo( partitionPath ).exists() )
 	{
         taskTree.taskFailed( "Partition path isn't correct" );
@@ -441,7 +441,7 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
 	}
     taskTree.taskSuccess();
 
-    taskTree.newTask( "Checking partition device path: ( " + partitionDevPath + " )" );
+    taskTree.newTask( "Checking partition device path: " + partitionDevPath );
     if( !QFileInfo(  partitionDevPath ).exists() )
 	{
         taskTree.taskFailed( "Partition device path isn't correct" );
@@ -457,15 +457,19 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
                              const QString &partitionDevPath,
                              const QString &pathToStore )
 {
-	if( !checkPaths( filesOnPartition ) )
-	{
-		LOG( INFO ) << "One or more path on partition isn't correct";
-		return false;
-	}
 
+    taskTree.newTask( "Checking paths on partition" );
+    if( !checkPaths( filesOnPartition ) )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Checking path to store: " + pathToStore );
     if( !QFileInfo(  pathToStore ).exists() )
-	{
-		LOG( INFO ) << "Path to store isn't correct";
+    {
+        taskTree.taskFailed( "Path '");
 		return false;
 	}
 
@@ -488,16 +492,24 @@ bool FileHider::checkPaths( const QStringList &paths )
 {
 	for(const auto &path : paths)
     {
-        taskTree.newTask( "Checking path: " + path );
-
-        if( !QFileInfo( path ).exists() )
-        {
-            taskTree.taskFailed( "Path '" + path + "' isn't correct" );
-			return false;
-        }
-
-        taskTree.taskSuccess();
+        if( !checkPath( path ) )
+            return false;
     }
 
 	return true;
+}
+
+bool FileHider::checkPath( const QString &path )
+{
+    taskTree.newTask( "Checking path: " + path );
+
+    if( !QFileInfo( path ).exists() )
+    {
+        taskTree.taskFailed( "Path '" + path + "' isn't correct" );
+        return false;
+    }
+
+    taskTree.taskSuccess();
+
+    return true;
 }
