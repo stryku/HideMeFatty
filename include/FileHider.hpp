@@ -107,6 +107,7 @@ private:
                      const QString &partitionPath,
                      const QString &partitionDevPath,
                      const QString &pathToStore );
+    bool checkPath( const QString &path );
 
 public:
     FileHider( TaskTree &taskTree ) :
