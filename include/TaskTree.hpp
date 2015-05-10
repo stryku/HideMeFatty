@@ -67,7 +67,7 @@ public:
         Task topTask = tasksStack.top();
         QStandardItem *topItem = itemsStack.top();
 
-        topItem->setText( topTask.getNameWithTime() );
+        topItem->setText( topTask.getName() + " ( successfully done in " + topTask.getTimeAsQString() + " )" );
         topItem->setForeground( QBrush( Qt::darkGreen ) );
 
         tasksStack.pop();
