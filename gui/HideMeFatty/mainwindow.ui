@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -49,15 +49,15 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxHide">
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="hidingStep1">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -131,7 +131,7 @@
             <item row="2" column="1">
              <widget class="QPushButton" name="pushButtonHideDeleteFilesOnPartition">
               <property name="text">
-               <string>Delete selected</string>
+               <string>Remove selected</string>
               </property>
              </widget>
             </item>
@@ -181,7 +181,7 @@
             <item row="2" column="1">
              <widget class="QPushButton" name="pushButtonHideDeleteFilesToHide">
               <property name="text">
-               <string>Delete selected</string>
+               <string>Remove selected</string>
               </property>
              </widget>
             </item>
@@ -199,8 +199,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>148</width>
+             <height>129</height>
             </rect>
            </property>
            <attribute name="label">
@@ -238,8 +238,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
