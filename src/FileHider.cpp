@@ -306,11 +306,11 @@ bool FileHider::sizeTest( const QStringList &filesOnPartition,
     return true;
 }
 
-bool FileHider::mainPreparation( QStringList &filesOnPartition,
-                                 const QString &partitionPath,
-                                 const QStringList &filesToHide,
-                                 const QString &partitionDevPath,
-                                 bool needSizeTest = false )
+bool FileHider::prepareToHide( QStringList &filesOnPartition,
+                               const QString &partitionPath,
+                               const QStringList &filesToHide,
+                               const QString &partitionDevPath,
+                               bool needSizeTest = false )
 {
     uint64_t freeSpaceSize, sizeToHide;
     uint32_t seed;
@@ -378,11 +378,11 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 
     taskTree.newTask( "Preparing to hide" );
 
-    if( !mainPreparation( filesOnPartition,
-                          partitionPath,
-                          filesToHide,
-                          partitionDevPath,
-                          true ) )
+    if( !prepareToHide( filesOnPartition,
+                        partitionPath,
+                        filesToHide,
+                        partitionDevPath,
+                        true ) )
     {
         taskTree.taskFailed();
         return false;
