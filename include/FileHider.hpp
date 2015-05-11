@@ -1,12 +1,6 @@
 #ifndef _INCLUDE_FILEHIDER_HPP_
 #define _INCLUDE_FILEHIDER_HPP_
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-
-
 #include <easylogging++.h>
 
 #include <QString>
@@ -24,7 +18,6 @@
 #include <PreparatorToHide.hpp>
 #include <PreparatorToRestore.hpp>
 
-namespace fs = boost::filesystem;
 
 class FileHider
 {
