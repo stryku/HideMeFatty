@@ -450,6 +450,7 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
     QStringList preparedPaths;
     std::map<QString, size_t> restoredFiles;
 
+    taskTree.newTask( "Preparing to hide" );
 
     if( !PreparatorToRestore(filesOnPartition, partitionPath,
                         partitionDevPath,
@@ -458,8 +459,11 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
                         dmm,
                         fatManager ).prepare())
     {
+        taskTree.taskFailed();
         return false;
     }
+
+    taskTree.taskSuccess();
 
 
    /* if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
@@ -488,8 +492,11 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 
     dmm.createShuffledArray( seed );*/
 
+    taskTree.newTask( "Restoring files" );
     while( restoreMyFile( pathToStore, restoredFiles ) )
     {}
+
+    taskTree.taskSuccess();
 
     return true;
 }

@@ -25,6 +25,7 @@ private:
             taskTree.taskFailed();
             return false;
         }
+        taskTree.taskSuccess();
 
         taskTree.newTask( "Checking partition path: " + partitionPath );
         if( !checkPath( partitionPath )  )

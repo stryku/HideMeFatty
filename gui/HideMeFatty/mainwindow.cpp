@@ -200,16 +200,16 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
 
     FileHider fileHider( taskTreeRestore );
 
+    taskTreeRestore.newTask( "Restoring files" );
     if( fileHider.restoreMyFiles( filesOnPartition,
                                   partitionMediaPath,
                                   partitionDevPath,
                                   pathToStore ) )
     {
-        QMessageBox::information(this, "ok", "ok");
+        taskTreeRestore.taskSuccess();
     }
     else
     {
-        QMessageBox::information(this, "chuja", "chuja");
-
+        taskTreeRestore.taskFailed();
     }
 }
