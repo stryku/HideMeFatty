@@ -77,19 +77,11 @@ void MainWindow::addFilesToTable( EnumFileTable tableId,
                                   const QString &caption,
                                   const QString &dir )
 {
-    auto filePaths = QFileDialog::getOpenFileNames( this,
+    auto filesPaths = QFileDialog::getOpenFileNames( this,
                                                     caption,
                                                     dir );
 
-    for( const auto &filePath : filePaths )
-    {
-        QFile file( filePath );
-        if( file.open( QIODevice::ReadOnly ) && file.size() > 0 )
-        {
-            fileTables[tableId]->addFile( filePath );
-            file.close();
-        }
-    }
+    fileTables[tableId]->addFiles( filesPaths );
 }
 
 void MainWindow::on_addFilesOnPartitionButton_clicked()

@@ -33,6 +33,7 @@ public:
     bool canAdd( const QString &path ) const;
     virtual void fillColumns( const QString &path );
     void addFile( const QString &path );
+    void addFiles( const QStringList &paths );
     void init( QTableView *tableView );
     QStringList getFullPaths() const;
 };

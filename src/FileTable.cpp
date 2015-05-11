@@ -21,6 +21,10 @@ void FileTable::createModel()
 bool FileTable::canAdd( const QString &path ) const
 {
     auto rowCount = model->rowCount();
+    auto fileInfo = QFileInfo( path );
+
+    if( !fileInfo.exists() || fileInfo.size() == 0 )
+        return false;
 
     for( size_t i = 0; i < rowCount; ++i )
     {
@@ -54,6 +58,13 @@ void FileTable::addFile( const QString &path )
         return;
 
     fillColumns( path );
+}
+
+void FileTable::addFiles( const QStringList &paths )
+{
+    for( const auto &path : paths )
+        addFile( path );
+
 
     view->resizeColumnsToContents();
 }
