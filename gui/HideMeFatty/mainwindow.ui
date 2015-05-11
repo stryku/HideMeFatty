@@ -196,13 +196,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QProgressBar" name="progressBarHide">
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QTreeView" name="treeViewHideTasks"/>
             </item>
            </layout>
@@ -341,13 +334,6 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="2" column="0">
-             <widget class="QProgressBar" name="progressBarRestore">
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
              <widget class="QTreeView" name="treeViewRestoreTasks"/>
             </item>
             <item row="1" column="0">

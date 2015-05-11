@@ -14,9 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     initHideInfo();
     initFileTables();
     initTaskTrees();
-    ui->progressBarHide->setVisible( false );
-    ui->progressBarRestore->setVisible( false );
-
 }
 
 MainWindow::~MainWindow()
