@@ -37,7 +37,7 @@ void MainWindow::initPartitionsComboBoxes()
 void MainWindow::initTaskTrees()
 {
     taskTreeHide.init( ui->treeViewHideTasks );
-    taskTreeRestore.init( ui->treeViewHideTasks );
+    taskTreeRestore.init( ui->treeViewRestoreTasks );
 }
 
 void MainWindow::initFileTables()
@@ -198,7 +198,7 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
             partitionMediaPath = restoreSelectedPartition.mediaPath;
     auto pathToStore = ui->labelSelectedFolderToStore->text();
 
-    FileHider fileHider( taskTreeHide );
+    FileHider fileHider( taskTreeRestore );
 
     if( fileHider.restoreMyFiles( filesOnPartition,
                                   partitionMediaPath,
