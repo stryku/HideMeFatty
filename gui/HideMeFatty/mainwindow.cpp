@@ -96,6 +96,16 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
     size_t freeSpace;
     HideSectionFileTable *table;
 
+    if( ui->comboBoxHidePartitions->currentIndex() == 0 )
+    {
+        QMessageBox::information(
+               this,
+               tr("Go to step 1"),
+               tr("Please select partition in Step 1.") );
+
+        return;
+    }
+
     addFilesToTable( FILETABLE_HIDE_FILES_ON_PARTITION,
                      "Select files on partition",
                      hideSelectedPartition.mediaPath );
@@ -135,7 +145,21 @@ void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
         tablePtr = dynamic_cast< HideFilesOnPartitionTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() );
 
         hideSelectedPartition = validParitions[index - 1];
-        hideSelectedPartition.initClusterSize();
+
+        try
+        {
+            hideSelectedPartition.initClusterSize();
+        }
+        catch( const std::ios_base::failure& e )
+        {
+            QMessageBox::critical( this,
+                                   tr("Error has occured"),
+                                   tr("Did you forget to \"sudo chown\" partition device file?") );
+
+            ui->comboBoxHidePartitions->setCurrentIndex( 0 );
+
+            return;
+        }
 
         tablePtr->setFsClusterSize( hideSelectedPartition.clusterSize );
     }
@@ -148,6 +172,16 @@ void MainWindow::on_pushButtonStartHiding_clicked()
 
     auto partitionDevPath = hideSelectedPartition.devicePath,
             partitionMediaPath = hideSelectedPartition.mediaPath;
+
+    if( filesToHide.size() == 0 )
+    {
+        QMessageBox::information(
+               this,
+               tr("Nothing to hide"),
+               tr("Please select files to hide in Step 3") );
+
+        return;
+    }
 
     FileHider fileHider( taskTreeHide );
 
@@ -168,6 +202,16 @@ void MainWindow::on_pushButtonStartHiding_clicked()
 
 void MainWindow::on_pushButtonRestAddFilesOnPartition_clicked()
 {
+    if( ui->comboBoxRestPartitions->currentIndex() == 0 )
+    {
+        QMessageBox::information(
+               this,
+               tr("Go to step 1"),
+               tr("Please select partition in Step 1.") );
+
+        return;
+    }
+
     addFilesToTable( FILETABLE_RESTORE_FILES_ON_PARTITION,
                      "Select files",
                      restoreSelectedPartition.mediaPath );
@@ -195,6 +239,15 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
     auto partitionDevPath = restoreSelectedPartition.devicePath,
             partitionMediaPath = restoreSelectedPartition.mediaPath;
     auto pathToStore = ui->labelSelectedFolderToStore->text();
+
+    if( filesOnPartition.size() == 0 )
+    {
+        QMessageBox::information( this,
+                                  tr("Can't restore"),
+                                  tr("Please select files on partition behind which you hid files") );
+
+        return;
+    }
 
     FileHider fileHider( taskTreeRestore );
 

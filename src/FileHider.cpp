@@ -168,14 +168,20 @@ bool FileHider::hideFiles( QStringList &filesOnPartition,
 
     taskTree.newTask( "Preparing to hide" );
 
-    PreparatorToHide( filesOnPartition,
-                      partitionPath,
-                      partitionDevPath,
-                      filesToHide,
-                      taskTree,
-                      dmm,
-                      fatManager,
-                      sizeof( HiddenFileMetadata ) ).prepare();
+    PreparatorToHide preparator( filesOnPartition,
+                                 partitionPath,
+                                 partitionDevPath,
+                                 filesToHide,
+                                 taskTree,
+                                 dmm,
+                                 fatManager,
+                                 sizeof( HiddenFileMetadata ) );
+
+    if( !preparator.prepare() )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
 
     taskTree.taskSuccess();
 
@@ -204,12 +210,15 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 
     taskTree.newTask( "Preparing to hide" );
 
-    if( !PreparatorToRestore(filesOnPartition, partitionPath,
-                        partitionDevPath,
-                             pathToStore,
-                        taskTree,
-                        dmm,
-                        fatManager ).prepare())
+    PreparatorToRestore preparator( filesOnPartition,
+                                    partitionPath,
+                                    partitionDevPath,
+                                    pathToStore,
+                                    taskTree,
+                                    dmm,
+                                    fatManager );
+
+    if( !preparator.prepare() )
     {
         taskTree.taskFailed();
         return false;
