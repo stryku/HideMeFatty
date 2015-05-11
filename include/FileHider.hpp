@@ -1,25 +1,11 @@
 #ifndef _INCLUDE_FILEHIDER_HPP_
 #define _INCLUDE_FILEHIDER_HPP_
 
-#ifdef _MSC_VER
-// Crypto++ Library
-#ifdef _DEBUG
-#  pragma comment ( lib, "cryptlib" )
-#else
-#  pragma comment ( lib, "cryptlib" )
-#endif
-#endif
-
 #include <boost/filesystem/operations.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/nowide/fstream.hpp>
 
-#include <crypto++/sha.h>
-#include <crypto++/hex.h>
-#include <crypto++/files.h>
-#include <crypto++/base64.h>
 
 #include <easylogging++.h>
 
@@ -35,9 +21,10 @@
 #include <Fat32Manager.hpp>
 #include <DistributedMemoryManager.hpp>
 #include <TaskTree.hpp>
+#include <PreparatorToHide.hpp>
+#include <PreparatorToRestore.hpp>
 
 namespace fs = boost::filesystem;
-using namespace boost::nowide;
 
 class FileHider
 {
