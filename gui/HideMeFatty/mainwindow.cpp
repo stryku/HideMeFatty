@@ -114,8 +114,6 @@ void MainWindow::on_addFilesOnPartitionButton_clicked()
 
     freeSpace = table->getAcumulatedFirstColumn();
 
-    ui->labFreeSpace->setText( QString::number( freeSpace ) );
-
     ui->labFreeSpace->setText( "Total free space: " + QString::number( freeSpace ) );
 }
 
@@ -273,4 +271,23 @@ void MainWindow::on_pushButtonRefreshHidePartitions_clicked()
 void MainWindow::on_pushButtonRefreshRestorePartitions_clicked()
 {
     refreshPartitionsComboBoxes();
+}
+
+void MainWindow::deleteSelectedFromTable( EnumFileTable tableId )
+{
+    fileTables[tableId]->deleteSelected();
+}
+
+void MainWindow::on_pushButtonHideDeleteFilesOnPartition_clicked()
+{
+    size_t sizeToHide;
+    HideSectionFileTable *table;
+
+    table = dynamic_cast<HideSectionFileTable*>( fileTables[FILETABLE_HIDE_FILES_ON_PARTITION].get() );
+
+    table->deleteSelected();
+
+    sizeToHide = table->getAcumulatedFirstColumn();
+
+    ui->labFreeSpace->setText( "Total size to hide: " + QString::number( sizeToHide ) );
 }

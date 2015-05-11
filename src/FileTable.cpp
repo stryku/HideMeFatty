@@ -87,3 +87,24 @@ QStringList FileTable::getFullPaths() const
 
     return ret;
 }
+
+void FileTable::deleteSelected()
+{
+    QItemSelection selection( view->selectionModel()->selection() );
+
+    QList<int> rows;
+    foreach( const QModelIndex & index, selection.indexes() ) {
+       rows.append( index.row() );
+    }
+
+    qSort( rows );
+
+    int prev = -1;
+    for( int i = rows.count() - 1; i >= 0; i -= 1 ) {
+       int current = rows[i];
+       if( current != prev ) {
+          model->removeRows( current, 1 );
+          prev = current;
+       }
+    }
+}

@@ -36,6 +36,7 @@ public:
     void addFiles( const QStringList &paths );
     void init( QTableView *tableView );
     QStringList getFullPaths() const;
+    void deleteSelected();
 };
 
 #endif // _INCLUDE_FILESTABLE_HPP_

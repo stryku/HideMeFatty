@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -49,7 +49,7 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="toolBoxHide">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="hidingStep1">
            <property name="geometry">
@@ -107,31 +107,38 @@
             <string>Step 2: Select files on partition</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
-            <item row="2" column="0">
+            <item row="0" column="0" colspan="2">
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Selected files on partition</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
+            <item row="1" column="0" colspan="3">
+             <widget class="QTableView" name="tableViewHidFileOnPartition">
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
              <widget class="QLabel" name="labFreeSpace">
               <property name="text">
                <string>Total free space:</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="QPushButton" name="addFilesOnPartitionButton">
+            <item row="2" column="1">
+             <widget class="QPushButton" name="pushButtonHideDeleteFilesOnPartition">
               <property name="text">
-               <string>Add files on partition</string>
+               <string>Delete selected</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="QTableView" name="tableViewHidFileOnPartition">
-              <property name="showGrid">
-               <bool>false</bool>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="addFilesOnPartitionButton">
+              <property name="text">
+               <string>Add files on partition</string>
               </property>
              </widget>
             </item>
@@ -299,8 +306,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -335,8 +342,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>247</height>
+             <width>168</width>
+             <height>129</height>
             </rect>
            </property>
            <attribute name="label">

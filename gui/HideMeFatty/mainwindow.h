@@ -53,6 +53,8 @@ private slots:
 
     void on_pushButtonRefreshRestorePartitions_clicked();
 
+    void on_pushButtonHideDeleteFilesOnPartition_clicked();
+
 private:
     enum EnumFileTable
     {
@@ -79,6 +81,8 @@ private:
     void addFilesToTable( EnumFileTable tableId,
                           const QString &caption = QString(),
                           const QString &dir = QString() );
+    void deleteSelectedFromTable( EnumFileTable tableId );
+
     std::vector<PartitionInfo> getFat32Partitions();
 };
 
