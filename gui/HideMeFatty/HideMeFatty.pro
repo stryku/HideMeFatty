@@ -55,7 +55,8 @@ HEADERS  += mainwindow.h \
     ../../include/TaskTree.hpp \
     ../../include/Task.hpp \
     ../../include/Preparator.hpp \
-    ../../include/PreparatorToHide.hpp
+    ../../include/PreparatorToHide.hpp \
+    ../../include/PreparatorToRestore.hpp
 
 
 FORMS    += mainwindow.ui

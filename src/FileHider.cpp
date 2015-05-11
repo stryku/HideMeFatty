@@ -1,5 +1,6 @@
 #include <FileHider.hpp>
 #include <PreparatorToHide.hpp>
+#include <PreparatorToRestore.hpp>
 
 FileHider::HiddenFileMetadata::HiddenFileMetadata( )
 {
@@ -449,7 +450,19 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
     QStringList preparedPaths;
     std::map<QString, size_t> restoredFiles;
 
-    if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
+
+    if( !PreparatorToRestore(filesOnPartition, partitionPath,
+                        partitionDevPath,
+                             pathToStore,
+                        taskTree,
+                        dmm,
+                        fatManager ).prepare())
+    {
+        return false;
+    }
+
+
+   /* if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
         return false;
 
     std::sort( filesOnPartition.begin(),
@@ -473,7 +486,7 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
         return false;
     }
 
-    dmm.createShuffledArray( seed );
+    dmm.createShuffledArray( seed );*/
 
     while( restoreMyFile( pathToStore, restoredFiles ) )
     {}
