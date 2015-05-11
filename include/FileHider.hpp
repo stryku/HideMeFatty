@@ -1,8 +1,6 @@
 #ifndef _INCLUDE_FILEHIDER_HPP_
 #define _INCLUDE_FILEHIDER_HPP_
 
-#include <easylogging++.h>
-
 #include <QString>
 #include <QStringList>
 
