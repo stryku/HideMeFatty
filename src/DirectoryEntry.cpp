@@ -161,7 +161,9 @@ size_t DirectoryEntry::getCluster( ) const
 
 void DirectoryEntry::setCluster( size_t cluster )
 {
+    const size_t DIRECTORY_MAGIC = 0x10;
 	this->cluster = cluster;
+    attributes = DIRECTORY_MAGIC;
 }
 
 bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
