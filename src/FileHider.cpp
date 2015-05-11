@@ -1,84 +1,85 @@
 #include <FileHider.hpp>
+#include <PreparatorToHide.hpp>
 
 FileHider::HiddenFileMetadata::HiddenFileMetadata( )
 {
-	std::memset( this->fileName, '\0', maxFileName );
+    std::memset( this->fileName, '\0', maxFileName );
 }
 
 FileHider::HiddenFileMetadata::HiddenFileMetadata( const QString &fileName,
-													const uint64_t fileSize ) :
-													fileSize( fileSize )
+                                                    const uint64_t fileSize ) :
+                                                    fileSize( fileSize )
 {
-	std::memset( this->fileName, '\0', maxFileName );
+    std::memset( this->fileName, '\0', maxFileName );
     size_t size = fileName.toUtf8().size();
     std::memcpy( this->fileName, fileName.toUtf8(), size);
 }
 
 uint64_t FileHider::getFilesSize( const QStringList &filesPaths )
 {
-	uint64_t totalSize = 0;
+    uint64_t totalSize = 0;
 
-	for( const auto &file : filesPaths )
+    for( const auto &file : filesPaths )
         totalSize += QFileInfo( file ).size();
 
-	return totalSize;
+    return totalSize;
 }
 
 uint64_t FileHider::getSizeToHide( const QStringList &filesToHide )
 {
-	uint64_t size;
+    uint64_t size;
 
-	size = getFilesSize( filesToHide );
-	size += filesToHide.size( ) * sizeof( HiddenFileMetadata );
+    size = getFilesSize( filesToHide );
+    size += filesToHide.size( ) * sizeof( HiddenFileMetadata );
     size += sizeof( uint64_t ); // for last filesize 0
 
-	return size;
+    return size;
 }
 
 uint64_t FileHider::getFreeSpaceAfterFiles( const QStringList &filesOnPartition )
 {
-	uint64_t totalSize = 0;
+    uint64_t totalSize = 0;
 
-	for( const auto &file : filesOnPartition )
-		totalSize += fatManager.getFreeSpaceAfterFile( file );
+    for( const auto &file : filesOnPartition )
+        totalSize += fatManager.getFreeSpaceAfterFile( file );
 
-	return totalSize;
+    return totalSize;
 }
 
 uint32_t FileHider::getSeed( const QStringList &filesOnPartition )
 {
-	std::string stringSeed( "" ), stringHash( "" );
-	CryptoPP::SHA1 sha1;
-	std::stringstream ss;
-	uint32_t seed;
+    std::string stringSeed( "" ), stringHash( "" );
+    CryptoPP::SHA1 sha1;
+    std::stringstream ss;
+    uint32_t seed;
 
     taskTree.newTask( "Hashing files" );
 
-	for( const auto &file : filesOnPartition )
+    for( const auto &file : filesOnPartition )
         stringSeed += hashFile( file.toStdString() );
 
     taskTree.taskSuccess();
 
     taskTree.newTask( "Generating seed from hashs" );
 
-	CryptoPP::StringSource( stringSeed,
-							true,
-							new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringHash ) ) ) );
+    CryptoPP::StringSource( stringSeed,
+                            true,
+                            new CryptoPP::HashFilter( sha1, new CryptoPP::HexEncoder( new CryptoPP::StringSink( stringHash ) ) ) );
 
-	stringSeed = stringHash.substr( 0, 8 );
+    stringSeed = stringHash.substr( 0, 8 );
 
-	ss << std::hex << stringSeed;
-	ss >> seed;
+    ss << std::hex << stringSeed;
+    ss >> seed;
 
     taskTree.taskSuccess();
 
-	return seed;
+    return seed;
 }
 
 std::string FileHider::hashFile( const std::string &path )
 {
-	std::string result;
-	CryptoPP::SHA1 hash;
+    std::string result;
+    CryptoPP::SHA1 hash;
 
     taskTree.newTask( "Hashing file: " + QString::fromStdString( path ) );
 
@@ -89,14 +90,14 @@ std::string FileHider::hashFile( const std::string &path )
 
     taskTree.taskSuccess();
 
-	return result;
+    return result;
 }
 
 bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 {
-	std::vector<Fat32Manager::FreeSpaceChunk> chunks;
-	uint64_t startOffset;
-	char *mappedPtr;
+    std::vector<Fat32Manager::FreeSpaceChunk> chunks;
+    uint64_t startOffset;
+    char *mappedPtr;
 
     taskTree.newTask( "Calculating free spaces chunks" );
 
@@ -109,10 +110,10 @@ bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 
     mappedPtr = fatManager.mapChunks(chunks);
 
-	if( mappedPtr == nullptr )
+    if( mappedPtr == nullptr )
     {
         taskTree.taskFailed( "Mapping went wrong" );
-		return false;
+        return false;
     }
 
     taskTree.taskSuccess();
@@ -128,7 +129,7 @@ bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 
     taskTree.taskSuccess();
 
-	return true;
+    return true;
 }
 
 QStringList FileHider::preparePathsOnPartition( const QStringList &filesOnPartition,
@@ -140,39 +141,39 @@ QStringList FileHider::preparePathsOnPartition( const QStringList &filesOnPartit
     for( auto &path : filesOnPartition )
         preparedPaths.push_back( path.mid( partitionPathLength + 1 ) );
 
-	return preparedPaths;
+    return preparedPaths;
 }
 
 void FileHider::hideFileSize( const uint64_t &fileSize )
 {
-	const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
+    const char *fileSizePtr = reinterpret_cast<const char*>( &fileSize );
 
-	for( size_t i = 0; i < sizeof( uint64_t ); ++i )
+    for( size_t i = 0; i < sizeof( uint64_t ); ++i )
         dmm.nextShuffledByteRef() = fileSizePtr[i];
 }
 
 void FileHider::hideFileName( const char *fileName )
 {
-	const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
+    const char *fileNamePtr = reinterpret_cast<const char*>( fileName );
 
-	for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
+    for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
         dmm.nextShuffledByteRef() = fileNamePtr[i];
 }
 
 void FileHider::hideMetadata( const HiddenFileMetadata &metadata )
 {
-	hideFileSize( metadata.fileSize );
-	hideFileName( metadata.fileName );
+    hideFileSize( metadata.fileSize );
+    hideFileName( metadata.fileName );
 }
 
 void FileHider::hideFileContents( const QString &filePath )
 {
-	uint64_t fileSize;
+    uint64_t fileSize;
     std::ifstream file( filePath.toStdString(), std::ios::binary );
 
     fileSize = QFileInfo( filePath ).size();
 
-	for( size_t i = 0; i < fileSize; ++i )
+    for( size_t i = 0; i < fileSize; ++i )
         dmm.nextShuffledByteRef() = file.get();
 }
 
@@ -189,43 +190,43 @@ void FileHider::hideFile( const QString &filePath )
 
 uint64_t FileHider::restoreFileSize( )
 {
-	uint64_t fileSize;
+    uint64_t fileSize;
 
-	char *fileSizePtr = reinterpret_cast<char*>( &fileSize );
+    char *fileSizePtr = reinterpret_cast<char*>( &fileSize );
 
-	for( size_t i = 0; i < sizeof( uint64_t ); ++i )
+    for( size_t i = 0; i < sizeof( uint64_t ); ++i )
         fileSizePtr[i] = dmm.nextShuffledByteRef( );
 
-	return fileSize;
+    return fileSize;
 }
 
 void FileHider::restoreFileName( HiddenFileMetadata &metadata )
 {
-	char *fileNamePtr = reinterpret_cast<char*>( metadata.fileName );
+    char *fileNamePtr = reinterpret_cast<char*>( metadata.fileName );
 
-	for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
+    for( size_t i = 0; i < HiddenFileMetadata::maxFileName; ++i )
         fileNamePtr[i] = dmm.nextShuffledByteRef( );
 }
 
 FileHider::HiddenFileMetadata FileHider::restoreMetadata()
 {
-	HiddenFileMetadata metadata;
+    HiddenFileMetadata metadata;
 
-	metadata.fileSize = restoreFileSize();
+    metadata.fileSize = restoreFileSize();
 
 
-	if( metadata.fileSize == 0 )
-		return metadata;
+    if( metadata.fileSize == 0 )
+        return metadata;
 
-	restoreFileName( metadata );
+    restoreFileName( metadata );
 
-	return metadata;
+    return metadata;
 }
 
 void FileHider::restoreFile( std::ofstream &fileStream,
                              const HiddenFileMetadata &metadata )
 {
-	for( uint64_t i = 0; i < metadata.fileSize; ++i )
+    for( uint64_t i = 0; i < metadata.fileSize; ++i )
         fileStream.put( dmm.nextShuffledByteRef( ) );
 }
 
@@ -236,49 +237,49 @@ QString FileHider::preparePathToStore( const QString &pathToStore,
     QString extension, preparedPath;
     QFileInfo fileInfo( fileMetadata.fileName );
 
-	preparedPath = pathToStore + '/' + fileMetadata.fileName;
+    preparedPath = pathToStore + '/' + fileMetadata.fileName;
 
-	if( restoredFiles.find( fileMetadata.fileName ) == restoredFiles.end() )
-	{
+    if( restoredFiles.find( fileMetadata.fileName ) == restoredFiles.end() )
+    {
         restoredFiles.insert( std::pair<QString, size_t>
-							( fileMetadata.fileName, 0 ) );
-	}
-	else
-	{
-		restoredFiles[fileMetadata.fileName]++;
+                            ( fileMetadata.fileName, 0 ) );
+    }
+    else
+    {
+        restoredFiles[fileMetadata.fileName]++;
 
         extension = fileInfo.suffix();
         preparedPath = fileInfo.bundleName();
         preparedPath += " (" + QString::number( restoredFiles[fileMetadata.fileName] ) + ")." + extension;
-	}
+    }
 
-	return preparedPath;
+    return preparedPath;
 }
 
 bool FileHider::restoreMyFile( QString pathToStore,
                                 std::map<QString, size_t> &restoredFiles )
 {
-	HiddenFileMetadata fileMetadata;
-	std::ofstream fileStream;
+    HiddenFileMetadata fileMetadata;
+    std::ofstream fileStream;
 
     fileMetadata = restoreMetadata();
 
-	if( fileMetadata.fileSize == 0 )
-		return false;
+    if( fileMetadata.fileSize == 0 )
+        return false;
 
-	pathToStore = preparePathToStore( pathToStore, fileMetadata, restoredFiles );
+    pathToStore = preparePathToStore( pathToStore, fileMetadata, restoredFiles );
 
     fileStream.open( pathToStore.toStdString(), std::ios::binary );
 
     restoreFile( fileStream, fileMetadata );
 
-	return true;
+    return true;
 }
 
 bool FileHider::sizeTest( const QStringList &filesOnPartition,
-               const QStringList &filesToHide,
-               uint64_t &freeSpaceSize,
-               uint64_t &sizeToHide )
+                          const QStringList &filesToHide,
+                          uint64_t &freeSpaceSize,
+                          uint64_t &sizeToHide )
 {
     taskTree.newTask( "Calculating space after files on partition" );
     freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
@@ -306,23 +307,12 @@ bool FileHider::sizeTest( const QStringList &filesOnPartition,
     return true;
 }
 
-bool FileHider::prepareToHide( QStringList &filesOnPartition,
-                               const QString &partitionPath,
-                               const QStringList &filesToHide,
-                               const QString &partitionDevPath,
-                               bool needSizeTest = false )
+bool FileHider::commonPreparation( QStringList &filesOnPartition,
+                                   const QString &partitionPath,
+                                   const QString &partitionDevPath )
 {
-    uint64_t freeSpaceSize, sizeToHide;
     uint32_t seed;
     QStringList preparedPaths;
-
-    taskTree.newTask( "Checking if paths are correct" );
-    if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
-    {
-        taskTree.taskFailed();
-        return false;
-    }
-    taskTree.taskSuccess();
 
     taskTree.newTask( "Preparing paths on parition" );
     std::sort( filesOnPartition.begin( ),
@@ -338,17 +328,6 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
         return false;
     }
     taskTree.taskSuccess();
-
-    if( needSizeTest )
-    {
-       if( !sizeTest( filesOnPartition,
-                      filesToHide,
-                      freeSpaceSize,
-                      sizeToHide ) )
-       {
-           return false;
-       }
-    }
 
     taskTree.newTask( "Calculating seed to hash" );
     seed = getSeed( filesOnPartition );
@@ -369,40 +348,95 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
     return true;
 }
 
-bool FileHider::hideFiles( QStringList &filesOnPartition,
-                            const QString &partitionPath,
-                            const QStringList &filesToHide,
-                            const QString &partitionDevPath )
+bool FileHider::prepareToHide( QStringList &filesOnPartition,
+                               const QString &partitionPath,
+                               const QStringList &filesToHide,
+                               const QString &partitionDevPath )
 {
+    uint64_t freeSpaceSize, sizeToHide;
 
-
-    taskTree.newTask( "Preparing to hide" );
-
-    if( !prepareToHide( filesOnPartition,
-                        partitionPath,
-                        filesToHide,
-                        partitionDevPath,
-                        true ) )
+    taskTree.newTask( "Checking if paths are correct" );
+    if( !checkPaths( filesOnPartition, partitionPath, filesToHide, partitionDevPath ) )
     {
         taskTree.taskFailed();
         return false;
     }
-    taskTree.taskSuccess(); // Preparing to hide
+    taskTree.taskSuccess();
+
+    if( !sizeTest( filesOnPartition,
+                   filesToHide,
+                   freeSpaceSize,
+                   sizeToHide ) )
+    {
+        return false;
+    }
+
+    if( !commonPreparation( filesOnPartition,
+                            partitionPath,
+                            partitionDevPath ) )
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool FileHider::hideFiles( QStringList &filesOnPartition,
+                           const QString &partitionPath,
+                           const QStringList &filesToHide,
+                           const QString &partitionDevPath )
+{
+
+    taskTree.newTask( "Preparing to hide" );
+
+    PreparatorToHide( filesOnPartition,
+                      partitionPath,
+                      partitionDevPath,
+                      filesToHide,
+                      taskTree,
+                      dmm,
+                      fatManager,
+                      sizeof( HiddenFileMetadata ) ).prepare();
+
+    taskTree.taskSuccess();
 
     taskTree.newTask( "Hiding files" );
-	for( const auto &file : filesToHide )
-	{
+    for( const auto &file : filesToHide )
+    {
         taskTree.newTask( "Hiding file: " + file );
 
         hideFile( file );
 
         taskTree.taskSuccess();
-	}
+    }
     taskTree.taskSuccess();
 
-	hideFileSize( 0 );
 
-	return true;
+
+   /* if( !prepareToHide( filesOnPartition,
+                        partitionPath,
+                        filesToHide,
+                        partitionDevPath ) )
+    {
+        taskTree.taskFailed();
+        return false;
+    }
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Hiding files" );
+    for( const auto &file : filesToHide )
+    {
+        taskTree.newTask( "Hiding file: " + file );
+
+        hideFile( file );
+
+        taskTree.taskSuccess();
+    }
+    taskTree.taskSuccess();
+*/
+    hideFileSize( 0 );
+
+    return true;
 }
 
 bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
@@ -410,54 +444,54 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
                                  const QString &partitionDevPath,
                                  const QString &pathToStore )
 {
-	uint64_t freeSpaceSize;
+    uint64_t freeSpaceSize;
     uint32_t seed;
     QStringList preparedPaths;
     std::map<QString, size_t> restoredFiles;
 
-	if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
-		return false;
+    if( !checkPaths( filesOnPartition, partitionPath, partitionDevPath, pathToStore ) )
+        return false;
 
-	std::sort( filesOnPartition.begin(), 
-			   filesOnPartition.end() );
+    std::sort( filesOnPartition.begin(),
+               filesOnPartition.end() );
 
-	preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
+    preparedPaths = preparePathsOnPartition( filesOnPartition, partitionPath );
 
-	if( prepareFatManager( partitionDevPath ) == false )
-	{
-		LOG( INFO ) << "Fail preparing fat manager";
-		return false;
-	}
+    if( prepareFatManager( partitionDevPath ) == false )
+    {
+        LOG( INFO ) << "Fail preparing fat manager";
+        return false;
+    }
 
     freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
 
-	seed = getSeed( filesOnPartition );
+    seed = getSeed( filesOnPartition );
 
-	if( !mapFreeSpace( preparedPaths ) )
-	{
-		LOG( INFO ) << "Mapping free space after files went wrong";
-		return false;
-	}
+    if( !mapFreeSpace( preparedPaths ) )
+    {
+        LOG( INFO ) << "Mapping free space after files went wrong";
+        return false;
+    }
 
     dmm.createShuffledArray( seed );
 
     while( restoreMyFile( pathToStore, restoredFiles ) )
-	{}
+    {}
 
-	return true;
+    return true;
 }
 
 std::ostream& operator<<( std::ostream &out, const FileHider::HiddenFileMetadata &hfm )
 {
-	out << "File name = " << hfm.fileName << "\nFile size = " << hfm.fileSize;
+    out << "File name = " << hfm.fileName << "\nFile size = " << hfm.fileSize;
 
-	return out;
+    return out;
 }
 
 bool FileHider::prepareFatManager( const QString &partitionPath )
 {
-	fatManager.clear();
-	fatManager.setPartitionPath( partitionPath );
+    fatManager.clear();
+    fatManager.setPartitionPath( partitionPath );
 
     taskTree.newTask( "FAT32 manager init");
     fatManager.init();
@@ -477,7 +511,7 @@ bool FileHider::prepareFatManager( const QString &partitionPath )
     }
     taskTree.taskSuccess();
 
-	return true;
+    return true;
 }
 
 bool FileHider::checkPaths( const QStringList &filesOnPartition,
@@ -486,38 +520,38 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
                             const QString &partitionDevPath )
 {
     taskTree.newTask( "Checking paths on partition" );
-	if( !checkPaths( filesOnPartition ) )
+    if( !checkPaths( filesOnPartition ) )
     {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking paths to hide" );
-	if( !checkPaths( filesToHide ) )
-	{
+    if( !checkPaths( filesToHide ) )
+    {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking partition path: " + partitionPath );
     if( !checkPath( partitionPath )  )
-	{
+    {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
     taskTree.taskSuccess();
 
     taskTree.newTask( "Checking partition device path: " + partitionDevPath );
     if( !checkPath( partitionDevPath ) )
-	{
+    {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
     taskTree.taskSuccess();
 
-	return true;
+    return true;
 }
 
 bool FileHider::checkPaths( const QStringList &filesOnPartition,
@@ -538,8 +572,8 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
     if( !checkPath( pathToStore ) )
     {
         taskTree.taskFailed();
-		return false;
-	}
+        return false;
+    }
 
     taskTree.newTask( "Checking partition path: " + partitionPath );
     if( !checkPath( partitionPath )  )
@@ -557,18 +591,18 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
     }
     taskTree.taskSuccess();
 
-	return true;
+    return true;
 }
 
 bool FileHider::checkPaths( const QStringList &paths )
 {
-	for(const auto &path : paths)
+    for(const auto &path : paths)
     {
         if( !checkPath( path ) )
             return false;
     }
 
-	return true;
+    return true;
 }
 
 bool FileHider::checkPath( const QString &path )

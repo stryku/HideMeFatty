@@ -53,7 +53,9 @@ HEADERS  += mainwindow.h \
     ../../include/HideSectionFileTable.hpp \
     ../../include/DistributedMemoryManager.hpp \
     ../../include/TaskTree.hpp \
-    ../../include/Task.hpp
+    ../../include/Task.hpp \
+    ../../include/Preparator.hpp \
+    ../../include/PreparatorToHide.hpp
 
 
 FORMS    += mainwindow.ui

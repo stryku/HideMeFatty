@@ -234,6 +234,15 @@ QStringList Fat32Manager::getPathFoldersNames( QString path ) const
 
     path.truncate( path.lastIndexOf( "/" ) );
 
+    auto a = path.split( "/" );
+
+    for( auto &i : a )
+    {
+        int b = 22;
+        b +=2;
+        b++;
+    }
+
     return path.split( "/" );
 }
 
