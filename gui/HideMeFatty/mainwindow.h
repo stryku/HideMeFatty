@@ -39,7 +39,7 @@ private slots:
 
     void on_comboBoxHidePartitions_currentIndexChanged(int index);
 
-    void on_pushButton_3_clicked();
+    void on_pushButtonStartHiding_clicked();
 
     void on_pushButtonRestAddFilesOnPartition_clicked();
 

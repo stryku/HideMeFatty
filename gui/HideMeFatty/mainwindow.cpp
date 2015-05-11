@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     initHideInfo();
     initFileTables();
     initTaskTrees();
+    ui->progressBarHide->setVisible( false );
+    ui->progressBarRestore->setVisible( false );
 
 }
 
@@ -143,7 +145,7 @@ void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
     }
 }
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_pushButtonStartHiding_clicked()
 {
     auto filesOnPartition = fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->getFullPaths(),
             filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
