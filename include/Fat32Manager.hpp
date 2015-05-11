@@ -18,6 +18,19 @@ namespace fs = boost::filesystem;
 
 class Fat32Manager
 {
+public:
+    struct FreeSpaceChunk
+    {
+        uint64_t offset;
+        size_t size;
+
+        FreeSpaceChunk( ) {}
+        FreeSpaceChunk( uint64_t offset, size_t size );
+
+        bool operator< ( const FreeSpaceChunk &c ) const;
+        friend std::ostream& operator<< ( std::ostream&, FreeSpaceChunk const& );
+    };
+
 private:
 	static const size_t bootSectorSize = 512;
 	static const unsigned char DELETED_MAGIC = 0xE5;
@@ -64,6 +77,7 @@ private:
     QStringList getPathFoldersNames( QString path ) const;
     QString getPathFileName( const QString &path ) const;
 	size_t getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const;
+    FreeSpaceChunk getFreeSpaceChunk( const QString &file );
 	size_t getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const;
 	ClusterInfo getFileLastClusterInfo( const DirectoryEntry &fileDirEntry );
     size_t getFileFreeSpaceOffset( const DirectoryEntry &file );
@@ -77,17 +91,7 @@ private:
     DirectoryEntry findFile( const QString &path );
 	
 public:
-	struct FreeSpaceChunk
-	{
-		uint64_t offset;
-		size_t size;
 
-		FreeSpaceChunk( ) {}
-		FreeSpaceChunk( uint64_t offset, size_t size );
-
-		bool operator< ( const FreeSpaceChunk &c ) const;
-		friend std::ostream& operator<< ( std::ostream&, FreeSpaceChunk const& );
-	};
 
 	Fat32Manager();
     Fat32Manager( const QString &partitionPath );

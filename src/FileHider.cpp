@@ -98,19 +98,35 @@ bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 	uint64_t startOffset;
 	char *mappedPtr;
 
+    taskTree.newTask( "Calculating free spaces chunks" );
+
     chunks = fatManager.getSpacesAfterFiles( filesOnPartition );
 
-	dmm.clear();
+    taskTree.taskSuccess();
+
+
+    taskTree.newTask( "Mapping space after files" );
 
     mappedPtr = fatManager.mapChunks(chunks);
 
 	if( mappedPtr == nullptr )
+    {
+        taskTree.taskFailed( "Mapping went wrong" );
 		return false;
+    }
+
+    taskTree.taskSuccess();
 
     startOffset = std::min_element( chunks.begin( ), chunks.end( ) )->offset;
 
+    taskTree.newTask( "Adding free space chunks do distributed memory manager" );
+
+    dmm.clear();
+
     for( const auto &chunk : chunks )
         dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
+
+    taskTree.taskSuccess();
 
 	return true;
 }

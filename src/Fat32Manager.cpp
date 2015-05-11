@@ -411,21 +411,25 @@ char *Fat32Manager::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
     return mappedFileMngr.map( preparedOffset, preparedSize, true );
 }
 
+Fat32Manager::FreeSpaceChunk Fat32Manager::getFreeSpaceChunk( const QString &file )
+{
+
+    auto fileDirEntry = findFile( file );
+    size_t clusterNo = getFileLastClusterNo( fileDirEntry );
+    uint64_t startOffset = getClusterStartOffset( clusterNo ),
+             freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
+             freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
+
+    return FreeSpaceChunk( startOffset + freeSpaceOffset,
+                           freeSpace );
+}
+
 std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const QStringList &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
 
-	for( const auto &file : files )
-    {
-        auto fileDirEntry = findFile( file );
-        size_t clusterNo = getFileLastClusterNo( fileDirEntry );
-        uint64_t startOffset = getClusterStartOffset( clusterNo ),
-                 freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
-                 freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
-
-        chunks.push_back( FreeSpaceChunk( startOffset + freeSpaceOffset,
-                                          freeSpace ) );
-	}
+    for( const auto &file : files )
+        chunks.push_back( getFreeSpaceChunk( file ) );
 
 	return chunks;
 }
