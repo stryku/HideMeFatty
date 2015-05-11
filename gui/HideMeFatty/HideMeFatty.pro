@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     ../../src/PartitionInfo.cpp \
     ../../src/DistributedMemoryManager.cpp \
     ../../src/Task.cpp \
-    ../../src/Preparator.cpp
+    ../../src/Preparator.cpp \
+    ../../src/PreparatorToHide.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
