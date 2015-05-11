@@ -275,6 +275,37 @@ bool FileHider::restoreMyFile( QString pathToStore,
 	return true;
 }
 
+bool FileHider::sizeTest( const QStringList &filesOnPartition,
+               const QStringList &filesToHide,
+               uint64_t &freeSpaceSize,
+               uint64_t &sizeToHide )
+{
+    taskTree.newTask( "Calculating space after files on partition" );
+    freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Calculating size to hide" );
+    sizeToHide = getSizeToHide( filesToHide );
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Test: size to hide > free space after files" );
+    if( sizeToHide > freeSpaceSize )
+    {
+        QString reason( "Size to hide (");
+
+        reason += QString::number( sizeToHide );
+        reason += ") free space after files (";
+        reason += QString ::number( freeSpaceSize );
+        reason += "). Not enough space to hide files.";
+
+        taskTree.taskFailed( reason );
+        return false;
+    }
+    taskTree.taskSuccess();
+
+    return true;
+}
+
 bool FileHider::mainPreparation( QStringList &filesOnPartition,
                                  const QString &partitionPath,
                                  const QStringList &filesToHide,
@@ -310,28 +341,13 @@ bool FileHider::mainPreparation( QStringList &filesOnPartition,
 
     if( needSizeTest )
     {
-        taskTree.newTask( "Calculating space after files on partition" );
-        freeSpaceSize = getFreeSpaceAfterFiles( filesOnPartition );
-        taskTree.taskSuccess();
-
-        taskTree.newTask( "Calculating size to hide" );
-        sizeToHide = getSizeToHide( filesToHide );
-        taskTree.taskSuccess();
-
-        taskTree.newTask( "Test: size to hide > free space after files" );
-        if( sizeToHide > freeSpaceSize )
-        {
-            QString reason( "Size to hide (");
-
-            reason += QString::number( sizeToHide );
-            reason += ") free space after files (";
-            reason += QString ::number( freeSpaceSize );
-            reason += "). Not enough space to hide files.";
-
-            taskTree.taskFailed( reason );
-            return false;
-        }
-        taskTree.taskSuccess();
+       if( !sizeTest( filesOnPartition,
+                      filesToHide,
+                      freeSpaceSize,
+                      sizeToHide ) )
+       {
+           return false;
+       }
     }
 
     taskTree.newTask( "Calculating seed to hash" );
@@ -521,7 +537,7 @@ bool FileHider::checkPaths( const QStringList &filesOnPartition,
     taskTree.newTask( "Checking path to store: " + pathToStore );
     if( !checkPath( pathToStore ) )
     {
-        taskTree.taskFailed( "Path '");
+        taskTree.taskFailed();
 		return false;
 	}
 

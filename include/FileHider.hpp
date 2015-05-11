@@ -85,6 +85,11 @@ private:
     void hideFileContents( const QString &filePath );
     void hideFile( const QString &filePath );
 
+    bool sizeTest( const QStringList &filesOnPartition,
+                   const QStringList &filesToHide,
+                   uint64_t &freeSpaceSize,
+                   uint64_t &sizeToHide );
+
 	uint64_t restoreFileSize();
 	void restoreFileName( HiddenFileMetadata &metadata );
     HiddenFileMetadata restoreMetadata();
