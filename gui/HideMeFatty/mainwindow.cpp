@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    initPartitionsComboBoxes();
+    refreshPartitionsComboBoxes();
     initHideInfo();
     initFileTables();
     initTaskTrees();
@@ -21,9 +21,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initPartitionsComboBoxes()
+void MainWindow::refreshPartitionsComboBoxes()
 {
     auto partitions = getFat32Partitions();
+
+    ui->comboBoxHidePartitions->clear();
+    ui->comboBoxRestPartitions->clear();
+    validParitions.clear();
+
+    ui->comboBoxHidePartitions->addItem( "No partition selected" );
+    ui->comboBoxRestPartitions->addItem( "No partition selected" );
 
     for( const auto &i : partitions)
     {
@@ -203,4 +210,14 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
     {
         taskTreeRestore.taskFailed();
     }
+}
+
+void MainWindow::on_pushButtonRefreshHidePartitions_clicked()
+{
+    refreshPartitionsComboBoxes();
+}
+
+void MainWindow::on_pushButtonRefreshRestorePartitions_clicked()
+{
+    refreshPartitionsComboBoxes();
 }

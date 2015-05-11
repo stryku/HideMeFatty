@@ -49,6 +49,10 @@ private slots:
 
     void on_pushButtonRestoreFiles_clicked();
 
+    void on_pushButtonRefreshHidePartitions_clicked();
+
+    void on_pushButtonRefreshRestorePartitions_clicked();
+
 private:
     enum EnumFileTable
     {
@@ -67,7 +71,7 @@ private:
                   restoreSelectedPartition;
     TaskTree taskTreeHide, taskTreeRestore;
 
-    void initPartitionsComboBoxes();
+    void refreshPartitionsComboBoxes();
     void initFileTables();
     void initHideInfo();
     void initTaskTrees();
