@@ -36,7 +36,8 @@ SOURCES += main.cpp \
     ../../src/Task.cpp \
     ../../src/Preparator.cpp \
     ../../src/PreparatorToHide.cpp \
-    ../../src/PreparatorToRestore.cpp
+    ../../src/PreparatorToRestore.cpp \
+    ../../src/TaskTree.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 

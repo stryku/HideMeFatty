@@ -18,89 +18,23 @@ private:
     std::stack<Task> tasksStack;
     std::stack<QStandardItem*> itemsStack;
     
-    void createModel()
-    {
-        model = new QStandardItemModel( 0, 0 );
-    }
+    void createModel();
     
 public:
-    TaskTree()
-    {
-        createModel();
-    }
-    TaskTree( QTreeView *treeView ) :
-        view( treeView )
-    {
-        createModel();
-    }
+    TaskTree();
+    TaskTree( QTreeView *treeView );
 
     ~TaskTree() {}
 
-    void newTask( const QString &taskName )
-    {
-        QStandardItem *item = new QStandardItem( taskName + " ( in progress )" );
-        item->setEditable( false );
+    void newTask( const QString &taskName );
 
-        if( itemsStack.size() == 0 )
-            model->setItem( 0, 0, item );
-        else
-        {
-            auto topItem = itemsStack.top();
-            topItem->appendRow( item );
-        }
+    void init( QTreeView *treeView );
 
-        itemsStack.push( item );
-        tasksStack.push( Task( taskName ) );
-    }
+    void taskSuccess();
 
-    void init( QTreeView *treeView )
-    {
-        view = treeView;
-        createModel();
-        view->setModel( model );
-        view->header()->hide();
+    void taskFailed( const QString &reason = QString() );
 
-    }
-
-    void taskSuccess()
-    {
-        Task topTask = tasksStack.top();
-        QStandardItem *topItem = itemsStack.top();
-
-        topItem->setText( topTask.getName() + " ( successfully done in " + topTask.getTimeAsQString() + " )" );
-        topItem->setForeground( QBrush( Qt::darkGreen ) );
-
-        tasksStack.pop();
-        itemsStack.pop();
-    }
-
-    void taskFailed( const QString &reason = QString() )
-    {
-        Task topTask = tasksStack.top();
-        QStandardItem *topItem = itemsStack.top(),
-                      *item;
-
-        topItem->setText( topTask.getName() + " ( failed )" );
-        topItem->setForeground( QBrush( Qt::darkRed ) );
-
-        if( reason.length() > 0 )
-        {
-            item = new QStandardItem( reason );
-            item->setEditable( false );
-            topItem->appendRow( item );
-        }
-
-        tasksStack.pop();
-        itemsStack.pop();
-    }
-
-    void addInfo( const QString &info )
-    {
-        QStandardItem *topItem = itemsStack.top(),
-                      *item = new QStandardItem( info );
-
-        topItem->appendRow( item );
-    }
+    void addInfo( const QString &info );
 
 };
 
