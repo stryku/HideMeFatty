@@ -11,7 +11,6 @@ class Task
 private:
     static std::string defaultFormat;
 
-
     boost::timer::cpu_timer timer;
     QString taskName;
 
@@ -21,22 +20,9 @@ public:
         taskName( taskName )
     {}
 
-    QString getTimeAsQString() const
-    {
-        const uint16_t places = 3;
+    QString getTimeAsQString() const;
 
-        return QString::fromStdString( timer.format(places, defaultFormat ) );
-    }
-
-    QString getNameWithTime() const
-    {
-        return taskName + " " + getTimeAsQString();
-    }
-
-    QString getName() const
-    {
-        return taskName;
-    }
+    QString getName() const;
 };
 
 #endif //_INCLUDE_TASK_HPP_
