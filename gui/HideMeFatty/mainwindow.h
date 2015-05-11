@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QVector>
 #include <QFileDialog>
+#include <QLabel>
 
 #include <vector>
 #include <string>
@@ -55,6 +56,10 @@ private slots:
 
     void on_pushButtonHideDeleteFilesOnPartition_clicked();
 
+    void on_pushButtonHideDeleteFilesToHide_clicked();
+
+    void on_pushButtonRestoreFilesOnPartition_clicked();
+
 private:
     enum EnumFileTable
     {
@@ -81,7 +86,9 @@ private:
     void addFilesToTable( EnumFileTable tableId,
                           const QString &caption = QString(),
                           const QString &dir = QString() );
-    void deleteSelectedFromTable( EnumFileTable tableId );
+    void deleteFromHideSectionTable( EnumFileTable tableId,
+                                     QLabel *connectedLabel,
+                                     QString labelPrefix );
 
     std::vector<PartitionInfo> getFat32Partitions();
 };
