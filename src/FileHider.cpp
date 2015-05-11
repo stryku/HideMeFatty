@@ -52,8 +52,14 @@ uint32_t FileHider::getSeed( const QStringList &filesOnPartition )
 	std::stringstream ss;
 	uint32_t seed;
 
+    taskTree.newTask( "Hashing files" );
+
 	for( const auto &file : filesOnPartition )
         stringSeed += hashFile( file.toStdString() );
+
+    taskTree.taskSuccess();
+
+    taskTree.newTask( "Generating seed from hashs" );
 
 	CryptoPP::StringSource( stringSeed,
 							true,
@@ -64,6 +70,8 @@ uint32_t FileHider::getSeed( const QStringList &filesOnPartition )
 	ss << std::hex << stringSeed;
 	ss >> seed;
 
+    taskTree.taskSuccess();
+
 	return seed;
 }
 
@@ -71,9 +79,15 @@ std::string FileHider::hashFile( const std::string &path )
 {
 	std::string result;
 	CryptoPP::SHA1 hash;
-	CryptoPP::FileSource( path.c_str(), true,
-							new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
-							new CryptoPP::StringSink( result ), true ) ) );
+
+    taskTree.newTask( "Hashing file: " + QString::fromStdString( path ) );
+
+    CryptoPP::FileSource( path.c_str(),
+                          true,
+                          new CryptoPP::HashFilter( hash, new CryptoPP::HexEncoder(
+                          new CryptoPP::StringSink( result ), true ) ) );
+
+    taskTree.taskSuccess();
 
 	return result;
 }
@@ -94,7 +108,6 @@ bool FileHider::mapFreeSpace( const QStringList &filesOnPartition )
 		return false;
 
     startOffset = std::min_element( chunks.begin( ), chunks.end( ) )->offset;
-
 
     for( const auto &chunk : chunks )
         dmm.addMemoryChunk( mappedPtr + ( chunk.offset - startOffset ), chunk.size );
@@ -308,7 +321,7 @@ bool FileHider::prepareToHide( QStringList &filesOnPartition,
     taskTree.newTask( "Mapping space after files on partition" );
     if( !mapFreeSpace( preparedPaths ) )
     {
-        LOG( INFO ) << "Mapping free space after files went wrong";
+        taskTree.taskFailed();
         return false;
     }
     taskTree.taskSuccess();
