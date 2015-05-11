@@ -33,3 +33,19 @@ void PartitionInfo::initClusterSize()
             clusterSize = 0;
     }
 }
+
+bool PartitionInfo::isValidFat32()
+{
+    if( devicePath.length() == 0 )
+        return false;
+
+    Fat32Manager fatManager;
+
+    fatManager.setPartitionPath( devicePath );
+    fatManager.init();
+
+    if( !fatManager.good() )
+        return false;
+
+    return fatManager.isValidFat32();
+}

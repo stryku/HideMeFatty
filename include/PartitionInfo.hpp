@@ -19,6 +19,7 @@ struct PartitionInfo
     ~PartitionInfo() {}
 
     void initClusterSize();
+    bool isValidFat32();
 };
 
 #endif // _INCLUDE_PARTITIONINFO_HPP_

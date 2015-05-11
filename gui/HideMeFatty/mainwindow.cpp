@@ -180,21 +180,20 @@ void MainWindow::on_pushButtonStartHiding_clicked()
 
         return;
     }
-
-    FileHider fileHider( taskTreeHide );
-
-    taskTreeHide.newTask( "Hiding files" );
-    if( fileHider.hideFiles( filesOnPartition,
-                             partitionMediaPath,
-                             filesToHide,
-                             partitionDevPath ) )
-    {
-        taskTreeHide.taskSuccess();
-    }
     else
     {
-        taskTreeHide.taskFailed();
+        FileHider fileHider( taskTreeHide );
 
+        taskTreeHide.newTask( "Hiding files" );
+        if( fileHider.hideFiles( filesOnPartition,
+                                 partitionMediaPath,
+                                 filesToHide,
+                                 partitionDevPath ) )
+        {
+            taskTreeHide.taskSuccess();
+        }
+        else
+            taskTreeHide.taskFailed();
     }
 }
 
@@ -220,6 +219,26 @@ void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
     if( index > 0 )
     {
         restoreSelectedPartition = validParitions[index - 1];
+
+        try
+        {
+            if( !restoreSelectedPartition.isValidFat32() )
+            {
+                QMessageBox::critical( this,
+                                       tr("Error has occured"),
+                                       tr("On that partition there is no valid FAT32 filesystem.") );
+            }
+        }
+        catch( const std::ios_base::failure& e )
+        {
+            QMessageBox::critical( this,
+                                   tr("Error has occured"),
+                                   tr("Did you forget to \"sudo chown\" partition device file?") );
+
+            ui->comboBoxHidePartitions->setCurrentIndex( 0 );
+
+            return;
+        }
     }
 }
 
@@ -246,20 +265,20 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
 
         return;
     }
-
-    FileHider fileHider( taskTreeRestore );
-
-    taskTreeRestore.newTask( "Restoring files" );
-    if( fileHider.restoreMyFiles( filesOnPartition,
-                                  partitionMediaPath,
-                                  partitionDevPath,
-                                  pathToStore ) )
-    {
-        taskTreeRestore.taskSuccess();
-    }
     else
     {
-        taskTreeRestore.taskFailed();
+        FileHider fileHider( taskTreeRestore );
+
+        taskTreeRestore.newTask( "Restoring files" );
+        if( fileHider.restoreMyFiles( filesOnPartition,
+                                      partitionMediaPath,
+                                      partitionDevPath,
+                                      pathToStore ) )
+        {
+            taskTreeRestore.taskSuccess();
+        }
+        else
+            taskTreeRestore.taskFailed();
     }
 }
 
