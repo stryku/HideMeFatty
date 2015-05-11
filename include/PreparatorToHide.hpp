@@ -6,8 +6,8 @@
 class PreparatorToHide : public Preparator
 {
 private:
-    const QStringList &filesToHide;
     const size_t metadataSize;
+    const QStringList &filesToHide;
 
     uint64_t getFreeSpaceAfterFiles( const QStringList &filesPaths )
     {

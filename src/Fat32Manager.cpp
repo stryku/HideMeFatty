@@ -182,7 +182,8 @@ std::vector<FatRawLongFileName> Fat32Manager::extractLongFileNames( char *&ptrIn
 
 	longFileNamePtr = reinterpret_cast<FatRawLongFileName*>( ptrInCluster );
 
-	if( *ptrInCluster == 0 || *ptrInCluster == DELETED_MAGIC )
+    if( *ptrInCluster == 0 ||
+        *reinterpret_cast<uint8_t*>( ptrInCluster ) == DELETED_MAGIC )
 		return ret;
 
 	for( ; longFileNamePtr->attribute == LFN_ATTRIBUTE; ++longFileNamePtr )
@@ -233,15 +234,6 @@ QStringList Fat32Manager::getPathFoldersNames( QString path ) const
         return QStringList();
 
     path.truncate( path.lastIndexOf( "/" ) );
-
-    auto a = path.split( "/" );
-
-    for( auto &i : a )
-    {
-        int b = 22;
-        b +=2;
-        b++;
-    }
 
     return path.split( "/" );
 }

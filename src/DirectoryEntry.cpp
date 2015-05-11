@@ -114,7 +114,7 @@ inline Date DirectoryEntry::extractDate( const unsigned short int time, const un
 
 inline bool DirectoryEntry::extractIfDeleted( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	const char *ptr = reinterpret_cast<char*>( const_cast<FatRawDirectoryEntry*>( &rawDirEntry ) );
+    const uint8_t *ptr = reinterpret_cast<uint8_t*>( const_cast<FatRawDirectoryEntry*>( &rawDirEntry ) );
 
 	return *ptr == DELETED_MAGIC;
 }

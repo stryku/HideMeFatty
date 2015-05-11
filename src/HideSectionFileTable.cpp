@@ -18,7 +18,7 @@ size_t HideSectionFileTable::getAcumulatedFirstColumn()
     size_t ret = 0;
     auto rowCount = model->rowCount();
 
-    for(size_t i = 0; i < rowCount; ++i )
+    for( size_t i = 0; i < rowCount; ++i )
         ret += model->item( i, firstColumnIndex )->data( Qt::DisplayRole ).toUInt();
 
     return ret;
