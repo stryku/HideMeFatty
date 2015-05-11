@@ -6,9 +6,8 @@
 #include <sstream>
 #include <PartitionInfo.hpp>
 
-class PartitionFinder
+struct PartitionFinder
 {
-public:
     PartitionFinder() {}
     ~PartitionFinder() {}
 
