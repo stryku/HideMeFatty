@@ -263,16 +263,28 @@ bool FileHider::restoreMyFile( QString pathToStore,
     HiddenFileMetadata fileMetadata;
     std::ofstream fileStream;
 
+    taskTree.newTask( "Restoring file metadata" );
+
     fileMetadata = restoreMetadata();
 
     if( fileMetadata.fileSize == 0 )
+    {
+        taskTree.addInfo( "Detected end of files." );
+        taskTree.taskSuccess();
         return false;
+    }
+
+    taskTree.taskSuccess();
 
     pathToStore = preparePathToStore( pathToStore, fileMetadata, restoredFiles );
 
     fileStream.open( pathToStore.toStdString(), std::ios::binary );
 
+    taskTree.newTask( "Restoring file to: " + pathToStore );
+
     restoreFile( fileStream, fileMetadata );
+
+    taskTree.taskSuccess();
 
     return true;
 }
@@ -492,9 +504,19 @@ bool FileHider::restoreMyFiles( QStringList &filesOnPartition,
 
     dmm.createShuffledArray( seed );*/
 
+
     taskTree.newTask( "Restoring files" );
-    while( restoreMyFile( pathToStore, restoredFiles ) )
-    {}
+    while( true )
+    {
+        taskTree.newTask( "Restoring file" );
+        if( !restoreMyFile( pathToStore, restoredFiles ) )
+        {
+            taskTree.taskSuccess();
+            break;
+        }
+        taskTree.taskSuccess();
+    }
+
 
     taskTree.taskSuccess();
 

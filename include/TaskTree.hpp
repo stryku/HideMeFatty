@@ -94,6 +94,14 @@ public:
         itemsStack.pop();
     }
 
+    void addInfo( const QString &info )
+    {
+        QStandardItem *topItem = itemsStack.top(),
+                      *item = new QStandardItem( info );
+
+        topItem->appendRow( item );
+    }
+
 };
 
 #endif // _INCLUDE_TASKTREE_HPP_
