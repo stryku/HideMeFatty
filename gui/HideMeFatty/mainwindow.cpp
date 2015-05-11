@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     initPartitionsComboBoxes();
     initHideInfo();
     initFileTables();
-    taskTree.init( ui->treeViewHideTasks );
+    initTaskTrees();
+
 }
 
 MainWindow::~MainWindow()
@@ -31,6 +32,12 @@ void MainWindow::initPartitionsComboBoxes()
         ui->comboBoxRestPartitions->addItem( i.name );
         validParitions.push_back( i );
     }
+}
+
+void MainWindow::initTaskTrees()
+{
+    taskTreeHide.init( ui->treeViewHideTasks );
+    taskTreeRestore.init( ui->treeViewHideTasks );
 }
 
 void MainWindow::initFileTables()
@@ -144,19 +151,19 @@ void MainWindow::on_pushButton_3_clicked()
     auto partitionDevPath = hideSelectedPartition.devicePath,
             partitionMediaPath = hideSelectedPartition.mediaPath;
 
-    FileHider fileHider( taskTree );
+    FileHider fileHider( taskTreeHide );
 
-    taskTree.newTask( "Hiding files" );
+    taskTreeHide.newTask( "Hiding files" );
     if( fileHider.hideFiles( filesOnPartition,
                              partitionMediaPath,
                              filesToHide,
                              partitionDevPath ) )
     {
-        taskTree.taskSuccess();
+        taskTreeHide.taskSuccess();
     }
     else
     {
-        taskTree.taskFailed();
+        taskTreeHide.taskFailed();
 
     }
 }
@@ -191,7 +198,7 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
             partitionMediaPath = restoreSelectedPartition.mediaPath;
     auto pathToStore = ui->labelSelectedFolderToStore->text();
 
-    FileHider fileHider( taskTree );
+    FileHider fileHider( taskTreeHide );
 
     if( fileHider.restoreMyFiles( filesOnPartition,
                                   partitionMediaPath,

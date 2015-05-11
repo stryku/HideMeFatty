@@ -65,11 +65,12 @@ private:
     Fat32Manager fatManager;
     PartitionInfo hideSelectedPartition,
                   restoreSelectedPartition;
-    TaskTree taskTree;
+    TaskTree taskTreeHide, taskTreeRestore;
 
     void initPartitionsComboBoxes();
     void initFileTables();
     void initHideInfo();
+    void initTaskTrees();
 
     void addFilesToTable( EnumFileTable tableId,
                           const QString &caption = QString(),
