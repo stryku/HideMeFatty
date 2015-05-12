@@ -261,43 +261,24 @@ ClusterInfo Fat32Manager::getFileLastClusterInfo( const DirectoryEntry &fileDirE
 	return ret;
 }
 
-DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry )
-{
-	std::vector<DirectoryEntry> dirEntries;
-
-	dirEntries = getDirEntriesFromFolder( folderCluster );
-
-	auto it = dirEntries.begin( );
-
-	if( prevDirEntry.type( ) != BAD_DIR_ENTRY )
-		it = std::find( dirEntries.begin( ), dirEntries.end( ), prevDirEntry ) + 1;
-
-	if( it == dirEntries.end() )
-		return DirectoryEntry();
-	else
-		return *it;
-
-	return DirectoryEntry( );
-}
-
 DirectoryEntry Fat32Manager::findDirEntryInFolder( QString searchedDirEntryName, const size_t folderCluster )
 {
 	DirectoryEntry currentDirEntry;
     QString dirEntryName;
+    std::vector<DirectoryEntry> dirEntries;
 
     searchedDirEntryName = searchedDirEntryName.toUpper();
 
-	do
-	{
-        dirEntryName = currentDirEntry.getName( );
+    dirEntries = getDirEntriesFromFolder( folderCluster );
+
+    for( auto &dirEntry : dirEntries )
+    {
+        dirEntryName = dirEntry.getName();
         dirEntryName = dirEntryName.toUpper();
 
-		if( dirEntryName == searchedDirEntryName )
-			return currentDirEntry;
-
-		currentDirEntry = findNextDirEntry( folderCluster, currentDirEntry );
-
-	} while( currentDirEntry.type( ) != BAD_DIR_ENTRY );
+        if( dirEntryName == searchedDirEntryName )
+            return dirEntry;
+    }
 
 	return DirectoryEntry();
 }
