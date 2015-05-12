@@ -18,7 +18,7 @@ Hide Me Fatty is simple program that is able to hide files on the partition with
 Latest version is v1.0 <br /> That version is still in tests. If you have any problems with program I will be grateful for some details.
 
 ## Downloads
-Last release: https://github.com/stryku/HideMeFatty/releases/tag/v1.0
+Latest release: https://github.com/stryku/HideMeFatty/releases/tag/v1.0
 
 ## Before hide-and-seek
 There are things you must to know before using this program.<br />
