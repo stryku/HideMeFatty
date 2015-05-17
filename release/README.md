@@ -86,6 +86,14 @@ After hiding some files you can view/copy etc. files on partition after which yo
 ########################################################
 
 ########################################################
+﻿#              Usage - Running program                 #
+########################################################
+To run prorgam just type :
+
+cd /path/to/downloaded/HideMeFatty
+./start.run
+
+########################################################
 ﻿#                   Usage - Hiding                     #
 ########################################################
 
