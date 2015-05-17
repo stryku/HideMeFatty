@@ -13,7 +13,7 @@
 </pre>
 
 ## About
-Hide Me Fatty is simple program that is able to hide files on the partition with (for now only) FAT32 filesystem.
+Hide Me Fatty is simple program that is able to hide files on the partition with (for now only) FAT32 file system.
 
 ## Latest version
 Latest version is v1.0 <br /> That version is still in tests. If you have any problems with program I will be grateful for some details.
@@ -22,7 +22,7 @@ Latest version is v1.0 <br /> That version is still in tests. If you have any pr
 Latest release: https://github.com/stryku/HideMeFatty/releases/tag/v1.0
 
 ## Before hide-and-seek
-There are things you must to know before using this program.<br />
+There are things you must know before using this program.<br />
 ###Chown device file
 Before hiding or restoring files you must prepare partition device file. In this example, linux user name is "stryku" and device label i "HideMeFatty"
 
@@ -65,7 +65,7 @@ gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,user=stryku 0 0
 Now you can hide and restore files
 
 #But there is a warning!
-After hiding some files you can view/copy etc. files on partition after which you hid your files but you can't modify/remove them because you will lose hidded files.<br />
+After hiding some files you can view/copy etc. files on partition after which you hid your files but you can't modify/remove them because you will lose hided files.<br />
 
 ## Usage
 
@@ -81,10 +81,10 @@ cd /path/to/downloaded/HideMeFatty
 
 ### Hiding
 ####Step 1
-In this step you must select partition from list. In combobox will be partitions with walid FAT32 filesystem.
+In this step you must select partition from list. In combobox will be partitions with valid FAT32 file system.
 
 ####Step 2
-Next you must select files on partition after which you want to hide your files. Below the table you can see amount of free space where you can hide files. Total size of files + metadata can not be higher then that value.
+Next you must select files on partition after which you want to hide your files. Below the table you can see amount of free space where you can hide files. Total size of files + metadata can not be higher than that value.
 
 ####Step 3
 Here just select files you want to hide. Again, below the table you can see total size to hide (size of files + size of metada).
