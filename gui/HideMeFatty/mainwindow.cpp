@@ -263,6 +263,8 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
                                   tr("Can't restore"),
                                   tr("Please select files on partition behind which you hid files") );
 
+        ui->comboBoxRestPartitions->setCurrentIndex( 0 );
+
         return;
     }
     else
