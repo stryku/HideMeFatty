@@ -184,16 +184,23 @@ void MainWindow::on_pushButtonStartHiding_clicked()
     {
         FileHider fileHider( taskTreeHide );
 
+        ui->pushButtonStartHiding->setEnabled( false );
+        ui->pushButtonStartHiding->setText( "Hiding started. Please be patient..." );
+
         taskTreeHide.newTask( "Hiding files" );
         if( fileHider.hideFiles( filesOnPartition,
                                  partitionMediaPath,
                                  filesToHide,
                                  partitionDevPath ) )
         {
+
             taskTreeHide.taskSuccess();
         }
         else
             taskTreeHide.taskFailed();
+
+        ui->pushButtonStartHiding->setEnabled( true );
+        ui->pushButtonStartHiding->setText( "Start hiding" );
     }
 }
 
@@ -271,7 +278,11 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
     {
         FileHider fileHider( taskTreeRestore );
 
+        ui->pushButtonRestoreFiles->setEnabled( false );
+        ui->pushButtonRestoreFiles->setText( "Restoring started. Please be patient..." );
+
         taskTreeRestore.newTask( "Restoring files" );
+
         if( fileHider.restoreMyFiles( filesOnPartition,
                                       partitionMediaPath,
                                       partitionDevPath,
@@ -281,6 +292,9 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
         }
         else
             taskTreeRestore.taskFailed();
+
+        ui->pushButtonStartHiding->setEnabled( true );
+        ui->pushButtonStartHiding->setText( "Restore files" );
     }
 }
 
