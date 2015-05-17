@@ -240,3 +240,5 @@ Thumbs.db
 
 # Folder config file  
 Desktop.ini
+
+!release/
