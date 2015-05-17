@@ -7,6 +7,7 @@
 	<a href="#chown-device-file">Chown device file</a>
 	<a href="#but-there-is-a-warning">There is a warning!</a>
 <a href="#usage">Usage</a>
+	<a href="#running-program">Running program</a>
 	<a href="#hiding">Hiding example</a>
 	<a href="#restoring">Restoring example</a>
 </pre>
@@ -67,6 +68,16 @@ Now you can hide and restore files
 After hiding some files you can view/copy etc. files on partition after which you hid your files but you can't modify/remove them because you will lose hidded files.<br />
 
 ## Usage
+
+### Running program
+To run prorgam just type 
+<pre>
+<code>
+cd /path/to/downloaded/HideMeFatty
+./start.run
+</code>
+</pre>
+
 
 ### Hiding
 ####Step 1
