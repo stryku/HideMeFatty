@@ -1,0 +1,3 @@
+#!/bin/sh
+export QT_QPA_FONTDIR=`pwd`/fonts
+./HideMeFatty-v1.0

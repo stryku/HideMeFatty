@@ -5,15 +5,15 @@ DirectoryEntry::DirectoryEntry( ) :
 {}
 
 DirectoryEntry::DirectoryEntry( const std::vector<FatRawLongFileName> &longFileNames,
-				const FatRawDirectoryEntry &rawDirEntry ) :
-				attributes( BAD_DIR_ENTRY )
+								const FatRawDirectoryEntry &rawDirEntry ) :
+								attributes( BAD_DIR_ENTRY )
 {
 	assign( longFileNames, rawDirEntry );
 }
 
-inline std::string DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
+inline std::u16string DirectoryEntry::getPartOfName( const FatRawLongFileName &longFileName ) const
 {
-	std::string namePart;
+	std::u16string namePart;
 
 	for( size_t i = 0; i < 5; ++i )
 	{
@@ -42,9 +42,9 @@ inline std::string DirectoryEntry::getPartOfName( const FatRawLongFileName &long
 	return namePart;
 }
 
-inline std::string DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::u16string DirectoryEntry::extractExtension( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempExtension;
+	std::u16string tempExtension;
 
 	for( size_t i = 8; i < 11; ++i )
 	{
@@ -57,9 +57,9 @@ inline std::string DirectoryEntry::extractExtension( const FatRawDirectoryEntry 
 	return tempExtension;
 }
 
-inline std::string DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
+inline std::u16string DirectoryEntry::extractShortName( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempName, tempExtension;
+	std::u16string tempName, tempExtension;
 
 	for( size_t i = 0; i < 8; ++i )
 	{
@@ -80,10 +80,10 @@ inline std::string DirectoryEntry::extractShortName( const FatRawDirectoryEntry 
 	return tempName;
 }
 
-inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
+inline QString DirectoryEntry::extractName( const std::vector<FatRawLongFileName> &longFileNames,
 												 const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	std::string tempName;
+	std::u16string tempName;
 
 	if( longFileNames.size( ) == 0 )
 		tempName = extractShortName( rawDirEntry );
@@ -93,7 +93,8 @@ inline std::string DirectoryEntry::extractName( const std::vector<FatRawLongFile
 			tempName += getPartOfName( i );
 	}
 
-	return tempName;
+    return QString::fromUtf16( reinterpret_cast<const ushort*>( tempName.c_str() ) );
+		
 }
 
 inline Date DirectoryEntry::extractDate( const unsigned short int time, const unsigned short int date ) const
@@ -113,14 +114,18 @@ inline Date DirectoryEntry::extractDate( const unsigned short int time, const un
 
 inline bool DirectoryEntry::extractIfDeleted( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	const char *ptr = reinterpret_cast<char*>( const_cast<FatRawDirectoryEntry*>( &rawDirEntry ) );
+    const uint8_t *ptr = reinterpret_cast<uint8_t*>( const_cast<FatRawDirectoryEntry*>( &rawDirEntry ) );
 
 	return *ptr == DELETED_MAGIC;
 }
 
 inline size_t DirectoryEntry::extractCluster( const FatRawDirectoryEntry &rawDirEntry ) const
 {
-	return ( static_cast<uint32_t>( rawDirEntry.highCluster ) << 31 ) + rawDirEntry.lowCluster;
+    size_t high = rawDirEntry.highCluster;
+    high = high << 16;
+    high += rawDirEntry.lowCluster;
+    return high;
+    //return ( static_cast<uint32_t>( rawDirEntry.highCluster ) << 31 ) + rawDirEntry.lowCluster;
 }
 
 void DirectoryEntry::assign( const std::vector<FatRawLongFileName> &longFileNames, const FatRawDirectoryEntry &rawDirEntry )
@@ -139,7 +144,7 @@ EDirEntryType DirectoryEntry::type( ) const
 	return static_cast<EDirEntryType>( attributes );
 }
 
-std::string DirectoryEntry::getName( ) const
+QString DirectoryEntry::getName( ) const
 {
 	return name;
 }
@@ -156,7 +161,9 @@ size_t DirectoryEntry::getCluster( ) const
 
 void DirectoryEntry::setCluster( size_t cluster )
 {
+    const size_t DIRECTORY_MAGIC = 0x10;
 	this->cluster = cluster;
+    attributes = DIRECTORY_MAGIC;
 }
 
 bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
@@ -172,7 +179,7 @@ bool DirectoryEntry::operator==( const DirectoryEntry &de ) const
 std::ostream& operator<< ( std::ostream &out, const DirectoryEntry &de )
 {
 	out << std::dec;
-	out << "\nname = " << de.name.c_str() <</*TODO*/ \
+    out << "\nname = " << de.name.toStdString() << \
 		"\nfile size = " << de.fileSize << \
 		"\nattributes = 0x" << std::hex << static_cast<size_t>( de.attributes ) << \
 		"\ncluster = " << std::dec << de.cluster << \

@@ -18,12 +18,12 @@ private:
 
 	struct MappedChunk
 	{
-		uintmax_t begin, end;
+		uint64_t begin, end;
 		bool mapped;
 
 		MappedChunk();
 
-		bool inside( const uintmax_t offset, const uintmax_t size ) const;
+		bool inside( const uint64_t offset, const uint64_t size ) const;
 
 	} mappedChunkInfo;
 
@@ -34,15 +34,15 @@ private:
 
 private:
 
-	uintmax_t getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const;
-	uintmax_t getSizeForGranularity( const uintmax_t offset,
-									 const uintmax_t preparedOffset,
-									 uintmax_t size,
+	uint64_t getOffsetForGranularity( uint64_t offset, const size_t granularity ) const;
+	uint64_t getSizeForGranularity( const uint64_t offset,
+									 const uint64_t preparedOffset,
+									 uint64_t size,
 									 const size_t granularity) const;
 
-	void remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, bool hard );
+	void remapChunk( uint64_t startOffset, uint64_t sizeToMap, bool hard );
 
-	char* getUserPtr( uintmax_t startOffset );
+	char* getUserPtr( uint64_t startOffset );
 
 public:
 	MappedFileManager();
@@ -51,7 +51,7 @@ public:
 
 	void setFilePath( const fs::path &pathToFile );
 
-	char* map( uintmax_t startOffset = 0, uintmax_t sizeToMap = 0, bool hard = false );
+	char* map( uint64_t startOffset = 0, uint64_t sizeToMap = 0, bool hard = false );
 
 	void close();
 

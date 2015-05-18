@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Hide Me Fatty v1.0</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideMiddle</enum>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Hide files</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QToolBox" name="toolBoxHide">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="hidingStep1">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 1: Select partition</string>
+           </attribute>
+           <widget class="QSplitter" name="splitter">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>0</y>
+              <width>181</width>
+              <height>91</height>
+             </rect>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Select partition to hide on</string>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="comboBoxHidePartitions">
+             <item>
+              <property name="text">
+               <string>No partition selected</string>
+              </property>
+             </item>
+            </widget>
+            <widget class="QPushButton" name="pushButtonRefreshHidePartitions">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="hidingStep2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 2: Select files on partition</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0" colspan="2">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Selected files on partition</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="3">
+             <widget class="QTableView" name="tableViewHidFileOnPartition">
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labFreeSpace">
+              <property name="text">
+               <string>Total free space:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="pushButtonHideDeleteFilesOnPartition">
+              <property name="text">
+               <string>Remove selected</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="addFilesOnPartitionButton">
+              <property name="text">
+               <string>Add files on partition</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="hidingStep3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 3: Select files to hide</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Selected files to hide</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="3">
+             <widget class="QTableView" name="tableViewHideFilesToHide">
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labSizeToHide">
+              <property name="text">
+               <string>Total size to hide: </string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="pushButtonHideDeleteFilesToHide">
+              <property name="text">
+               <string>Remove selected</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Add files to hide</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="hidingStep4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 4: Hide files</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QPushButton" name="pushButtonStartHiding">
+              <property name="text">
+               <string>Start hiding files</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeView" name="treeViewHideTasks"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Restore files</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QToolBox" name="toolBoxRest">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="restoringStep1">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 1: Select partition</string>
+           </attribute>
+           <widget class="QSplitter" name="splitter_2">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>0</y>
+              <width>221</width>
+              <height>91</height>
+             </rect>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Select partition to restore from</string>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="comboBoxRestPartitions">
+             <item>
+              <property name="text">
+               <string>No partition selected</string>
+              </property>
+             </item>
+            </widget>
+            <widget class="QPushButton" name="pushButtonRefreshRestorePartitions">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="restoringStep2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>560</width>
+             <height>247</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 2: Select files on partition</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Files on partition</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QTableView" name="tableViewRestoreFilesOnPartition"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="pushButtonRestoreFilesOnPartition">
+              <property name="text">
+               <string>Remove selected</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="pushButtonRestAddFilesOnPartition">
+              <property name="text">
+               <string>Add files on partition</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="restoringStep3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>100</width>
+             <height>30</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 3: Select folder to store files</string>
+           </attribute>
+           <widget class="QSplitter" name="splitter_3">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>0</y>
+              <width>531</width>
+              <height>51</height>
+             </rect>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QPushButton" name="pushButtonSelectFolderToStore">
+             <property name="text">
+              <string>Select folder</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelSelectedFolderToStore">
+             <property name="text">
+              <string>Folder not selected</string>
+             </property>
+            </widget>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="restoringStep4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>168</width>
+             <height>129</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Step 4: Restore files</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="2" column="0">
+             <widget class="QTreeView" name="treeViewRestoreTasks"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pushButtonRestoreFiles">
+              <property name="text">
+               <string>Start restoring files</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -22,32 +22,30 @@ MappedFileManager::MappedChunk::MappedChunk() :
 	mapped( false )
 {}
 
-bool MappedFileManager::MappedChunk::inside( const uintmax_t offset, const uintmax_t size ) const
+bool MappedFileManager::MappedChunk::inside( const uint64_t offset, const uint64_t size ) const
 {
 	return offset >= begin && offset + size <= end;
 }
 
-
-uintmax_t MappedFileManager::getOffsetForGranularity( uintmax_t offset, const size_t granularity ) const
+uint64_t MappedFileManager::getOffsetForGranularity( uint64_t offset, const size_t granularity ) const
 {
-	offset = offset / granularity * granularity;
-	return offset;
+    return offset / granularity * granularity;;
 }
 
-uintmax_t MappedFileManager::getSizeForGranularity( const uintmax_t offset,
-													const uintmax_t preparedOffset,
-													uintmax_t size,
+uint64_t MappedFileManager::getSizeForGranularity( const uint64_t offset,
+													const uint64_t preparedOffset,
+													uint64_t size,
 													const size_t granularity) const
 {
 
-	uintmax_t calculatedSize = granularity + size - ( preparedOffset + granularity - offset );
+	uint64_t calculatedSize = granularity + size - ( preparedOffset + granularity - offset );
 
 	return ( calculatedSize < granularity ) ? granularity : calculatedSize;
 }
 
-void MappedFileManager::remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, bool hard )
+void MappedFileManager::remapChunk( uint64_t startOffset, uint64_t sizeToMap, bool hard )
 {
-	uintmax_t preparedOffset, preparedSize;
+	uint64_t preparedOffset, preparedSize;
 
 	if( !fs::exists( filePath ) )
 		return;
@@ -58,17 +56,17 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, 
 		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, allocationGranularity );
 	}
 	else
-	{
+    {
 		preparedOffset = getOffsetForGranularity( startOffset, allocationGranularity );
 		preparedOffset = getOffsetForGranularity( preparedOffset, mappingGranularity );
 		preparedSize = getSizeForGranularity( startOffset, preparedOffset, sizeToMap, mappingGranularity );
 	}
 
-	mappedFile.close();
+    mappedFile.close();
 
 	mappedFile.open( filePath,
 					 std::ios_base::in | std::ios_base::out,
-					 preparedSize,
+                     preparedSize,
 					 preparedOffset );
 
 	if( mappedFile.is_open() == false )
@@ -78,7 +76,7 @@ void MappedFileManager::remapChunk( uintmax_t startOffset, uintmax_t sizeToMap, 
 	}
 
 	mappedChunkInfo.begin = preparedOffset;
-	mappedChunkInfo.end = preparedOffset + preparedSize;
+    mappedChunkInfo.end = preparedOffset + preparedSize;
 	mappedChunkInfo.mapped = true;
 }
 
@@ -91,7 +89,7 @@ std::ostream& operator<<( std::ostream &out, const MappedFileManager::MappedChun
 	return out;
 }
 
-char* MappedFileManager::getUserPtr( uintmax_t startOffset )
+char* MappedFileManager::getUserPtr( uint64_t startOffset )
 {
 	char *preparedPtr;
 
@@ -107,17 +105,17 @@ void MappedFileManager::setFilePath( const fs::path &pathToFile )
 	filePath = pathToFile;
 }
 
-char* MappedFileManager::map( uintmax_t startOffset, uintmax_t sizeToMap, bool hard )
+char* MappedFileManager::map( uint64_t startOffset, uint64_t sizeToMap, bool hard )
 {
 	char *mappedPtr;
 
 	if( hard || !mappedChunkInfo.mapped || !mappedChunkInfo.inside( startOffset, sizeToMap ) )
-		remapChunk( startOffset, sizeToMap, hard );
+        remapChunk( startOffset, sizeToMap, hard );
 
 	if( mappedFile.is_open() == false )
 		return nullptr;
 
-	mappedPtr = getUserPtr( startOffset );
+    mappedPtr = getUserPtr( startOffset );
 
 	return mappedPtr;
 }

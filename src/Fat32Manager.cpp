@@ -1,4 +1,5 @@
 #include <Fat32Manager.hpp>
+#include <QDir>
 
 Fat32Manager::Fat32Manager( ) :
 	fatInfoLoaded( false ),
@@ -7,12 +8,12 @@ Fat32Manager::Fat32Manager( ) :
 	initOk( false )
 {}
 
-Fat32Manager::Fat32Manager( const std::string &partitionPath ) :
+Fat32Manager::Fat32Manager( const QString &partitionPath ) :
 	fatInfoLoaded( false ),
 	bootSectorLoaded( false ),
 	fatTableLoaded( false )
 {
-	mappedFileMngr.setFilePath( partitionPath );
+    mappedFileMngr.setFilePath( partitionPath.toStdString() );
 	initOk = _init();
 }
 
@@ -31,7 +32,7 @@ bool Fat32Manager::ClusterWithFreeSpace::operator>( const ClusterWithFreeSpace &
 	return clusterNo > c.clusterNo;
 }
 
-Fat32Manager::FreeSpaceChunk::FreeSpaceChunk( uintmax_t offset, size_t size ) :
+Fat32Manager::FreeSpaceChunk::FreeSpaceChunk( uint64_t offset, size_t size ) :
 	offset( offset ),
 	size( size )
 {}
@@ -104,6 +105,7 @@ bool Fat32Manager::loadBootSector( )
 
 	return true;
 }
+
 void Fat32Manager::loadFatInfo()
 {
 	if( fatInfoLoaded )
@@ -119,6 +121,7 @@ void Fat32Manager::loadFatInfo()
 
 	fatInfoLoaded = true;
 }
+
 bool Fat32Manager::loadFatTable()
 {
 	char *mappedPtr;
@@ -157,15 +160,17 @@ char* Fat32Manager::loadCluster( size_t clusterNo )
 	return mappedPtr;
 }
 
-inline size_t Fat32Manager::clusterSize( ) const
+size_t Fat32Manager::clusterSize( ) const
 {
 	return bootSector.bytes_per_sector * bootSector.sectors_per_cluster;
 }
+
 inline size_t Fat32Manager::getClusterFirstSectorNo( size_t clusterNo ) const
 {
 	return ( clusterNo - 2 ) * bootSector.sectors_per_cluster + fatInfo.first_data_sector;
 }
-inline uintmax_t Fat32Manager::getClusterStartOffset( size_t clusterNo ) const
+
+inline uint64_t Fat32Manager::getClusterStartOffset( size_t clusterNo ) const
 {
 	return getClusterFirstSectorNo( clusterNo ) * bootSector.bytes_per_sector;
 }
@@ -177,7 +182,8 @@ std::vector<FatRawLongFileName> Fat32Manager::extractLongFileNames( char *&ptrIn
 
 	longFileNamePtr = reinterpret_cast<FatRawLongFileName*>( ptrInCluster );
 
-	if( *ptrInCluster == 0 || *ptrInCluster == DELETED_MAGIC )
+    if( *ptrInCluster == 0 ||
+        *reinterpret_cast<uint8_t*>( ptrInCluster ) == DELETED_MAGIC )
 		return ret;
 
 	for( ; longFileNamePtr->attribute == LFN_ATTRIBUTE; ++longFileNamePtr )
@@ -186,16 +192,16 @@ std::vector<FatRawLongFileName> Fat32Manager::extractLongFileNames( char *&ptrIn
 	std::sort( ret.begin( ),
 			   ret.end( ),
 			   []( const FatRawLongFileName &a, const FatRawLongFileName &b )
-	{
-		return a.sequenceNumber < b.sequenceNumber;
-	} );
+                {
+                    return a.sequenceNumber < b.sequenceNumber;
+                } );
 
 	ptrInCluster = reinterpret_cast<char*>( longFileNamePtr );
 
 	return ret;
 }
 
-std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster )
+std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster ) const
 {
 	std::vector<size_t> chain;
 	size_t cluster = firstCluster;
@@ -204,96 +210,46 @@ std::vector<size_t> Fat32Manager::getClusterChain( size_t firstCluster )
 	{
 		chain.push_back( cluster );
 		cluster = fatTable[cluster];
-	} while( cluster <= lastClusterMagic );
+    } while( cluster < lastClusterMagic );
 
 	return chain;
 }
-std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromDirCluster( size_t dirCluster )
-{
-	std::vector<DirectoryEntry> dirEntries;
-	FatRawDirectoryEntry tempRawDirEntry;
-	std::vector<FatRawLongFileName> tempRawLongFileNames;
-	char *mappedClusterPtr, *endOfCluster;
 
-	mappedClusterPtr = loadCluster( dirCluster );
-
-	if( mappedClusterPtr == nullptr )
-		return dirEntries;
-
-	endOfCluster = mappedClusterPtr + clusterSize( );
-
-	while( true )
-	{
-		tempRawLongFileNames = extractLongFileNames( mappedClusterPtr );
-
-		if( mappedClusterPtr >= endOfCluster || *( static_cast<char*>( mappedClusterPtr ) ) == 0 )
-			break;
-
-		tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( mappedClusterPtr ) );
-
-		dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
-
-		mappedClusterPtr += sizeof( FatRawDirectoryEntry );
-	}
-
-	return dirEntries;
-}
 std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromFolder( size_t firstCluster )
 {
-	std::vector<size_t> clusterChain;
-	std::vector<DirectoryEntry> tmpDirEntries, dirEntries;
+    std::vector<size_t> clusterChain;
+    std::vector<char> rawFolder;
 
-	clusterChain = getClusterChain( firstCluster );
+    clusterChain = getClusterChain( firstCluster );
+    rawFolder = getRawFolder( clusterChain );
 
-	for( const auto &cluster : clusterChain )
-	{
-		tmpDirEntries = getDirEntriesFromDirCluster( cluster );
-		dirEntries.reserve( dirEntries.size( ) + tmpDirEntries.size( ) );
-		dirEntries.insert( dirEntries.end( ), tmpDirEntries.begin( ), tmpDirEntries.end( ) );
-	}
-
-	return dirEntries;
+    return getDirEntriesFromRawFolder( rawFolder );
 }
-StringVector Fat32Manager::getPathFoldersNames( const std::string &path ) const
+
+QStringList Fat32Manager::getPathFoldersNames( QString path ) const
 {
-	StringVector folders;
-	size_t posBegin = 0, posEnd, numberToCopy;
+    auto pos = path.lastIndexOf( "/" );
 
-	while( ( posEnd = path.find( '/', posBegin ) ) != std::string::npos )
-	{
-		numberToCopy = posEnd - posBegin;
-		folders.push_back( path.substr( posBegin, numberToCopy ) );
-		posBegin = posEnd + 1;
-	}
+    if( pos == -1 )
+        return QStringList();
 
-	return folders;
+    path.truncate( path.lastIndexOf( "/" ) );
+
+    return path.split( "/" );
 }
-std::string Fat32Manager::getPathFileName( const std::string &path ) const
-{
-	size_t pos = path.find_last_of( '/' );
 
-	pos = ( pos == std::string::npos ) ? 0 : pos + 1; // pos+1 to not copy '/' char
-
-	return path.substr( pos );
-}
 size_t Fat32Manager::getFreeSpaceAfterFile( const DirectoryEntry &fileDirEntry ) const
 {
 	return clusterSize( ) - ( fileDirEntry.getFileSize( ) % clusterSize( ) );
 }
+
 size_t Fat32Manager::getFileLastClusterNo( const DirectoryEntry &fileDirEntry ) const
 {
-	size_t currentClusterNo;
+    auto clustersChain = getClusterChain( fileDirEntry.getCluster() );
 
-	currentClusterNo = fileDirEntry.getCluster( );
-
-	while( true )
-	{
-		if( fatTable[currentClusterNo] >= lastClusterMagic )
-			return currentClusterNo;
-
-		currentClusterNo = fatTable[currentClusterNo];
-	}
+    return clustersChain.back();
 }
+
 ClusterInfo Fat32Manager::getFileLastClusterInfo( const DirectoryEntry &fileDirEntry )
 {
 	ClusterInfo ret;
@@ -305,68 +261,67 @@ ClusterInfo Fat32Manager::getFileLastClusterInfo( const DirectoryEntry &fileDirE
 	return ret;
 }
 
-DirectoryEntry Fat32Manager::findNextDirEntry( size_t folderCluster, const DirectoryEntry &prevDirEntry )
-{
-	std::vector<DirectoryEntry> dirEntries;
-
-	dirEntries = getDirEntriesFromFolder( folderCluster );
-
-	auto it = dirEntries.begin( );
-
-	if( prevDirEntry.type( ) != BAD_DIR_ENTRY )
-		it = std::find( dirEntries.begin( ), dirEntries.end( ), prevDirEntry ) + 1;
-
-	if( it == dirEntries.end() )
-		return DirectoryEntry();
-	else
-		return *it;
-
-	return DirectoryEntry( );
-}
-DirectoryEntry Fat32Manager::findDirEntryInFolder( std::string searchedDirEntryName, const size_t folderCluster )
+DirectoryEntry Fat32Manager::findDirEntryInFolder( QString searchedDirEntryName, const size_t folderCluster )
 {
 	DirectoryEntry currentDirEntry;
-	std::string dirEntryName;
+    QString dirEntryName;
+    std::vector<DirectoryEntry> dirEntries;
 
-	boost::to_upper( searchedDirEntryName );
+    searchedDirEntryName = searchedDirEntryName.toUpper();
 
-	do
-	{
-		dirEntryName = currentDirEntry.getName( );
-		boost::to_upper( dirEntryName );
+    dirEntries = getDirEntriesFromFolder( folderCluster );
 
-		if( dirEntryName == searchedDirEntryName )
-			return currentDirEntry;
+    for( auto &dirEntry : dirEntries )
+    {
+        dirEntryName = dirEntry.getName();
+        dirEntryName = dirEntryName.toUpper();
 
-		currentDirEntry = findNextDirEntry( folderCluster, currentDirEntry );
-
-	} while( currentDirEntry.type( ) != BAD_DIR_ENTRY );
+        if( dirEntryName == searchedDirEntryName )
+            return dirEntry;
+    }
 
 	return DirectoryEntry();
 }
-DirectoryEntry Fat32Manager::findFile( const std::string &path )
+
+DirectoryEntry Fat32Manager::getFileParentFolder( const QString &path )
 {
-	StringVector foldersNames;
-	std::string fileName;
-	DirectoryEntry currentFolder, foundFile;
+    DirectoryEntry currentFolder;
+    QStringList foldersNames;
 
-	foldersNames = getPathFoldersNames( path );
-	fileName = getPathFileName( path );
+    foldersNames = getPathFoldersNames( path );
 
-	currentFolder.setCluster( fat32ExtBS.root_cluster );
+    currentFolder.setCluster( fat32ExtBS.root_cluster );
 
-	for( const auto &folderName : foldersNames )
-	{
-		currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+    for( const auto &folderName : foldersNames )
+    {
+        if(folderName.length() == 0)
+            break;
 
-		if( currentFolder.type() == BAD_DIR_ENTRY )
-			return DirectoryEntry();
-	}
+        currentFolder = findDirEntryInFolder( folderName, currentFolder.getCluster( ) );
+
+        if( currentFolder.type() == BAD_DIR_ENTRY )
+            return DirectoryEntry();
+    }
+
+    return currentFolder;
+}
+
+DirectoryEntry Fat32Manager::findFile( const QString &path )
+{
+    QString fileName;
+    DirectoryEntry parentFolder, foundFile;
+
+    fileName = path.split( "/" ).back();
 
 	if( fileName.length() == 0 )
 		return DirectoryEntry();
 
-	foundFile = findDirEntryInFolder( fileName, currentFolder.getCluster( ) );
+    parentFolder = getFileParentFolder( path );
+
+    if( parentFolder.type() == BAD_DIR_ENTRY )
+        return DirectoryEntry();
+
+    foundFile = findDirEntryInFolder( fileName, parentFolder.getCluster( ) );
 
 	if( foundFile.type() == BAD_DIR_ENTRY )
 		return DirectoryEntry();
@@ -374,9 +329,9 @@ DirectoryEntry Fat32Manager::findFile( const std::string &path )
 	return foundFile;
 }
 
-void Fat32Manager::setPartitionPath( const fs::path &partitionPath )
+void Fat32Manager::setPartitionPath( const QString &partitionPath )
 {
-	mappedFileMngr.setFilePath( partitionPath );
+    mappedFileMngr.setFilePath( partitionPath.toStdString() );
 }
 
 bool Fat32Manager::isValidFat32()
@@ -392,13 +347,6 @@ void Fat32Manager::close()
 	mappedFileMngr.close();
 }
 
-bool Fat32Manager::isPathCorrect( const std::string &path )
-{
-	bool isCorrect = findFile( path ).type() != BAD_DIR_ENTRY;
-
-	return isCorrect;
-}
-
 EFatType Fat32Manager::getFatType()
 {
 	if( fatInfo.total_clusters < 4085 )
@@ -412,16 +360,12 @@ EFatType Fat32Manager::getFatType()
 	}
 }
 
-size_t Fat32Manager::getFreeSpaceAfterFile( const std::string &path )
+size_t Fat32Manager::getFreeSpaceAfterFile( const QString &path )
 {
-	DirectoryEntry file;
-
-	file = findFile( path );
-
-	return getFreeSpaceAfterFile( file );
+    return AdvancedFileInfo( path, clusterSize() ).freeSpaceAfterFile;
 }
 
-size_t Fat32Manager::getFileLastClusterNo( const std::string &path )
+size_t Fat32Manager::getFileLastClusterNo( const QString &path )
 {
 	DirectoryEntry file;
 
@@ -430,49 +374,96 @@ size_t Fat32Manager::getFileLastClusterNo( const std::string &path )
 	return getFileLastClusterNo( file );
 }
 
-size_t Fat32Manager::getFileFreeSpaceOffset( const std::string &path )
+size_t Fat32Manager::getFileFreeSpaceOffset( const DirectoryEntry &file )
 {
-	DirectoryEntry file;
-
-	file = findFile( path );
-
-	return file.getFileSize() % clusterSize();
+    return file.getFileSize() % clusterSize();
 }
 
-std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const StringVector &files )
+char *Fat32Manager::mapChunks( std::vector<Fat32Manager::FreeSpaceChunk> chunks)
+{
+    uint64_t preparedOffset, preparedSize;
+    Fat32Manager::FreeSpaceChunk firstCluster, lastCluster;
+
+    firstCluster = *( std::min_element( chunks.begin(), chunks.end() ) );
+    lastCluster = *( std::max_element( chunks.begin(), chunks.end() ) );
+
+    preparedOffset = firstCluster.offset;
+    preparedSize = lastCluster.offset + lastCluster.size - preparedOffset;
+
+    return mappedFileMngr.map( preparedOffset, preparedSize, true );
+}
+
+Fat32Manager::FreeSpaceChunk Fat32Manager::getFreeSpaceChunk( const QString &file )
+{
+
+    auto fileDirEntry = findFile( file );
+    size_t clusterNo = getFileLastClusterNo( fileDirEntry );
+    uint64_t startOffset = getClusterStartOffset( clusterNo ),
+             freeSpace = getFreeSpaceAfterFile( fileDirEntry ),
+             freeSpaceOffset = getFileFreeSpaceOffset( fileDirEntry );
+
+    return FreeSpaceChunk( startOffset + freeSpaceOffset,
+                           freeSpace );
+}
+
+std::vector<Fat32Manager::FreeSpaceChunk> Fat32Manager::getSpacesAfterFiles( const QStringList &files )
 {
 	std::vector<FreeSpaceChunk> chunks;
 
-	for( const auto &file : files )
-	{
-		size_t clusterNo = getFileLastClusterNo( file );
-
-		chunks.push_back( FreeSpaceChunk(   getClusterStartOffset( clusterNo ) + getFileFreeSpaceOffset( file ) ,
-											getFreeSpaceAfterFile( file ) ) );
-	}
+    for( const auto &file : files )
+        chunks.push_back( getFreeSpaceChunk( file ) );
 
 	return chunks;
 }
 
-char* Fat32Manager::mapSpaceAfterFiles( const StringVector &files )
+std::vector<char> Fat32Manager::getRawFolder( const std::vector<size_t> &folderClusterChain )
 {
-	std::vector<ClusterWithFreeSpace> clusters;
-	uintmax_t preparedOffset, preparedSize;
-	ClusterWithFreeSpace firstCluster, lastCluster;
+    std::vector<char> ret;
+    size_t size;
+    char *rawPtr, *mappedClusterPtr;
 
-	for( const auto &file : files )
-	{
-		clusters.push_back( ClusterWithFreeSpace( getFileLastClusterNo( file ),
-			getFileFreeSpaceOffset( file ) ) );
-	}
+    size = folderClusterChain.size() * clusterSize();
 
-	firstCluster = *std::min_element( clusters.begin(), clusters.end() );
-	lastCluster = *std::max_element( clusters.begin(), clusters.end() );
+    ret.resize( size );
 
-	preparedOffset = getClusterStartOffset( firstCluster.clusterNo ) + firstCluster.freeSpaceOffset;
-	preparedSize = getClusterStartOffset( lastCluster.clusterNo + 1 ) - preparedOffset;
+    rawPtr = ret.data();
 
-	return mappedFileMngr.map( preparedOffset, preparedSize, true );
+    for( const auto &clusterNo : folderClusterChain )
+    {
+        mappedClusterPtr = loadCluster( clusterNo );
+
+        std::memcpy( rawPtr, mappedClusterPtr, clusterSize() );
+        rawPtr += clusterSize();
+    }
+
+    return ret;
+}
+
+std::vector<DirectoryEntry> Fat32Manager::getDirEntriesFromRawFolder( std::vector<char> &rawFolder )
+{
+    std::vector<DirectoryEntry> dirEntries;
+    FatRawDirectoryEntry tempRawDirEntry;
+    std::vector<FatRawLongFileName> tempRawLongFileNames;
+    char *rawPtr, *endOfFolder;
+
+    endOfFolder = rawFolder.data() + rawFolder.size();
+    rawPtr = rawFolder.data();
+
+    while( true )
+    {
+        tempRawLongFileNames = extractLongFileNames( rawPtr );
+
+        if( rawPtr >= endOfFolder || *rawPtr == 0 )
+            break;
+
+        tempRawDirEntry = *( reinterpret_cast<FatRawDirectoryEntry*>( rawPtr ) );
+
+        dirEntries.push_back( DirectoryEntry( tempRawLongFileNames, tempRawDirEntry ) );
+
+        rawPtr += sizeof( FatRawDirectoryEntry );
+    }
+
+    return dirEntries;
 }
 
 std::ostream& operator<<( std::ostream &out, const std::vector<Fat32Manager::FreeSpaceChunk> &v )

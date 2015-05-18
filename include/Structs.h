@@ -1,6 +1,10 @@
 #ifndef _INCLUDE_STRUCTS_
 #define _INCLUDE_STRUCTS_
 
+#include <string>
+#include <sstream>
+#include <QFileInfo>
+
 struct Date
 {
 	size_t second,
@@ -44,6 +48,29 @@ struct ClusterInfo
 	size_t clusterNo,
 	freeBytes,
 	freeBytesOffset;
+};
+
+
+struct AdvancedFileInfo
+{
+    size_t freeSpaceAfterFile;
+    QFileInfo basicInfo;
+
+    void init( const QFile &file, const size_t fsClusterSize )
+    {
+        basicInfo = QFileInfo( file );
+        freeSpaceAfterFile = fsClusterSize - ( basicInfo.size() % fsClusterSize );
+    }
+
+    AdvancedFileInfo() {}
+    AdvancedFileInfo( const QFile &file, const size_t fsClusterSize )
+    {
+        init( file, fsClusterSize );
+    }
+    AdvancedFileInfo( const QString &path, const size_t fsClusterSize )
+    {
+        init( QFile( path ), fsClusterSize );
+    }
 };
 
 #endif

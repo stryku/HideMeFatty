@@ -8,6 +8,10 @@ hmf/*
 czasomierz/
 czasomierz/*
 cbp2make*
+gui/build*
+!gui/HideMeFatty
+*.autosave
+*.user
 
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -237,3 +241,5 @@ Thumbs.db
 
 # Folder config file  
 Desktop.ini
+
+!release/
