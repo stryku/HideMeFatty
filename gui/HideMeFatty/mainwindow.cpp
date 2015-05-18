@@ -265,9 +265,6 @@ bool MainWindow::restoreFiles()
 
     FileHider fileHider( taskTreeRestore );
 
-    ui->pushButtonRestoreFiles->setEnabled( false );
-    ui->pushButtonRestoreFiles->setText( "Restoring started. Please be patient..." );
-
     return fileHider.restoreMyFiles( filesOnPartition,
                                      partitionMediaPath,
                                      partitionDevPath,
