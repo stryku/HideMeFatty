@@ -194,18 +194,12 @@ void MainWindow::on_pushButtonStartHiding_clicked()
     }
     else
     {
-        ui->pushButtonStartHiding->setEnabled( false );
-        ui->pushButtonStartHiding->setText( "Hiding started. Please be patient..." );
-
         taskTreeHide.newTask( "Hiding files" );
 
         if( hideFiles() )
             taskTreeHide.taskSuccess();
         else
             taskTreeHide.taskFailed();
-
-        ui->pushButtonStartHiding->setEnabled( true );
-        ui->pushButtonStartHiding->setText( "Start hiding" );
     }
 }
 
@@ -297,18 +291,12 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
     }
     else
     {
-        ui->pushButtonRestoreFiles->setEnabled( false );
-        ui->pushButtonRestoreFiles->setText( "Restoring started. Please be patient..." );
-
         taskTreeRestore.newTask( "Restoring files" );
 
         if( restoreFiles() )
             taskTreeRestore.taskSuccess();
         else
             taskTreeRestore.taskFailed();
-
-        ui->pushButtonStartHiding->setEnabled( true );
-        ui->pushButtonStartHiding->setText( "Restore files" );
     }
 }
 
