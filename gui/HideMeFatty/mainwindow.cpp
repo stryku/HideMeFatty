@@ -247,7 +247,7 @@ void MainWindow::on_comboBoxRestPartitions_currentIndexChanged(int index)
                                    tr("Error has occured"),
                                    tr("Did you forget to \"sudo chown\" partition device file?") );
 
-            ui->comboBoxHidePartitions->setCurrentIndex( 0 );
+            ui->comboBoxRestPartitions->setCurrentIndex( 0 );
 
             return;
         }
