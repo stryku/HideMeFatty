@@ -91,6 +91,9 @@ private:
                                      QString labelPrefix );
 
     std::vector<PartitionInfo> getFat32Partitions();
+
+    bool hideFiles();
+    bool restoreFiles();
 };
 
 #endif // MAINWINDOW_H

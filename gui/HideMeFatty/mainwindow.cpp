@@ -163,13 +163,25 @@ void MainWindow::on_comboBoxHidePartitions_currentIndexChanged(int index)
     }
 }
 
-void MainWindow::on_pushButtonStartHiding_clicked()
+bool MainWindow::hideFiles()
 {
     auto filesOnPartition = fileTables[FILETABLE_HIDE_FILES_ON_PARTITION]->getFullPaths(),
             filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
 
     auto partitionDevPath = hideSelectedPartition.devicePath,
             partitionMediaPath = hideSelectedPartition.mediaPath;
+
+    FileHider fileHider( taskTreeHide );
+
+    return fileHider.hideFiles( filesOnPartition,
+                                partitionMediaPath,
+                                filesToHide,
+                                partitionDevPath );
+}
+
+void MainWindow::on_pushButtonStartHiding_clicked()
+{
+    auto filesToHide = fileTables[FILETABLE_FILES_TO_HIDE]->getFullPaths();
 
     if( filesToHide.size() == 0 )
     {
@@ -182,20 +194,13 @@ void MainWindow::on_pushButtonStartHiding_clicked()
     }
     else
     {
-        FileHider fileHider( taskTreeHide );
-
         ui->pushButtonStartHiding->setEnabled( false );
         ui->pushButtonStartHiding->setText( "Hiding started. Please be patient..." );
 
         taskTreeHide.newTask( "Hiding files" );
-        if( fileHider.hideFiles( filesOnPartition,
-                                 partitionMediaPath,
-                                 filesToHide,
-                                 partitionDevPath ) )
-        {
 
+        if( hideFiles() )
             taskTreeHide.taskSuccess();
-        }
         else
             taskTreeHide.taskFailed();
 
@@ -256,13 +261,29 @@ void MainWindow::on_pushButtonSelectFolderToStore_clicked()
     ui->labelSelectedFolderToStore->setText( selectedFolder );
 }
 
-void MainWindow::on_pushButtonRestoreFiles_clicked()
+bool MainWindow::restoreFiles()
 {
     auto filesOnPartition = fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->getFullPaths();
 
     auto partitionDevPath = restoreSelectedPartition.devicePath,
             partitionMediaPath = restoreSelectedPartition.mediaPath;
     auto pathToStore = ui->labelSelectedFolderToStore->text();
+
+    FileHider fileHider( taskTreeRestore );
+
+    ui->pushButtonRestoreFiles->setEnabled( false );
+    ui->pushButtonRestoreFiles->setText( "Restoring started. Please be patient..." );
+
+    return fileHider.restoreMyFiles( filesOnPartition,
+                                     partitionMediaPath,
+                                     partitionDevPath,
+                                     pathToStore );
+
+}
+
+void MainWindow::on_pushButtonRestoreFiles_clicked()
+{
+    auto filesOnPartition = fileTables[FILETABLE_RESTORE_FILES_ON_PARTITION]->getFullPaths();
 
     if( filesOnPartition.size() == 0 )
     {
@@ -276,20 +297,13 @@ void MainWindow::on_pushButtonRestoreFiles_clicked()
     }
     else
     {
-        FileHider fileHider( taskTreeRestore );
-
         ui->pushButtonRestoreFiles->setEnabled( false );
         ui->pushButtonRestoreFiles->setText( "Restoring started. Please be patient..." );
 
         taskTreeRestore.newTask( "Restoring files" );
 
-        if( fileHider.restoreMyFiles( filesOnPartition,
-                                      partitionMediaPath,
-                                      partitionDevPath,
-                                      pathToStore ) )
-        {
+        if( restoreFiles() )
             taskTreeRestore.taskSuccess();
-        }
         else
             taskTreeRestore.taskFailed();
 

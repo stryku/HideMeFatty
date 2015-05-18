@@ -11,6 +11,7 @@ cbp2make*
 gui/build*
 !gui/HideMeFatty
 *.autosave
+*.user
 
 
 ## Ignore Visual Studio temporary files, build results, and

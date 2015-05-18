@@ -69,3 +69,28 @@ OTHER_FILES += \
     ../../TODO.txt
 
 CONFIG += static
+
+INCLUDEPATH += $$PWD/../../../../../libraries/boost/lib/static
+DEPENDPATH += $$PWD/../../../../../libraries/boost/lib/static
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lboost_filesystem
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libboost_filesystem.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lboost_iostreams
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libboost_iostreams.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lboost_system
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libboost_system.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lboost_timer
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libboost_timer.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lcrypto++
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libcrypto++.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../libraries/boost/lib/static/ -lboost_chrono
+
+INCLUDEPATH += $$PWD/../../../../../libraries/boost/lib/static
+DEPENDPATH += $$PWD/../../../../../libraries/boost/lib/static
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../libraries/boost/lib/static/libboost_chrono.a
