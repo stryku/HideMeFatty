@@ -26,7 +26,7 @@ There are things you must know before using this program.<br />
 
 ###Chown device file
 Before hiding or restoring files you must prepare partition device file. In this example, linux user name is "stryku" and device label i "HideMeFatty"
->>>>>>> nextVersion
+
 
 Follow this steps:
 <pre>
