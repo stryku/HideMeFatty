@@ -99,7 +99,7 @@ cd /path/to/downloaded/HideMeFatty
 
 Step 1
 
-In this step you must select partition from list. In combobox will be partitions with walid FAT32 filesystem.
+In this step you must select partition from list. In combobox will be partitions with valid FAT32 filesystem.
 
 Step 2
 
